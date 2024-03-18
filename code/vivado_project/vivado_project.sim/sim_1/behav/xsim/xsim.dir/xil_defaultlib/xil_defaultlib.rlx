@@ -1,0 +1,9 @@
+0.6
+2017.4
+Dec 15 2017
+21:07:18
+D:/Desktop/Computer organization/MineCPU/code/cpu_core/ImmGen.sv,1710743533,systemVerilog,,D:/Desktop/Computer organization/MineCPU/code/sim/ImmGenSim.sv,,ImmGen,,xil_defaultlib,D:/Vivado/2017.4/data/xilinx_vip/include,,,,,
+D:/Desktop/Computer organization/MineCPU/code/cpu_core/InstMem.sv,1708358705,systemVerilog,,,,InstMem,,xil_defaultlib,D:/Vivado/2017.4/data/xilinx_vip/include,,,,,
+D:/Desktop/Computer organization/MineCPU/code/sim/ImmGenSim.sv,1710748425,systemVerilog,,,,ImmGenSim,,xil_defaultlib,D:/Vivado/2017.4/data/xilinx_vip/include,,,,,
+D:/Desktop/Computer organization/MineCPU/code/vivado_project/vivado_project.sim/sim_1/behav/xsim/glbl.v,1513215259,verilog,,,,glbl,,xil_defaultlib,,,,,,
+D:/Desktop/Computer organization/MineCPU/code/vivado_project/vivado_project.srcs/sources_1/ip/progrom/sim/progrom.v,1708356910,verilog,,,,progrom,,xil_defaultlib,D:/Vivado/2017.4/data/xilinx_vip/include,,,,,

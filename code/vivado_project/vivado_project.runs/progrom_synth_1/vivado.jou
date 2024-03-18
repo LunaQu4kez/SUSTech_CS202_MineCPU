@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:55:39 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Mon Feb 19 23:35:13 2024
+# Process ID: 15680
+# Current directory: D:/Desktop/Computer organization/MineCPU/code/vivado_project/vivado_project.runs/progrom_synth_1
+# Command line: vivado.exe -log progrom.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source progrom.tcl
+# Log file: D:/Desktop/Computer organization/MineCPU/code/vivado_project/vivado_project.runs/progrom_synth_1/progrom.vds
+# Journal file: D:/Desktop/Computer organization/MineCPU/code/vivado_project/vivado_project.runs/progrom_synth_1\vivado.jou
+#-----------------------------------------------------------
+source progrom.tcl -notrace

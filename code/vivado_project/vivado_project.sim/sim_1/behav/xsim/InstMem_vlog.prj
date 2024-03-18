@@ -1,0 +1,12 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "D:/Vivado/2017.4/data/xilinx_vip/include" \
+"../../../../vivado_project.srcs/sources_1/ip/progrom/sim/progrom.v" \
+
+sv xil_defaultlib  --include "D:/Vivado/2017.4/data/xilinx_vip/include" \
+"../../../../../cpu_core/InstMem.sv" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

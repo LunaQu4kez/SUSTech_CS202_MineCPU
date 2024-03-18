@@ -1,0 +1,16 @@
+<mxfile host="Electron" modified="2024-02-20T06:21:10.566Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="cqlMXE_oyVCruTW9dtZS" version="22.1.2" type="device">
+  <diagram name="第 1 页" id="0rYRHhfyeYts_oOujGHw">
+    <mxGraphModel dx="1276" dy="614" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="0sDvLEXe0sxFgGh2yJfL-1" value="InstMem" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="310" width="170" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="0sDvLEXe0sxFgGh2yJfL-2" value="PC" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="300" width="50" height="150" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
