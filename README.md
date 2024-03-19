@@ -15,13 +15,13 @@ MineCPU
 ├── code                                              
 │   ├── assembly               # assembly code
 │   ├── constrain
-│       └── cons.xdc           # constrain file
+│   │   └── cons.xdc           # constrain file
 │   ├── cpu_core
-│       └── *.sv               # code of CPU core
+│   │   └── *.sv               # code of CPU core
 │   ├── io
-│       └── *.sv               # code related to IO
+│   │   └── *.sv               # code related to IO
 │   ├── sim
-│       └── *.sv               # code related to simulation
+│   │   └── *.sv               # code related to simulation
 │   ├── vivado_project         # vivado project, including ip core
 │   └── Top.v                  # top module of MineCPU
 ├── docs
