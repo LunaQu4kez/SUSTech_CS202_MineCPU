@@ -1,9 +1,9 @@
-module CPURegister (
-    input               clk, rst,
-    input [4:0]         read_reg_1, read_reg_2, write_reg,
-    input [31:0]        write_data,
-    input               RegWrite,
-    output reg [31:0]   read_data_1, read_data_2
+module RegisterFile (
+    input             clk, rst,
+    input      [4:0]  read_reg_1, read_reg_2, write_reg,
+    input      [31:0] write_data,
+    input             RegWrite,
+    output reg [31:0] read_data_1, read_data_2
 );
     
     reg [31:0] regs [31:0];
