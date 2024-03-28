@@ -1,4 +1,0 @@
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "D:/Desktop/Computer organization/MineCPU/code/cpu_core/ImmGen.sv" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module ImmGen
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "D:/Desktop/Computer organization/MineCPU/code/sim/ImmGenSim.sv" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module ImmGenSim
