@@ -4,7 +4,7 @@ module ALU (
     input  logic [`DATA_WID ] src1,
     input  logic [`DATA_WID ] src2,
     input  logic [`ALUOP_WID] ALU_op,
-    output logic [`DATA_WID ] result,
+    output logic [`DATA_WID ] result
 );
     always_comb begin
         unique case (ALU_op)
@@ -19,6 +19,7 @@ module ALU (
         `ALU_SLT:  result = ($signed(src1) < $signed(src2)) ? 1 : 0;
        `ALU_SLTU:  result = (src1 < src2) ? 1 : 0;
          default:  result = 0;
+        endcase
     end
 
 endmodule

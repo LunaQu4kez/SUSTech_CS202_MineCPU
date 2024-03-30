@@ -1,4 +1,4 @@
-module ImmGenSim ();
+module ImmGen_Sim ();
 
 reg [31:0] in;
 wire [31:0] out;
