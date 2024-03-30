@@ -1,10 +1,20 @@
-# CS202 Course Project: MineCPU
+<div align=center>
 
-这是 2024 春季 CS202 计算机组成原理的课程 Project
+# SUSTech CS202 Course Project: MineCPU
+
+萨斯泰克2024春季`CS202 计算机组成原理`的课程Project 标准五级流水线RISC-V CPU
+
+</div>
+
+## 功能
+
+管他**，能跑再说...
 
 ## 小组成员及分工
 
-zz，cb，ysy
+ - [**zz**](https://github.com/wLUOw)
+ - [**ysy**](https://github.com/Yao1OoO)
+ - [**cb** ~~电灯泡~~](https://github.com/chanbengz)
 
 分工先略...
 
@@ -12,22 +22,24 @@ zz，cb，ysy
 
 ```
 MineCPU
-├── code                                              
-│   ├── assembly               # assembly code
+├── sources                                              
+│   ├── assembly               # program embedded for fun
 │   ├── constrain
-│   │   └── cons.xdc           # constrain file
-│   ├── cpu_core
+│   │   └── constr.xdc         # constrain file
+│   ├── core
 │   │   └── *.sv               # code of CPU core
 │   ├── io
 │   │   └── *.sv               # code related to IO
 │   ├── sim
-│   │   └── *.sv               # code related to simulation
-│   ├── vivado_project         # vivado project, including ip core
+│   │   └── *.cpp              # verilator simulation
 │   └── Top.v                  # top module of MineCPU
 ├── docs
 │   ├── Report.md              # report of this project
-│   └── Others
-├── pic
+│   ├── riscv-card.pdf         # ISA reference
+│   └── cpu.*                  # design draft
+├── test
+│   ├── difftest.cpp           # differential test of CPU
+│   └── Others                 # other tests
 ├── .gitignore
 ├── LICENSE
 └── README.md
