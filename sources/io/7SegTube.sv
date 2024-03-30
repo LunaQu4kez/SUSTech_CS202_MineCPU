@@ -1,17 +1,17 @@
 `include "7SegLib.svh"
 
 module 7SegTube(
-    input            clk, rst_n,                      // clock, reset
-    input      [7:0] p0, p1, p2, p3, p4, p5, p6, p7,  // data input
-    output     [7:0] seg_en,                          // scan signal
-    output     [7:0] seg_out0, seg_out1               // 7-segment display
+    input        clk, rst_n,                      // clock, reset
+    input  [7:0] p0, p1, p2, p3, p4, p5, p6, p7,  // data input
+    output [7:0] seg_en,                          // scan signal
+    output [7:0] seg_out0, seg_out1               // 7-segment display
     );
 
-    logic        clkout;                                // 500Hz clock
-    logic [31:0] cnt;                                   // Counter for the 500Hz clock
-    logic [3:0]  scan_cnt;                              // Scan signal for the 7-segment display
-    logic [7:0]  seg_in0, seg_in1;                      // Data for the 7-segment display
-    parameter  period = `SEG_FREQ;                    // Period of the 500Hz clock
+    logic        clk_500hz;                       // 500Hz clock
+    logic [31:0] cnt;                             // Counter for the 500Hz clock
+    logic [3:0]  scan_cnt;                        // Scan signal for the 7-segment display
+    logic [7:0]  seg_in0, seg_in1;                // Data for the 7-segment display
+    parameter  period = `SEG_FREQ;                // Period of the 500Hz clock
 
     always_comb begin
         case(seg_in0)
@@ -40,7 +40,7 @@ module 7SegTube(
             `INn: seg_out0 = `SEGn; // Display 'n'
             `INN: seg_out0 = `SEGN; // Display 'N'
             `INU: seg_out0 = `SEGU; // Display 'U'
-         default: seg_out0 = 0; // Display nothing
+         default: seg_out0 = 0;     // Display nothing
         endcase
     end
 
@@ -71,19 +71,19 @@ module 7SegTube(
             `INn: seg_out1 = `SEGn; // Display 'n'
             `INN: seg_out1 = `SEGN; // Display 'N'
             `INU: seg_out1 = `SEGU; // Display 'U'
-         default: seg_out1 = 0; // Display nothing
+         default: seg_out1 = 0;     // Display nothing
         endcase
     end
 
     // Generate the 500Hz clock
     always @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
-            clkout <= 0;
+            clk_500hz <= 0;
             cnt <= 0;
         end
         else begin
             if (cnt == (period >> 1) - 1) begin
-                clkout <= ~clkout;
+                clk_500hz <= ~clk_500hz;
                 cnt <= 32'd0;
             end else begin
                 cnt <= cnt + 1;
@@ -92,7 +92,7 @@ module 7SegTube(
     end
 
     // Generate the scan signal
-    always @(posedge clkout, negedge rst_n) begin
+    always @(posedge clk_500hz, negedge rst_n) begin
         if (!rst_n) begin
             scan_cnt <= 0;
         end else begin
