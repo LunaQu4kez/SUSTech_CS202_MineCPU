@@ -1,10 +1,10 @@
-`include "7SegLib.svh"
+`include "Seg7Lib.svh"
 
-module 7SegTube(
+module Seg7Tube(
     input        clk, rst_n,                      // clock, reset
     input  [7:0] p0, p1, p2, p3, p4, p5, p6, p7,  // data input
-    output [7:0] seg_en,                          // scan signal
-    output [7:0] seg_out0, seg_out1               // 7-segment display
+    output logic [7:0] seg_en,                          // scan signal
+    output logic [7:0] seg_out0, seg_out1               // 7-segment display
     );
 
     logic        clk_500hz;                       // 500Hz clock

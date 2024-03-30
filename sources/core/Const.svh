@@ -5,15 +5,15 @@
 `define ALUOP_WID   3:0
 `define FW_WID      1:0
 // Opcode
-`define ART_LOG_OP 7'b0110011
-`define ART_IMM_OP 7'b0010011
-`define LOAD_OP    7'b0000011
-`define STORE_OP   7'b0100011
-`define BRANCH_OP  7'b1100011
-`define JALR_OP    7'b1100111
-`define JAL_OP     7'b1101111
-`define LUI_OP     7'b0110111
-`define AUIPC_OP   7'b0010111
+`define ART_LOG_OP 7'b0110011  // R type
+`define ART_IMM_OP 7'b0010011  // I type
+`define LOAD_OP    7'b0000011  // I type
+`define STORE_OP   7'b0100011  // S type for sb, sh, sw, I type for sd
+`define BRANCH_OP  7'b1100011  // B type (SB type)
+`define JALR_OP    7'b1100111  // I type
+`define JAL_OP     7'b1101111  // J type (UJ type)
+`define LUI_OP     7'b0110111  // U type
+`define AUIPC_OP   7'b0010111  // U type
 // ALU Control lines
 `define ALU_AND    4'b0000
 `define ALU_OR     4'b0001
