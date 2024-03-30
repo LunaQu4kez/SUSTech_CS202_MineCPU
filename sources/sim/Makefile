@@ -1,4 +1,4 @@
-TARGET ?= ALU
+TARGET := ImmGen
 
 .PHONY: all
 all: obj_dir_$(TARGET)/V$(TARGET)

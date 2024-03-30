@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
             case 2: result = ((uint32_t) alu->src1) ^ ((uint32_t) alu->src2); break;
             case 3: result = alu->src1 + alu->src2; break;
             case 4: result = alu->src1 - alu->src2; break;
-            case 5: alu->src2 = shift_num(engine); result = ((uint32_t) alu->src1
+            case 5: alu->src2 = shift_num(engine); result = ((uint32_t) alu->src1); break;
             case 6: alu->src2 = shift_num(engine); result = ((uint32_t) alu->src1) >> alu->src2; break;
             case 7: alu->src2 = shift_num(engine); result = ((int32_t) alu->src1) >> alu->src2; break;
             case 8: result = ((int32_t) alu->src1) < ((int32_t) alu->src2); break;
