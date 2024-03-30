@@ -1,13 +1,15 @@
+`include "Const.svh"
+
 module ID_EX (
-    input               clk, rst,
-    input [31:0]        pc_in, data1_in, data2_in, imm_in,
-    input [3:0]         inst_piece1_in,     // inst[30,14-12]
-    input [4:0]         inst_piece2_in,     // inst[11-7], rd_in
-    input [4:0]         rs1_in, rs2_in,     // ID_EX_rs1, ID_EX_rs2
-    output [31:0]       pc_out, data1_out, data2_out, imm_out,
-    output [3:0]        inst_piece1_out,    // inst[30,14-12]
-    output [4:0]        inst_piece2_out,    // inst[11-7], rd_out
-    output [4:0]        rs1_out, rs2_out    // ID_EX_rs1, ID_EX_rs2
+    input              clk, rst,
+    input  [`DATA_WID] pc_in, data1_in, data2_in, imm_in,
+    input  [3:0]       inst_piece1_in,     // inst[30,14-12]
+    input  [4:0]       inst_piece2_in,     // inst[11-7], rd_in
+    input  [`REGS_WID] rs1_in, rs2_in,     // ID_EX_rs1, ID_EX_rs2
+    output [`DATA_WID] pc_out, data1_out, data2_out, imm_out,
+    output [3:0]       inst_piece1_out,    // inst[30,14-12]
+    output [4:0]       inst_piece2_out,    // inst[11-7], rd_out
+    output [`REGS_WID] rs1_out, rs2_out    // ID_EX_rs1, ID_EX_rs2
 );
 
     reg [31:0] pc = 0;

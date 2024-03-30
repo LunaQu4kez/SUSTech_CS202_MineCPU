@@ -1,5 +1,8 @@
 // Bus Widths
 `define DATA_WID   31:0
+`define FUNC5_WID   4:0
+`define FUNC3_WID   2:0
+`define FUNC7_WID   6:0
 `define REGS_WID    4:0
 `define OP_WID      6:0
 `define ALUOP_WID   3:0
