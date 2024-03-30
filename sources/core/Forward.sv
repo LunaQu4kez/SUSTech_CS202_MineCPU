@@ -1,10 +1,10 @@
 module Forward (
-    input       [5:0]   ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
-    input               EX_MEM_RegWrite, MEM_WB_RegWrite,
-    output reg  [1:0]   fwA, fwB
+    input  logic [`REGS_WID] ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
+    input  logic             EX_MEM_RegWrite, MEM_WB_RegWrite,
+    output logic [`FW_WID  ] fwA, fwB
 );
 
-    always @(*) begin
+    always_comb begin
         if (EX_MEM_RegWrite
             & (EX_MEM_rd != 0)
             & (EX_MEM_rd == ID_EX_rs1)) begin

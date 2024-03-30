@@ -1,7 +1,7 @@
 module InstMem (
-    input           clk,
-    input [31:0]    addr,
-    output [31:0]   inst
+    input              clk,
+    input  [`DATA_WID] addr,
+    output [`DATA_WID] inst
 );
 
     progrom instmem (

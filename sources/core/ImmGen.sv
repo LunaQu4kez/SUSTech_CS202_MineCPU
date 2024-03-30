@@ -1,9 +1,9 @@
 module ImmGen (
-    input [31:0]        inst,
-    output reg [31:0]   imm
+    input  logic [`DATA_WID] inst,
+    output logic [`DATA_WID] imm
 );
 
-always @(inst) begin
+always_comb begin
     if (inst[6:0] == 7'b0000111) begin            // I type
         imm[11:0] = inst[31:20];
         if (inst[31] == 0) begin
@@ -44,7 +44,7 @@ always @(inst) begin
             imm[31:21] = 11'b1111_1111_111;
         end
     end
-    else begin                                      // R type and others
+    else begin                                     // R type and others
         imm[31:0] = 32'b0000_0000_0000_0000_0000_0000_0000_0000;
     end
 end

@@ -1,8 +1,8 @@
 module PC (
-    input           clk, rst,  // toDo: implement reset
-    input           PC_Write,  // stall, 1 yes, 0 no
-    input [31:0]    pc_in,
-    output [31:0]   pc_out
+    input              clk, rst,  // toDo: implement reset
+    input              PC_Write,  // stall, 1 yes, 0 no
+    input  [`DATA_WID] pc_in,
+    output [`DATA_WID] pc_out
 );
 
     reg [31:0] pc = 0;

@@ -12,4 +12,4 @@ run: all
 
 .PHONY: clean
 clean:
-	rm -rf obj_dir_$(TARGET)
+	rm -rf obj_dir_*

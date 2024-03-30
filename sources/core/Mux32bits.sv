@@ -1,9 +1,9 @@
 module Mux32bits (
-    input [31:0]    in1, in2,
-    input           sel,
-    output [31:0]   out1
+    input  [`DATA_WID] in1, in2,
+    input              sel,
+    output [`DATA_WID] out
 );
 
-    assign out1 = ~sel ? in1 : in2;
-    
+assign out = ~sel ? in1 : in2;
+
 endmodule

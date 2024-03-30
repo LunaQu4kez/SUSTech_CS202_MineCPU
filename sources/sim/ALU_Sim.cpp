@@ -20,49 +20,25 @@ int main(int argc, char** argv) {
     int time = 0, result;
     while (time < SIM_TIME) {
         alu->ALU_op = alu_op(engine);
-        alu->src1 = src_num(engine);
-        alu->src2 = src_num(engine);
+        alu->src1   = src_num(engine);
+        alu->src2   = src_num(engine);
         switch (alu->ALU_op) {
-            case 0:
-                result = ((uint32_t) alu->src1) & ((uint32_t) alu->src2);
-                break;
-            case 1:
-                result = ((uint32_t) alu->src1) | ((uint32_t) alu->src2);
-                break;
-            case 2:
-                result = ((uint32_t) alu->src1) ^ ((uint32_t) alu->src2);
-                break;
-            case 3:
-                result = alu->src1 + alu->src2;
-                break;
-            case 4:
-                result = alu->src1 - alu->src2;
-                break;
-            case 5:
-                alu->src2 = shift_num(engine);
-                result = ((uint32_t) alu->src1) << alu->src2;
-                break;
-            case 6:
-                alu->src2 = shift_num(engine);
-                result = ((uint32_t) alu->src1) >> alu->src2;
-                break;
-            case 7:
-                alu->src2 = shift_num(engine);
-                result = ((int32_t) alu->src1) >> alu->src2;
-                break;
-            case 8:
-                result = ((int32_t) alu->src1) < ((int32_t) alu->src2) ;
-                break;
-            case 9:
-                result = ((uint32_t) alu->src1) < ((uint32_t) alu->src2);
-                break;
+            case 0: result = ((uint32_t) alu->src1) & ((uint32_t) alu->src2); break;
+            case 1: result = ((uint32_t) alu->src1) | ((uint32_t) alu->src2); break;
+            case 2: result = ((uint32_t) alu->src1) ^ ((uint32_t) alu->src2); break;
+            case 3: result = alu->src1 + alu->src2; break;
+            case 4: result = alu->src1 - alu->src2; break;
+            case 5: alu->src2 = shift_num(engine); result = ((uint32_t) alu->src1
+            case 6: alu->src2 = shift_num(engine); result = ((uint32_t) alu->src1) >> alu->src2; break;
+            case 7: alu->src2 = shift_num(engine); result = ((int32_t) alu->src1) >> alu->src2; break;
+            case 8: result = ((int32_t) alu->src1) < ((int32_t) alu->src2); break;
+            case 9: result = ((uint32_t) alu->src1) < ((uint32_t) alu->src2); break;
         }
         alu->eval();
         if (alu->result != result) {
             printf("src1: %d, src2: %d, ALU_op: %s, result: %d\n", alu->src1, alu->src2, ALU_OP_NAMES[alu->ALU_op], alu->result);
             printf("Expected: %d\n", result);
         }
-
         time++;
     }
     alu->final();
