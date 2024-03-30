@@ -1,4 +1,5 @@
-TARGET := ImmGen  # modify this to the name of the module you want to simulate
+TARGET := ALU
+# modify this to the name of the module you want to simulate
 
 .PHONY: all
 all: obj_dir_$(TARGET)/V$(TARGET)

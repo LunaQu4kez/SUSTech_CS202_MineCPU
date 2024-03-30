@@ -10,7 +10,6 @@ const char* ALU_OP_NAMES[ALU_OPS] = {"AND", "OR", "XOR", "ADD", "SUB", "SLL", "S
 std::random_device seed;
 std::ranlux48 engine(seed());
 std::uniform_int_distribution<> src_num(-MAX_VAL, MAX_VAL);
-std::uniform_int_distribution<> shift_num(0, 30);
 std::uniform_int_distribution<> alu_op(0, ALU_OPS - 1);
 VerilatedContext* contextp = new VerilatedContext;
 
@@ -28,9 +27,9 @@ int main(int argc, char** argv) {
             case 2: result = ((uint32_t) alu->src1) ^ ((uint32_t) alu->src2); break;
             case 3: result = alu->src1 + alu->src2; break;
             case 4: result = alu->src1 - alu->src2; break;
-            case 5: alu->src2 = shift_num(engine); result = ((uint32_t) alu->src1); break;
-            case 6: alu->src2 = shift_num(engine); result = ((uint32_t) alu->src1) >> alu->src2; break;
-            case 7: alu->src2 = shift_num(engine); result = ((int32_t) alu->src1) >> alu->src2; break;
+            case 5: alu->src2 = alu->src2 % 32; result = ((uint32_t) alu->src1) << alu->src2; break;
+            case 6: alu->src2 = alu->src2 % 32; result = ((uint32_t) alu->src1) >> alu->src2; break;
+            case 7: alu->src2 = alu->src2 % 32; result = ((int32_t)  alu->src1) >> alu->src2; break;
             case 8: result = ((int32_t) alu->src1) < ((int32_t) alu->src2); break;
             case 9: result = ((uint32_t) alu->src1) < ((uint32_t) alu->src2); break;
         }
