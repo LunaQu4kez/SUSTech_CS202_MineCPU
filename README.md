@@ -2,7 +2,7 @@
 
 # SUSTech CS202 Course Project: MineCPU
 
-萨斯泰克2024春季`CS202 计算机组成原理`的课程Project 标准五级流水线RISC-V CPU
+南方科技大学 2024 年春季 `CS202 计算机组成原理` 的课程 Project RISC-V CPU（标准五级流水线版）
 
 </div>
 
