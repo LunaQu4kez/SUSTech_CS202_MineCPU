@@ -9,7 +9,14 @@ module ID_EX (
     output [`DATA_WID] pc_out, data1_out, data2_out, imm_out,
     output [3:0]       inst_piece1_out,    // inst[30,14-12]
     output [4:0]       inst_piece2_out,    // inst[11-7], rd_out
-    output [`REGS_WID] rs1_out, rs2_out    // ID_EX_rs1, ID_EX_rs2
+    output [`REGS_WID] rs1_out, rs2_out,   // ID_EX_rs1, ID_EX_rs2
+    // Control related
+    input  [`EX_CTRL_WID]  EX_ctrl_in,
+    input  [`MEM_CTRL_WID] MEM_ctrl_in,
+    input  [`WB_CTRL_WID]  WB_ctrl_in,
+    output [`EX_CTRL_WID]  EX_ctrl_out,
+    output [`MEM_CTRL_WID] MEM_ctrl_out,
+    output [`WB_CTRL_WID]  WB_ctrl_out
 );
 
     reg [31:0] pc = 0;
@@ -20,6 +27,9 @@ module ID_EX (
     reg [3:0] inst_piece2 = 0;
     reg [4:0] rs1 = 0;
     reg [4:0] rs2 = 0;
+    reg [`EX_CTRL_WID]  EX_ctrl = 0;
+    reg [`MEM_CTRL_WID] MEM_ctrl = 0;
+    reg [`WB_CTRL_WID]  WB_ctrl = 0;
     assign pc_out = pc;
     assign data1_out = data1;
     assign data2_out = data2;
@@ -28,6 +38,9 @@ module ID_EX (
     assign inst_piece2_out = inst_piece2;
     assign rs1_out = rs1;
     assign rs2_out = rs2;
+    assign EX_ctrl_out = EX_ctrl;
+    assign MEM_ctrl_out = MEM_ctrl;
+    assign WB_ctrl_out = WB_ctrl;
 
     always @(posedge clk) begin
         pc <= pc_in;
@@ -38,6 +51,9 @@ module ID_EX (
         inst_piece2 <= inst_piece2_in;
         rs1 <= rs1_in;
         rs2 <= rs2_in;
+        EX_ctrl <= EX_ctrl_in;
+        MEM_ctrl <= MEM_ctrl_in;
+        WB_ctrl <= WB_ctrl_in;
     end
     
 endmodule

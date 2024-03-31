@@ -1,12 +1,16 @@
 // Bus Widths
-`define DATA_WID   31:0
-`define FUNC5_WID   4:0
-`define FUNC3_WID   2:0
-`define FUNC7_WID   6:0
-`define REGS_WID    4:0
-`define OP_WID      6:0
-`define ALUOP_WID   3:0
-`define FW_WID      1:0
+`define DATA_WID    31:0
+`define FUNC5_WID    4:0
+`define FUNC3_WID    2:0
+`define FUNC7_WID    6:0
+`define REGS_WID     4:0
+`define OP_WID       6:0
+`define ALUOP_WID    3:0
+`define FW_WID       1:0
+`define CTRL_WID     8:0
+`define EX_CTRL_WID  4:0
+`define MEM_CTRL_WID 1:0
+`define WB_CTRL_WID  1:0
 // Opcode
 `define ART_LOG_OP 7'b0110011  // R type
 `define ART_IMM_OP 7'b0010011  // I type

@@ -1,20 +1,32 @@
 `include "Const.svh"
 
-// toDo: add 3 states control signals: 
-// EX_ctrl: ALU_op(y), ALU_scr(y) 
-// MEM_ctrl: MemWrite(n), MemRead(n)
-// WB_ctrl: RegWrite(n), MemtoReg(n)
+// add 3 states control signals: 
+// EX_ctrl_in: ALU_op(y), ALU_scr(y) 
+// MEM_ctrl_in: MemWrite(n), MemRead(n)
+// WB_ctrl_in: RegWrite(n), MemtoReg(n)
 module Stage_EX(
-	input  logic              clk, rst,
-	input  logic [`ALUOP_WID] ALU_op,
-	input  logic              ALU_src,
-	input  logic [`DATA_WID ] reg_data1, reg_data2, imm,
-	input  logic [`DATA_WID ] EX_MEM_data, MEM_WB_data,
-	input  logic [`REGS_WID ] ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
-	input  logic              EX_MEM_RegWrite, MEM_WB_RegWrite,
-	output logic [`DATA_WID ] data_out,
-	output logic [`DATA_WID ] write_addr
+	input  logic              	 clk, rst,
+	input  logic [`EX_CTRL_WID]  EX_ctrl_in,
+	input  logic [`MEM_CTRL_WID] MEM_ctrl_in,
+	input  logic [`WB_CTRL_WID]  WB_ctrl_in,
+	input  logic [`DATA_WID ] 	 reg_data1, reg_data2, imm,
+	input  logic [`DATA_WID ] 	 EX_MEM_data, MEM_WB_data,
+	input  logic [`REGS_WID ] 	 ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
+	input  logic              	 EX_MEM_RegWrite, MEM_WB_RegWrite,
+	output logic [`DATA_WID ] 	 data_out,
+	output logic [`DATA_WID ] 	 write_addr,
+	output logic [`MEM_CTRL_WID] MEM_ctrl_out,
+	output logic [`WB_CTRL_WID]  WB_ctrl_out
 );
+
+	logic [`ALUOP_WID] ALU_op;
+	logic ALU_src;
+
+	assign ALU_op = EX_ctrl_in[4:1];
+	assign ALU_src = EX_ctrl_in[0];
+
+	assign MEM_ctrl_out = MEM_ctrl_in;
+	assign WB_ctrl_out = WB_ctrl_in;
 
 	logic [`DATA_WID] src1, src2, src2_mux;
 	logic [`FW_WID  ] fwA, fwB;
