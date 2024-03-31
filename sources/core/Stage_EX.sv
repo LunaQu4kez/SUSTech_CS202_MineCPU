@@ -4,8 +4,7 @@
 // EX_ctrl_in: ALU_op(y), ALU_scr(y) 
 // MEM_ctrl_in: MemWrite(n), MemRead(n)
 // WB_ctrl_in: RegWrite(n), MemtoReg(n)
-module Stage_EX(
-	input  logic              	 clk, rst,
+module Stage_EX (
 	input  logic [`EX_CTRL_WID]  EX_ctrl_in,
 	input  logic [`MEM_CTRL_WID] MEM_ctrl_in,
 	input  logic [`WB_CTRL_WID]  WB_ctrl_in,
@@ -31,6 +30,7 @@ module Stage_EX(
 	logic [`DATA_WID] src1, src2, src2_mux;
 	logic [`FW_WID  ] fwA, fwB;
 
+	// determine whether to forward
 	always_comb begin : Mux_A
 		unique case (fwA)
 			2'b00: src1 = reg_data1;
@@ -49,9 +49,11 @@ module Stage_EX(
 		endcase
 	end
 
+	// source of ALU and write address
 	assign src2 = ALU_src ? imm : src2_mux;
+	assign data_out = src2_mux;
 
-	Forward forward_unit(
+	Forward forward_unit (
 		.ID_EX_rs1,
 		.ID_EX_rs2,
 		.EX_MEM_rd,
@@ -62,11 +64,11 @@ module Stage_EX(
 		.fwB
 	);
 
-	ALU alu_unit(
+	ALU alu_unit (
 		.src1,
 		.src2,
 		.ALU_op,
-		.res(data_out)
+		.result(write_addr)
 	);
-	
+
 endmodule

@@ -22,7 +22,7 @@ module Forward (
             fwA = 2'b00;
         end
     end
-    
+
     always_comb begin : ForwardB
         if (EX_MEM_RegWrite
             & (EX_MEM_rd != 0)
