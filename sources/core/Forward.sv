@@ -1,3 +1,5 @@
+`include "Const.svh"
+
 module Forward (
     input  logic [`REGS_WID] ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
     input  logic             EX_MEM_RegWrite, MEM_WB_RegWrite,
@@ -20,7 +22,7 @@ module Forward (
             fwA = 2'b00;
         end
     end
-    
+
     always_comb begin : ForwardB
         if (EX_MEM_RegWrite
             & (EX_MEM_rd != 0)

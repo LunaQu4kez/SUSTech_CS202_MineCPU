@@ -12,9 +12,11 @@
 
 ## 小组成员及分工
 
- - [**zz**](https://github.com/wLUOw)
- - [**ysy**](https://github.com/Yao1OoO)
- - [**cb** ~~电灯泡~~](https://github.com/chanbengz)
+| 成员 | 分工 |
+| --- | --- |
+| [**zz**](https://github.com/wLUOw) |  |
+| [**ysy**](https://github.com/Yao1OoO) |  |
+| [**cb** ~~电灯泡~~](https://github.com/chanbengz) |  |
 
 分工先略...
 
@@ -38,7 +40,7 @@ MineCPU
 │   ├── riscv-card.pdf         # ISA reference
 │   └── cpu.*                  # design draft
 ├── test
-│   ├── difftest.cpp           # differential test of CPU
+│   ├── DiffTest.cpp           # differential test of CPU
 │   └── Others                 # other tests
 ├── .gitignore
 ├── LICENSE

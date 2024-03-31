@@ -1,7 +1,6 @@
 `include "Const.svh"
 
-module Stage_EX(
-	input  logic              clk, rst,
+module Stage_EX (
 	input  logic [`ALUOP_WID] ALU_op,
 	input  logic              ALU_src,
 	input  logic [`DATA_WID ] reg_data1, reg_data2, imm,
@@ -9,12 +8,13 @@ module Stage_EX(
 	input  logic [`REGS_WID ] ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
 	input  logic              EX_MEM_RegWrite, MEM_WB_RegWrite,
 	output logic [`DATA_WID ] data_out,
-	output logic [`DATA_WID ] write_addr
+	output logic [`DATA_WID ] result
 );
 
 	logic [`DATA_WID] src1, src2, src2_mux;
 	logic [`FW_WID  ] fwA, fwB;
 
+	// determine whether to forward
 	always_comb begin : Mux_A
 		unique case (fwA)
 			2'b00: src1 = reg_data1;
@@ -33,9 +33,11 @@ module Stage_EX(
 		endcase
 	end
 
+	// source of ALU and write address
 	assign src2 = ALU_src ? imm : src2_mux;
+	assign data_out = src2_mux;
 
-	Forward forward_unit(
+	Forward forward_unit (
 		.ID_EX_rs1,
 		.ID_EX_rs2,
 		.EX_MEM_rd,
@@ -46,11 +48,11 @@ module Stage_EX(
 		.fwB
 	);
 
-	ALU alu_unit(
+	ALU alu_unit (
 		.src1,
 		.src2,
 		.ALU_op,
-		.res(data_out)
+		.result
 	);
-	
+
 endmodule
