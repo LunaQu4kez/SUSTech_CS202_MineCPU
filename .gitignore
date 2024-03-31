@@ -3,3 +3,4 @@
 .DS_Store?
 sources/sim/obj_dir_*
 .vscode
+vivado_project

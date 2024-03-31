@@ -1,5 +1,9 @@
 `include "Const.svh"
 
+// toDo: add 3 states control signals: 
+// EX_ctrl: ALU_op(y), ALU_scr(y) 
+// MEM_ctrl: MemWrite(n), MemRead(n)
+// WB_ctrl: RegWrite(n), MemtoReg(n)
 module Stage_EX(
 	input  logic              clk, rst,
 	input  logic [`ALUOP_WID] ALU_op,
