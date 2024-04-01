@@ -7,8 +7,8 @@ all: obj_dir_$(TARGET)/V$(TARGET)
 obj_dir_$(TARGET)/V$(TARGET): ../core/$(TARGET).sv $(TARGET)_Sim.cpp
 	verilator --cc --vpi --build -j 0 -Wall -I../core --Mdir ./obj_dir_$(TARGET) ../core/$(TARGET).sv --exe $(TARGET)_Sim.cpp
 
-.PHONY: run
-run: all
+.PHONY: test
+test: all
 	./obj_dir_$(TARGET)/V$(TARGET)
 
 .PHONY: clean
