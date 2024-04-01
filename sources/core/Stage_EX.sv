@@ -6,10 +6,13 @@ module Stage_EX (
 	input  logic [`WB_CTRL_WID ] WB_ctrl_in,
 	input  logic [`DATA_WID    ] reg_data1, reg_data2, imm,
 	input  logic [`DATA_WID    ] EX_MEM_data, MEM_WB_data,
-	input  logic [`REGS_WID    ] ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
+	input  logic [`REGS_WID    ] ID_EX_rs1, ID_EX_rs2, ID_EX_rd, EX_MEM_rd, MEM_WB_rd,
 	input  logic              	 EX_MEM_RegWrite, MEM_WB_RegWrite,
 	output logic [`DATA_WID    ] data_out,
 	output logic [`DATA_WID    ] write_addr,
+	output logic [`DATA_WID    ] EX_rd_out,
+	output logic              	 ID_EX_MemRead,
+	output logic [`REGS_WID    ] ID_EX_rd_out,
 	output logic [`MEM_CTRL_WID] MEM_ctrl_out,
 	output logic [`WB_CTRL_WID ] WB_ctrl_out
 );
@@ -23,6 +26,10 @@ module Stage_EX (
 	assign ALU_src = EX_ctrl_in[0];
 	assign MEM_ctrl_out = MEM_ctrl_in;
 	assign WB_ctrl_out = WB_ctrl_in;
+
+	assign EX_rd_out = ID_EX_rd;
+	assign ID_EX_rd_out = ID_EX_rd;
+	assign ID_EX_MemRead = MEM_ctrl_in[0];
 
 	// determine whether to forward
 	always_comb begin : Mux_A
