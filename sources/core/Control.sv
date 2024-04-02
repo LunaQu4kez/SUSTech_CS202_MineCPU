@@ -12,7 +12,7 @@ module Control(
     logic MemWrite;
     logic MemRead;
     logic RegWrite;
-    logic MemtoReg;
+    logic MemtoReg;     // 1: data from memory to regs, 0: ALU res to regs
 
     // stage ctrl wire
     logic [`EX_CTRL_WID]  EX_ctrl;
