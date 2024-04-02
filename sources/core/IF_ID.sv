@@ -14,7 +14,7 @@ module IF_ID (
     assign pc_out = pc;
 
     always @(posedge clk) begin
-        inst <= (IF_ID_Write == 1'b0 & IF_Flush == 1'b0) ? inst_in : inst;
+        inst <= (IF_ID_Write == 1'b1) ? inst : ((IF_Flush == 1'b1) ? 8'h00 : inst_in);
         pc <= (IF_ID_Write == 1'b0 & IF_Flush == 1'b0) ? pc_in : pc;
     end
 
