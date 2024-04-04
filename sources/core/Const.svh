@@ -5,9 +5,10 @@
 `define REGS_WID     4:0
 `define OP_WID       6:0
 `define ALUOP_WID    3:0
+`define BRUOP_WID    2:0
 `define FW_WID       1:0
 `define CTRL_WID     8:0
-`define EX_CTRL_WID  4:0
+`define EX_CTRL_WID  7:0
 `define MEM_CTRL_WID 1:0
 `define WB_CTRL_WID  1:0
 // Opcode
@@ -40,3 +41,17 @@
 `define SRL_FUNC3  3'b101
 `define OR_FUNC3   3'b110
 `define AND_FUNC3  3'b111
+`define BEQ_FUNC3  3'b000
+`define BNE_FUNC3  3'b001
+`define BLT_FUNC3  3'b100
+`define BGE_FUNC3  3'b101
+`define BLTU_FUNC3 3'b110
+`define BGEU_FUNC3 3'b111
+// Branch Control lines
+`define BRU_NOP    3'b000
+`define BRU_EQ     3'b001
+`define BRU_NE     3'b010
+`define BRU_LT     3'b011
+`define BRU_GE     3'b100
+`define BRU_LTU    3'b101
+`define BRU_GEU    3'b110

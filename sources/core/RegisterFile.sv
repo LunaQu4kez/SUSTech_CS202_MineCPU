@@ -10,6 +10,12 @@ module RegisterFile (
     
     reg [`DATA_WID] regs[31:0] /*verilator public*/;
 
+    initial begin
+        for (int i = 0; i < 32; i++) begin
+            regs[i] = 0;
+        end
+    end
+
     assign read_data_1 = regs[read_reg_1];
     assign read_data_2 = regs[read_reg_2];
     
@@ -20,7 +26,7 @@ module RegisterFile (
             end
         end 
         else if (RegWrite) begin
-            regs[write_reg] <= write_data;
+            if (write_reg != 0) regs[write_reg] <= write_data;
         end
     end
     

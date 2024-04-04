@@ -9,8 +9,9 @@ module PC (
     output [`DATA_WID]      pc_out
 );
 
-    reg [31:0] pc = 0;
+    reg [31:0] pc /*verilator public*/;
     assign pc_out = pc;
+    initial begin pc = 0; end
 
     always @(posedge clk) begin
         pc <= (PC_Write == 1'b0) ? (branch == 1'b0 ? pc_branch_n : pc_branch_y) : pc;

@@ -19,14 +19,18 @@ module Stage_EX (
 
 	logic [`ALUOP_WID] ALU_op;
 	logic              ALU_src;
+	logic [`BRUOP_WID] BRU_op;
 	logic [`DATA_WID ] src1, src2, src2_mux;
 	logic [`FW_WID   ] fwA, fwB;
 
+	// control signals
+	assign BRU_op = EX_ctrl_in[7:5];
 	assign ALU_op = EX_ctrl_in[4:1];
 	assign ALU_src = EX_ctrl_in[0];
+
+	// pass control signals to next stage
 	assign MEM_ctrl_out = MEM_ctrl_in;
 	assign WB_ctrl_out = WB_ctrl_in;
-
 	assign EX_rd_out = ID_EX_rd;
 	assign ID_EX_rd_out = ID_EX_rd;
 	assign ID_EX_MemRead = MEM_ctrl_in[0];
@@ -70,6 +74,13 @@ module Stage_EX (
 		.src2,
 		.ALU_op,
 		.result(write_addr)
+	);
+
+	BRU bru_unit (
+		.src1,
+		.src2(src2_mux),
+		.BRU_op,
+		.res
 	);
 
 endmodule

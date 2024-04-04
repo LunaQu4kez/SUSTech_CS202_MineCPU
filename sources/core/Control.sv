@@ -8,6 +8,7 @@ module Control (
 
     // atom ctrl wire
     logic [`ALUOP_WID] ALUOp;
+    logic [`BRUOP_WID] BRUOp;
     logic ALUSrc;       // 1: imm, 0: reg
     logic MemWrite;     // 1: write to memory, 0: no write
     logic MemRead;      // 1: read from memory, 0: no read
@@ -20,7 +21,7 @@ module Control (
     logic [`WB_CTRL_WID]  WB_ctrl;
 
     // part control signal
-    assign EX_ctrl  = {ALUOp, ALUSrc};
+    assign EX_ctrl  = {BRUOp, ALUOp, ALUSrc};
     assign MEM_ctrl = {MemWrite, MemRead};
     assign WB_ctrl  = {RegWrite, MemtoReg};
 
@@ -41,6 +42,7 @@ module Control (
                     `AND_FUNC3: ALUOp = `ALU_AND;
                        default: ALUOp = 0;
                 endcase
+                BRUOp    = `BRU_NOP;
                 ALUSrc   = 0;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -48,6 +50,7 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
+                ujtype   = 0;
             end
             `ART_IMM_OP: begin
                 unique case (inst[`FUNC3_WID])
@@ -61,6 +64,7 @@ module Control (
                     `AND_FUNC3: ALUOp = `ALU_AND;
                        default: ALUOp = 0;
                 endcase
+                BRUOp    = `BRU_NOP;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -68,70 +72,111 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
+                ujtype   = 0;
             end
             `LOAD_OP: begin
                 ALUOp    = `ALU_ADD;
+                BRUOp    = `BRU_NOP;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 1;
                 RegWrite = 1;
                 MemtoReg = 1;
+                branch   = 0;
+                predict  = 0;
+                ujtype   = 0;
             end
             `STORE_OP: begin
                 ALUOp    = `ALU_ADD;
+                BRUOp    = `BRU_NOP;
                 ALUSrc   = 1;
                 MemWrite = 1;
                 MemRead  = 0;
                 RegWrite = 0;
                 MemtoReg = 0;
+                branch   = 0;
+                predict  = 0;
+                ujtype   = 0;
             end
             `BRANCH_OP: begin
+                unique case (inst[`FUNC3_WID])
+                    `BEQ_FUNC3: BRUOp = `BRU_EQ;
+                    `BNE_FUNC3: BRUOp = `BRU_NE;
+                    `BLT_FUNC3: BRUOp = `BRU_LT;
+                    `BGE_FUNC3: BRUOp = `BRU_GE;
+                   `BLTU_FUNC3: BRUOp = `BRU_LTU;
+                   `BGEU_FUNC3: BRUOp = `BRU_GEU;
+                       default: BRUOp = `BRU_NOP;
+                endcase
                 ALUOp    = `ALU_ADD;
                 ALUSrc   = 0;
                 MemWrite = 0;
                 MemRead  = 0;
                 RegWrite = 0;
                 MemtoReg = 0;
+                branch   = 1;
+                predict  = 1;
+                ujtype   = 0;
             end
             `JALR_OP: begin
-                ALUOp = `ALU_ADD;
-                ALUSrc = 1;
+                ALUOp    = `ALU_ADD;
+                BRUOp    = `BRU_NOP;
+                ALUSrc   = 1;
                 MemWrite = 0;
-                MemRead = 0;
+                MemRead  = 0;
                 RegWrite = 1;
                 MemtoReg = 0;
+                branch   = 1;
+                predict  = 0;
+                ujtype   = 0;
             end
             `JAL_OP: begin
-                ALUOp = `ALU_ADD;
-                ALUSrc = 1;
+                ALUOp    = `ALU_ADD;
+                BRUOp    = `BRU_NOP;
+                ALUSrc   = 1;
                 MemWrite = 0;
-                MemRead = 0;
+                MemRead  = 0;
                 RegWrite = 1;
                 MemtoReg = 0;
+                branch   = 1;
+                predict  = 0;
+                ujtype   = 1;
             end
             `LUI_OP: begin
-                ALUOp = `ALU_ADD;
-                ALUSrc = 1;
+                ALUOp    = `ALU_ADD;
+                BRUOp    = `BRU_NOP;
+                ALUSrc   = 1;
                 MemWrite = 0;
-                MemRead = 0;
+                MemRead  = 0;
                 RegWrite = 1;
                 MemtoReg = 0;
+                branch   = 0;
+                predict  = 0;
+                ujtype   = 1;
             end
             `AUIPC_OP: begin
-                ALUOp = `ALU_ADD;
-                ALUSrc = 1;
+                ALUOp    = `ALU_ADD;
+                BRUOp    = `BRU_NOP;
+                ALUSrc   = 1;
                 MemWrite = 0;
-                MemRead = 0;
+                MemRead  = 0;
                 RegWrite = 1;
                 MemtoReg = 0;
+                branch   = 1;
+                predict  = 0;
+                ujtype   = 1;
             end
             default: begin
-                ALUOp = 0;
-                ALUSrc = 0;
+                ALUOp    = 0;
+                BRUOp    = 0;
+                ALUSrc   = 0;
                 MemWrite = 0;
-                MemRead = 0;
+                MemRead  = 0;
                 RegWrite = 0;
                 MemtoReg = 0;
+                branch   = 0;
+                predict  = 0;
+                ujtype   = 0;
             end
         endcase
     end
