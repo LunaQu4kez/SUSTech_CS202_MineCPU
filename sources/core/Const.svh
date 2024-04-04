@@ -1,8 +1,7 @@
 // Bus Widths
 `define DATA_WID    31:0
-`define FUNC5_WID    4:0
-`define FUNC3_WID    2:0
-`define FUNC7_WID    6:0
+`define FUNC3_WID   14:12
+`define FUNC7_WID   31:25
 `define REGS_WID     4:0
 `define OP_WID       6:0
 `define ALUOP_WID    3:0
@@ -32,3 +31,12 @@
 `define ALU_SRA    4'b0111
 `define ALU_SLT    4'b1000
 `define ALU_SLTU   4'b1001
+// Funct3 list
+`define ADD_FUNC3  3'b000
+`define SLL_FUNC3  3'b001
+`define SLT_FUNC3  3'b010
+`define SLTU_FUNC3 3'b011
+`define XOR_FUNC3  3'b100
+`define SRL_FUNC3  3'b101
+`define OR_FUNC3   3'b110
+`define AND_FUNC3  3'b111

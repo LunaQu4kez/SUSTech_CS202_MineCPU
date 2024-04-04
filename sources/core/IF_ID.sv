@@ -8,8 +8,8 @@ module IF_ID (
     output [`DATA_WID]      inst_out, pc_out
 );
 
-    reg [31:0] inst = 0;
-    reg [31:0] pc = 0;
+    reg [`DATA_WID] inst = 0;
+    reg [`DATA_WID] pc = 0;
     assign inst_out = inst;
     assign pc_out = pc;
 
