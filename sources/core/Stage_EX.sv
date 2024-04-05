@@ -1,20 +1,25 @@
 `include "Const.svh"
 
 module Stage_EX (
+	// control signals
 	input  logic [`EX_CTRL_WID ] EX_ctrl_in,
 	input  logic [`MEM_CTRL_WID] MEM_ctrl_in,
 	input  logic [`WB_CTRL_WID ] WB_ctrl_in,
+	// data and forwarding signals
 	input  logic [`DATA_WID    ] reg_data1, reg_data2, imm,
 	input  logic [`DATA_WID    ] EX_MEM_data, MEM_WB_data,
 	input  logic [`REGS_WID    ] ID_EX_rs1, ID_EX_rs2, ID_EX_rd, EX_MEM_rd, MEM_WB_rd,
 	input  logic              	 EX_MEM_RegWrite, MEM_WB_RegWrite,
+	// signals for MEM stage
 	output logic [`DATA_WID    ] data_out,
 	output logic [`DATA_WID    ] write_addr,
 	output logic [`DATA_WID    ] EX_rd_out,
-	output logic              	 ID_EX_MemRead,
 	output logic [`REGS_WID    ] ID_EX_rd_out,
 	output logic [`MEM_CTRL_WID] MEM_ctrl_out,
-	output logic [`WB_CTRL_WID ] WB_ctrl_out
+	output logic [`WB_CTRL_WID ] WB_ctrl_out,
+	// signals to pass back to ID stage
+	output logic              	 ID_EX_MemRead,
+	output logic                 branch_result
 );
 
 	logic [`ALUOP_WID] ALU_op;
@@ -80,7 +85,7 @@ module Stage_EX (
 		.src1,
 		.src2(src2_mux),
 		.BRU_op,
-		.res
+		.result(branch_result)
 	);
 
 endmodule
