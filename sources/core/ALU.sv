@@ -5,6 +5,7 @@ module ALU (
     input  logic [`ALUOP_WID] ALU_op,
     output logic [`DATA_WID ] result
 );
+
     always_comb begin
         unique case (ALU_op)
         `ALU_AND:  result = src1 & src2;

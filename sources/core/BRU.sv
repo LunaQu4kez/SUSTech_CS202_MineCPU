@@ -1,8 +1,11 @@
 module BRU (
 	input  logic [`DATA_WID] src1, src2, pc, imm,
 	input  logic [`BRU_OP  ] op,
-	output logic [`DATA_WID] result, pc_out
+	output logic [`DATA_WID] result, pc_out, branch
 );
+
+	assign branch = (op != `BRU_NOP);
+
 	always_comb begin : BRU
 		unique case (op)
 			`BRU_NOP: result = 0;
