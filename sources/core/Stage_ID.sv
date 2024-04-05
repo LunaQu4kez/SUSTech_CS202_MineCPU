@@ -5,11 +5,12 @@ module Stage_ID (
     input  logic [`DATA_WID    ]    pc_in,
     input  logic [`DATA_WID    ]    inst,
     input  logic [`REGS_WID    ]    ID_EX_rd, MEM_WB_rd,
+    // signal from WB stage
     input  logic [`DATA_WID    ]    data_WB,
     input  logic                    RegWrite,
     input  logic                    ID_EX_MemRead,
     output logic [`DATA_WID    ]    pc_branch,
-    output logic                    Flush,
+    output logic                    flush,
     output logic [`EX_CTRL_WID ]    EX_ctrl,
     output logic [`MEM_CTRL_WID]    MEM_ctrl,
     output logic [`WB_CTRL_WID ]    WB_ctrl,

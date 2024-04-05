@@ -8,7 +8,7 @@ module RegisterFile (
     output logic [`DATA_WID] read_data_1, read_data_2
 );
     
-    reg [`DATA_WID] regs[31:0] /*verilator public*/;
+    reg [`DATA_WID] regs[0:31] /*verilator public*/;
 
     initial begin
         for (int i = 0; i < 32; i++) begin

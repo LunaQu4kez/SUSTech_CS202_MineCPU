@@ -55,3 +55,4 @@
 `define BRU_GE     3'b100
 `define BRU_LTU    3'b101
 `define BRU_GEU    3'b110
+`define BRU_JMP    3'b111

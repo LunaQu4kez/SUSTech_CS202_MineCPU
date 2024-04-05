@@ -6,7 +6,7 @@ module Stage_EX (
 	input  logic [`MEM_CTRL_WID] MEM_ctrl_in,
 	input  logic [`WB_CTRL_WID ] WB_ctrl_in,
 	// data and forwarding signals
-	input  logic [`DATA_WID    ] reg_data1, reg_data2, imm,
+	input  logic [`DATA_WID    ] reg_data1, reg_data2, imm, pc,
 	input  logic [`DATA_WID    ] EX_MEM_data, MEM_WB_data,
 	input  logic [`REGS_WID    ] ID_EX_rs1, ID_EX_rs2, ID_EX_rd, EX_MEM_rd, MEM_WB_rd,
 	input  logic              	 EX_MEM_RegWrite, MEM_WB_RegWrite,

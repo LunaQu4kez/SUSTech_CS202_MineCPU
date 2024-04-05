@@ -120,7 +120,7 @@ module Control (
             end
             `JALR_OP: begin
                 ALUOp    = `ALU_ADD;
-                BRUOp    = `BRU_NOP;
+                BRUOp    = `BRU_JMP;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -132,7 +132,7 @@ module Control (
             end
             `JAL_OP: begin
                 ALUOp    = `ALU_ADD;
-                BRUOp    = `BRU_NOP;
+                BRUOp    = `BRU_JMP;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -156,7 +156,7 @@ module Control (
             end
             `AUIPC_OP: begin
                 ALUOp    = `ALU_ADD;
-                BRUOp    = `BRU_NOP;
+                BRUOp    = `BRU_JMP;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 0;
