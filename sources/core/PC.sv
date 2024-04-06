@@ -11,7 +11,7 @@ module PC (
     assign pc_out = pc;
     initial pc = 0;
 
-    always_ff @(posedge clk) begin
+    always_ff @(negedge clk) begin
         pc <= (PC_Write == 1'b0) ? new_pc : pc;
     end
     

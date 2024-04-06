@@ -1,13 +1,16 @@
+`include "Const.svh"
+
 module BRU (
 	input  logic [`DATA_WID] src1, src2, pc, imm,
-	input  logic [`BRU_OP  ] op,
-	output logic [`DATA_WID] result, pc_out, branch
+	input  logic [`BRU_OP  ] BRU_op,
+	output logic [`DATA_WID] old_pc
+	output logic             old_branch, old_branch
 );
 
-	assign branch = (op != `BRU_NOP);
+	assign old_branch = (op != `BRU_NOP);
 
 	always_comb begin : BRU
-		unique case (op)
+		unique case (BRU_op)
 			`BRU_NOP: result = 0;
 			 `BRU_EQ: result = (src1 == src2);
 			 `BRU_NE: result = (src1 != src2);
@@ -22,9 +25,8 @@ module BRU (
 
 	always_comb begin : Actual_PC
 		unique case (result)
-			1'b0: pc_out = pc + 4; // not taken
-			1'b1: pc_out = pc + imm; // taken
-		 default: pc_out = 0;
+			1'b0: old_pc = pc + 4;   // not taken
+			1'b1: old_pc = pc + (imm << 1); // taken
 		endcase
 	end
 

@@ -7,8 +7,8 @@ module Branch_Predictor (
     // process jalr
     input  logic [`REGS_WID] rs1,
     input  logic             ujtype,
-    // pc is from IF, old_pc is from EX
-    input  logic [`DATA_WID] pc, old_pc,
+    // pc, imm is from IF, old_pc is from EX
+    input  logic [`DATA_WID] pc, imm, old_pc,
     input  logic             old_predict, old_actual, old_branch,
     // target pc is predicted pc, pass predict_result to EX, predict_fail to flush
     output logic [`DATA_WID] target_pc,
@@ -26,7 +26,7 @@ module Branch_Predictor (
     assign predict_fail = old_predict != old_actual;
 
     always_comb begin // 0: strongly not taken, 1: weakly not taken, 2: weakly taken, 3: strongly taken
-        predict_result = History_Table[rd_table_addr] >= 2'b10;
+        predict_result = History_Table[table_addr] >= 2'b10;
         target_pc = predict_result ? pc + imm : pc + 4;
     end
 

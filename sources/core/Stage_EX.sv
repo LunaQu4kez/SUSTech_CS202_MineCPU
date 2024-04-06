@@ -10,16 +10,18 @@ module Stage_EX (
 	input  logic [`DATA_WID    ] EX_MEM_data, MEM_WB_data,
 	input  logic [`REGS_WID    ] ID_EX_rs1, ID_EX_rs2, ID_EX_rd, EX_MEM_rd, MEM_WB_rd,
 	input  logic              	 EX_MEM_RegWrite, MEM_WB_RegWrite,
+	input  logic                 old_predict_in,
 	// signals for MEM stage
 	output logic [`DATA_WID    ] data_out,
 	output logic [`DATA_WID    ] write_addr,
 	output logic [`DATA_WID    ] EX_rd_out,
-	output logic [`REGS_WID    ] ID_EX_rd_out,
 	output logic [`MEM_CTRL_WID] MEM_ctrl_out,
 	output logic [`WB_CTRL_WID ] WB_ctrl_out,
 	// signals to pass back to ID stage
+	output logic [`REGS_WID    ] ID_EX_rd_out,
 	output logic              	 ID_EX_MemRead,
-	output logic                 branch_result
+	output logic                 branch_result, old_branch, old_predict_out,
+	output logic [`DATA_WID    ] old_pc
 );
 
 	logic [`ALUOP_WID] ALU_op;
@@ -33,12 +35,15 @@ module Stage_EX (
 	assign ALU_op = EX_ctrl_in[4:1];
 	assign ALU_src = EX_ctrl_in[0];
 
-	// pass control signals to next stage
+	// pass control signals to EX_MEM reg
 	assign MEM_ctrl_out = MEM_ctrl_in;
 	assign WB_ctrl_out = WB_ctrl_in;
 	assign EX_rd_out = ID_EX_rd;
-	assign ID_EX_rd_out = ID_EX_rd;
+
+	// pass back to ID stage
 	assign ID_EX_MemRead = MEM_ctrl_in[0];
+	assign old_predict_out = old_predict_in;
+	assign ID_EX_rd_out = ID_EX_rd;
 
 	// determine whether to forward
 	always_comb begin : Mux_A
@@ -84,8 +89,12 @@ module Stage_EX (
 	BRU bru_unit (
 		.src1,
 		.src2(src2_mux),
+		.pc,
+		.imm,
 		.BRU_op,
 		.result(branch_result)
+		.old_pc,
+		.old_branch
 	);
 
 endmodule
