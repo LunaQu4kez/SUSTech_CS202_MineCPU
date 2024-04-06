@@ -25,6 +25,7 @@ module Memory (
     logic [`DATA_WID] wdatab, rdatab;
 
     // IP RAM
+    /*
     TestMemory test_inst (
         .clka(~clka),
         .clkb(~clkb),
@@ -34,6 +35,22 @@ module Memory (
         .web(we),
         .dataa,
         .datab(rdatab)
+    );
+    */
+
+    Mem mem_inst (
+        .clka(~clka),
+        .clkb(~clkb),
+        .addra(addra[15:2]),
+        .addrb(addrb[15:2]),
+        .dina(0),
+        .dinb(wdatab),
+        .douta(dataa),
+        .doutb(rdatab),
+        .ena(1'b1),
+        .enb(1'b1),
+        .wea(1'b0),
+        .web(we)
     );
 
     always_comb begin
