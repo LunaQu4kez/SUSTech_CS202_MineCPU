@@ -37,8 +37,8 @@ module Stage_ID (
     assign rd_out  = rd;
     assign pc_out = pc_in;
     assign ctrl_out = (stall == 1'b0) ? total_ctrl : 0;
-    assign EX_ctrl  = ctrl_out[11:4];
-    assign MEM_ctrl = ctrl_out[3:2];
+    assign EX_ctrl  = ctrl_out[14:7];
+    assign MEM_ctrl = ctrl_out[6:2];
     assign WB_ctrl  = ctrl_out[1:0];
     
     ImmGen immgen_inst (
@@ -58,7 +58,7 @@ module Stage_ID (
         .read_data_2(reg_data2)
     );
 
-    Hazard hazard (
+    Hazard hazard_inst (
         .IF_ID_rs1(rs1),
         .IF_ID_rs2(rs2),
         .ID_EX_rd,

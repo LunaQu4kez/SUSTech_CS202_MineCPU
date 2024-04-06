@@ -7,10 +7,11 @@
 `define ALUOP_WID    3:0
 `define BRUOP_WID    2:0
 `define FW_WID       1:0
-`define CTRL_WID    11:0
+`define CTRL_WID    14:0
 `define EX_CTRL_WID  7:0
-`define MEM_CTRL_WID 1:0
+`define MEM_CTRL_WID 4:0
 `define WB_CTRL_WID  1:0
+`define LDST_WID     2:0
 // Opcode
 `define ART_LOG_OP 7'b0110011  // R type
 `define ART_IMM_OP 7'b0010011  // I type
@@ -47,6 +48,14 @@
 `define BGE_FUNC3  3'b101
 `define BLTU_FUNC3 3'b110
 `define BGEU_FUNC3 3'b111
+`define LB_FUNC3   3'b000
+`define LH_FUNC3   3'b001
+`define LW_FUNC3   3'b010
+`define LBU_FUNC3  3'b100
+`define LHU_FUNC3  3'b101
+`define SB_FUNC3   3'b000
+`define SH_FUNC3   3'b001
+`define SW_FUNC3   3'b010
 // Branch Control lines
 `define BRU_NOP    3'b000
 `define BRU_EQ     3'b001
@@ -56,3 +65,13 @@
 `define BRU_LTU    3'b101
 `define BRU_GEU    3'b110
 `define BRU_JMP    3'b111
+// Load Store op
+`define LB_OP      3'b000
+`define LH_OP      3'b001
+`define LW_OP      3'b010
+`define LBU_OP     3'b011
+`define LHU_OP     3'b100
+`define SB_OP      3'b101
+`define SH_OP      3'b110
+`define SW_OP      3'b111
+

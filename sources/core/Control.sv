@@ -19,10 +19,11 @@ module Control (
     logic [`EX_CTRL_WID]  EX_ctrl;
     logic [`MEM_CTRL_WID] MEM_ctrl;
     logic [`WB_CTRL_WID]  WB_ctrl;
+    logic [`LDST_WID]     LDST;
 
     // part control signal
     assign EX_ctrl  = {BRUOp, ALUOp, ALUSrc};
-    assign MEM_ctrl = {MemWrite, MemRead};
+    assign MEM_ctrl = {LDST, MemWrite, MemRead};
     assign WB_ctrl  = {RegWrite, MemtoReg};
 
     // total control
@@ -51,6 +52,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
+                LDST     = 0;
             end
             `ART_IMM_OP: begin
                 unique case (inst[`FUNC3_WID])
@@ -73,6 +75,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
+                LDST     = 0;
             end
             `LOAD_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -85,6 +88,14 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
+                unique case (inst[`FUNC3_WID])
+                    `LB_FUNC3:  LDST = `LB_OP;
+                    `LH_FUNC3:  LDST = `LH_OP;
+                    `LW_FUNC3:  LDST = `LW_OP;
+                    `LBU_FUNC3: LDST = `LBU_OP;
+                    `LHU_FUNC3: LDST = `LHU_OP;  
+                    default:    LDST = 0;
+                endcase
             end
             `STORE_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -97,6 +108,12 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
+                unique case (inst[`FUNC3_WID])
+                    `SB_FUNC3 : LDST = `SB_OP; 
+                    `SH_FUNC3 : LDST = `SH_OP; 
+                    `SW_FUNC3 : LDST = `SW_OP; 
+                    default:    LDST = 0;
+                endcase
             end
             `BRANCH_OP: begin
                 unique case (inst[`FUNC3_WID])
@@ -117,6 +134,7 @@ module Control (
                 branch   = 1;
                 predict  = 1;
                 ujtype   = 0;
+                LDST     = 0;
             end
             `JALR_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -129,6 +147,7 @@ module Control (
                 branch   = 1;
                 predict  = 0;
                 ujtype   = 0;
+                LDST     = 0;
             end
             `JAL_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -141,6 +160,7 @@ module Control (
                 branch   = 1;
                 predict  = 0;
                 ujtype   = 1;
+                LDST     = 0;
             end
             `LUI_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -153,6 +173,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 1;
+                LDST     = 0;
             end
             `AUIPC_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -165,6 +186,7 @@ module Control (
                 branch   = 1;
                 predict  = 0;
                 ujtype   = 1;
+                LDST     = 0;
             end
             default: begin
                 ALUOp    = 0;
@@ -177,6 +199,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
+                LDST     = 0;
             end
         endcase
     end
