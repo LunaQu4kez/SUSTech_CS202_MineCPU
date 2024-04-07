@@ -11,7 +11,11 @@ module RegisterFile (
     reg [`DATA_WID] regs[0:31] /*verilator public*/;
 
     initial begin
-        for (int i = 0; i < 32; i++) begin
+        regs[0] = 0;
+        regs[1] = 0;
+        regs[2] = 32'h7fffeffc;    // sp
+        regs[3] = 32'hffffff00;    // gp, base addr of IO
+        for (int i = 4; i < 32; i++) begin
             regs[i] = 0;
         end
     end
@@ -19,9 +23,13 @@ module RegisterFile (
     assign read_data_1 = regs[read_reg_1];
     assign read_data_2 = regs[read_reg_2];
     
-    always_ff @(negedge clk, posedge rst) begin
+    always_ff @(negedge clk) begin
         if (rst) begin
-            for (int i = 0; i < 32; i++) begin
+            regs[0] = 0;
+            regs[1] = 0;
+            regs[2] = 32'h7fffeffc;    // sp
+            regs[3] = 32'hffffff00;    // gp, base addr of IO
+            for (int i = 4; i < 32; i++) begin
                 regs[i] <= 0;
             end
         end 

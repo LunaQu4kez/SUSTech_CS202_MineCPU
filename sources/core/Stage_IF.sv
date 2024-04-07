@@ -2,16 +2,16 @@
 
 module Stage_IF (
     input  logic [`DATA_WID]        new_pc,
-    input  logic                    PC_Write,
+    input  logic                    PC_Write,    ////// ?????
     output logic [`DATA_WID]        pc_out,
     output logic [`DATA_WID]        inst,
     // interact with Memory
-    input  logic [`DATA_WID]        mem_inst
-    output logic [`DATA_WID]        mem_pc,
+    input  logic [`DATA_WID]        mem_inst,
+    output logic [`DATA_WID]        mem_pc
 );
 
     assign inst = mem_inst;
-    assign mem_pc = pc_now;
-
+    assign mem_pc = new_pc;
+    assign pc_out = new_pc;
 
 endmodule
