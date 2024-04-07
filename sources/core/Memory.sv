@@ -1,11 +1,11 @@
 `include "Const.svh"
 
 module Memory (
-    input                       clka, clkb, rst,
+    input                       clka, clkb, // rst,
     input  logic [`LDST_WID]    LDST,
     input  logic [`DATA_WID]    addra, addrb,
     input  logic [`DATA_WID]    write_datab,
-    input  logic [`DATA_WID]    web,            // port b write enable
+    input  logic                web, // port b write enable
     output logic [`DATA_WID]    dataa, datab
     // uart related
     // ......
@@ -58,6 +58,7 @@ module Memory (
         unique case (LDST)
             `LW_OP: begin
                 datab = rdatab;
+                wdatab = 0;
             end
             `LH_OP: begin
                 if (addrb[1]) begin
@@ -66,12 +67,15 @@ module Memory (
                 else begin
                     datab = {rdatab[15] ? 16'hffff : 16'h0000, rdatab[15:0]};
                 end
+                wdatab = 0;
             end
             `LHU_OP: begin
                 datab = {16'h0000, addrb[1] ? rdatab[31:16] : rdatab[15:0]};
+                wdatab = 0;
             end
             `LBU_OP: begin
                 datab = {24'h000000, addrb[1] ? (addrb[0] ? rdatab[31:24] : rdatab[23:16]) : (addrb[0] ? rdatab[15:8] : rdatab[7:0])};
+                wdatab = 0;
             end
             `LB_OP: begin
                 unique case (addrb[1:0])
@@ -80,12 +84,15 @@ module Memory (
                     2'b10: datab = {rdatab[23] ? 24'hffffff : 24'h000000, rdatab[23:16]};
                     2'b11: datab = {rdatab[31] ? 24'hffffff : 24'h000000, rdatab[31:24]};
                 endcase
+                wdatab = 0;
             end
             `SW_OP: begin
                 wdatab = write_datab;
+                datab = rdatab;
             end
             `SH_OP: begin
                 wdatab = addrb[1] ? {write_datab[15:0], rdatab[15:0]} : {rdatab[31:16], write_datab[15:0]};
+                datab = rdatab;
             end
             `SB_OP: begin
                 unique case (addrb[1:0])
@@ -94,6 +101,7 @@ module Memory (
                     2'b10: wdatab = {rdatab[31:24], write_datab[7:0], rdatab[15:0]}; 
                     2'b11: wdatab = {write_datab[7:0], rdatab[23:0]}; 
                 endcase
+                datab = rdatab;
             end
         endcase
     end
