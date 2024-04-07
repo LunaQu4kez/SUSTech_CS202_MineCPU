@@ -25,8 +25,8 @@ module Memory (
     logic [`DATA_WID] wdatab, rdatab;
 
     // IP RAM
-    /*
-    TestMemory test_inst (
+    
+    MemoryAnalog test_inst (
         .clka(~clka),
         .clkb(~clkb),
         .addra(addra[15:2]),
@@ -36,8 +36,8 @@ module Memory (
         .dataa,
         .datab(rdatab)
     );
-    */
-
+    
+    /*
     Mem mem_inst (
         .clka(~clka),
         .clkb(~clkb),
@@ -52,6 +52,7 @@ module Memory (
         .wea(1'b0),
         .web(we)
     );
+    */
 
     always_comb begin
         unique case (LDST)

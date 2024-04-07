@@ -1,6 +1,6 @@
 `include "Const.svh"
 
-module TestMemory (
+module MemoryAnalog (
     input                       clka, clkb,
     input  logic [13:0     ]    addra, addrb,
     input  logic [`DATA_WID]    write_datab,
@@ -19,7 +19,7 @@ module TestMemory (
     always_ff @(posedge clkb) begin : data_mem
     datab <= datab_temp;
         unique if (~web) begin
-            datab_temp <= mem[datab];
+            datab_temp <= mem[addrb];
         end
         else begin
             datab_temp <= write_datab;
