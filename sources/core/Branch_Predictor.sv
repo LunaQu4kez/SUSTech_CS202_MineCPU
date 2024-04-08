@@ -2,10 +2,10 @@
 
 module Branch_Predictor (
     input  logic             clk, rst,
-    // whether to branch and predict
+    // whether to branch and predict, from Control
     input  logic             branch, predict,
     // process jalr
-    input  logic [`REGS_WID] rs1,
+    input  logic [`DATA_WID] rs1_data,
     input  logic             ujtype,
     // pc, imm is from IF, old_pc is from EX
     input  logic [`DATA_WID] pc, imm, old_pc,

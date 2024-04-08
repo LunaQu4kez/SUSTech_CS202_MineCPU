@@ -26,7 +26,7 @@ module BRU (
 	always_comb begin : Actual_PC
 		unique case (result)
 			1'b0: old_pc = pc + 4;   // not taken
-			1'b1: old_pc = pc + (imm << 1); // taken
+			1'b1: old_pc = pc + imm; // taken
 		endcase
 	end
 
