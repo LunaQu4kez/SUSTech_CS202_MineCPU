@@ -7,10 +7,10 @@
 `define ALUOP_WID    3:0
 `define BRUOP_WID    2:0
 `define FW_WID       1:0
-`define CTRL_WID    14:0
+`define CTRL_WID    15:0
 `define EX_CTRL_WID  7:0
 `define MEM_CTRL_WID 4:0
-`define WB_CTRL_WID  1:0
+`define WB_CTRL_WID  2:0
 `define LDST_WID     2:0
 // Opcode
 `define ART_LOG_OP 7'b0110011  // R type

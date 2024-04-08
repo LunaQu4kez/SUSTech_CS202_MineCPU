@@ -14,6 +14,7 @@ module Control (
     logic MemRead;      // 1: read from memory, 0: no read
     logic RegWrite;     // 1: write to regs, 0: no write
     logic MemtoReg;     // 1: data from memory to regs, 0: ALU res to regs
+    logic jal;          // 1: jal or jalr, 0: not
 
     // stage ctrl wire
     logic [`EX_CTRL_WID]  EX_ctrl;
@@ -24,10 +25,12 @@ module Control (
     // part control signal
     assign EX_ctrl  = {BRUOp, ALUOp, ALUSrc};
     assign MEM_ctrl = {LDST, MemWrite, MemRead};
-    assign WB_ctrl  = {RegWrite, MemtoReg};
+    assign WB_ctrl  = {jal ,RegWrite, MemtoReg};
 
     // total control
     assign total_ctrl = {EX_ctrl, MEM_ctrl, WB_ctrl};
+
+    assign jal = (inst[`OP_WID] == `JALR_OP | inst[`OP_WID] == `JAL_OP);
 
     always_comb begin : Ctrl_Signal_Gen
         unique case (inst[`OP_WID])

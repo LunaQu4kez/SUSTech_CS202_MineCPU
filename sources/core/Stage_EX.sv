@@ -21,7 +21,7 @@ module Stage_EX (
 	output logic [`REGS_WID    ] ID_EX_rd_out,
 	output logic              	 ID_EX_MemRead,
 	output logic                 branch_result, old_branch, old_predict_out,
-	output logic [`DATA_WID    ] old_pc
+	output logic [`DATA_WID    ] old_pc, pc_4
 );
 
 	logic [`ALUOP_WID] ALU_op;
@@ -92,8 +92,9 @@ module Stage_EX (
 		.pc,
 		.imm,
 		.BRU_op,
-		.result(branch_result)
+		.result(branch_result),
 		.old_pc,
+		.pc_4,
 		.old_branch
 	);
 
