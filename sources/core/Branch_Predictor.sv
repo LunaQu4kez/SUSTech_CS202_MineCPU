@@ -17,6 +17,7 @@ module Branch_Predictor (
 
     reg [1:0] History_Table [0: (1 << 12) - 1];
     initial begin
+        target_pc = 0;
         for (int i = 0; i < (1 << 12); i = i + 1) begin
             History_Table[i] = 2'b00;
         end
@@ -27,7 +28,10 @@ module Branch_Predictor (
     assign predict_fail = old_predict != old_actual;
 
     always_comb begin : Predict // 0: strongly not taken, 1: weakly not taken, 2: weakly taken, 3: strongly taken
-        if (predict_fail | rst) begin
+        if (rst) begin
+            predict_result = 1'b0;
+            target_pc = 0;
+        end else if (predict_fail) begin
             predict_result = old_actual;
             target_pc = old_pc;
         end else begin
@@ -54,7 +58,11 @@ module Branch_Predictor (
     end
 
     always_ff @(posedge clk) begin : Update_Table
-        if (old_branch) begin // update table
+        if (rst) begin
+            for (int i = 0; i < (1 << 12); i = i + 1) begin
+                History_Table[i] <= 2'b00;
+            end
+        end else if (old_branch) begin // update table
             if (old_actual) begin
                 if (History_Table[table_addr] < 2'b11) begin
                     History_Table[table_addr] <= History_Table[table_addr] + 1;
