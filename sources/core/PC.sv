@@ -7,9 +7,8 @@ module PC (
     output [`DATA_WID] pc_out
 );
 
-    reg [31:0] pc /*verilator public*/;
+    logic [`DATA_WID] pc = -4; /*verilator public*/
     assign pc_out = pc;
-    initial pc = 0;
 
     always_ff @(negedge clk) begin
         pc <= (PC_Write == 1'b0) ? new_pc : pc;

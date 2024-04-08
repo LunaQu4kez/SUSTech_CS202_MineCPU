@@ -14,15 +14,17 @@ module Stage_EX (
 	// signals for MEM stage
 	output logic [`DATA_WID    ] data_out,
 	output logic [`DATA_WID    ] write_addr,
-	output logic [`DATA_WID    ] EX_rd_out,
+	output logic [`REGS_WID    ] EX_rd_out,
 	output logic [`DATA_WID    ] pc_4,
 	output logic [`MEM_CTRL_WID] MEM_ctrl_out,
 	output logic [`WB_CTRL_WID ] WB_ctrl_out,
 	// signals to pass back to ID stage
 	output logic [`REGS_WID    ] ID_EX_rd_out,
 	output logic              	 ID_EX_MemRead,
-	output logic                 branch_result, old_branch, old_predict_out,
-	output logic [`DATA_WID    ] old_pc
+	output logic                 branch_result, old_branch, old_predict,
+	output logic [`DATA_WID    ] old_pc,
+	// used for debug
+	output logic [`FW_WID      ] fwB_out
 );
 
 	logic [`ALUOP_WID] ALU_op;
@@ -43,7 +45,7 @@ module Stage_EX (
 
 	// pass back to ID stage
 	assign ID_EX_MemRead = MEM_ctrl_in[0];
-	assign old_predict_out = old_predict_in;
+	assign old_predict = old_predict_in;
 	assign ID_EX_rd_out = ID_EX_rd;
 
 	// determine whether to forward
@@ -64,6 +66,8 @@ module Stage_EX (
 		  default: src2_mux = 0;
 		endcase
 	end
+
+	assign fwB_out = fwB;
 
 	// source of ALU and write address
 	assign src2 = ALU_src ? imm : src2_mux;

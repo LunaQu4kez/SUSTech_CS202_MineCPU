@@ -6,6 +6,8 @@ module Memory_Sim ();
     logic [31:0] write_datab;
     logic [0:0] web;            // port b write enable
     logic [31:0] dataa, datab;
+    logic [7:0] switches;
+    logic [31:0] led;
 
     Memory mem_test_inst (
         .clka,
@@ -16,7 +18,9 @@ module Memory_Sim ();
         .write_datab,
         .web,
         .dataa,
-        .datab
+        .datab,
+        .switches,
+        .led_out(led)
     );
 
     initial begin
@@ -29,6 +33,7 @@ module Memory_Sim ();
         addrb = 0;
         write_datab = 0;
         web = 0;
+        switches = 0;
         forever begin
             #5 clkb = ~clkb;
         end
@@ -62,10 +67,17 @@ module Memory_Sim ();
         #5 write_datab = 32'h123456f8;
         #5 web = 1;
 
+        #45 LDST = 7; // store word
+        #45 addrb = 32'hffff_ff04;
+        #45 write_datab = 32'h0000_0005;
+        #45 web = 1;
+
+        /*
         #45 LDST = 2; // load word
         #45 addrb = 100;
         #45 write_datab = 32'h000fff00;
         #45 web = 0;
+        */
 
         #85 LDST = 1; // load half
         #85 addrb = 102;

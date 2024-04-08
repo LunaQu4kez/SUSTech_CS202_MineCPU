@@ -2,7 +2,6 @@
 
 module Stage_IF (
     input  logic [`DATA_WID]        new_pc,
-    input  logic                    PC_Write,    ////// ?????
     output logic [`DATA_WID]        pc_out,
     output logic [`DATA_WID]        inst,
     // interact with Memory

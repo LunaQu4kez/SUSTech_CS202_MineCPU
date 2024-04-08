@@ -27,7 +27,8 @@ module Branch_Predictor (
 
     always_comb begin // 0: strongly not taken, 1: weakly not taken, 2: weakly taken, 3: strongly taken
         predict_result = History_Table[table_addr] >= 2'b10;
-        target_pc = predict_result ? pc + imm : pc + 4;
+        // target_pc = predict_result ? pc + imm : pc + 4;
+        target_pc = pc + 4;
     end
 
     always_ff @(posedge clk) begin : Update_Table
