@@ -15,13 +15,14 @@ module Stage_EX (
 	output logic [`DATA_WID    ] data_out,
 	output logic [`DATA_WID    ] write_addr,
 	output logic [`DATA_WID    ] EX_rd_out,
+	output logic [`DATA_WID    ] pc_4,
 	output logic [`MEM_CTRL_WID] MEM_ctrl_out,
 	output logic [`WB_CTRL_WID ] WB_ctrl_out,
 	// signals to pass back to ID stage
 	output logic [`REGS_WID    ] ID_EX_rd_out,
 	output logic              	 ID_EX_MemRead,
 	output logic                 branch_result, old_branch, old_predict_out,
-	output logic [`DATA_WID    ] old_pc, pc_4
+	output logic [`DATA_WID    ] old_pc
 );
 
 	logic [`ALUOP_WID] ALU_op;

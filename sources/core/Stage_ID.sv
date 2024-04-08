@@ -13,14 +13,15 @@ module Stage_ID (
     // signal from WB stage
     input  logic [`DATA_WID    ] data_WB,
     input  logic                 RegWrite,
-    // signal to EX_MEM reg
+    // signal to ID_EX reg
     output logic [`EX_CTRL_WID ] EX_ctrl,
     output logic [`MEM_CTRL_WID] MEM_ctrl,
     output logic [`WB_CTRL_WID ] WB_ctrl,
     output logic [`REGS_WID    ] rs1_out, rs2_out, rd_out,
-    output logic [`DATA_WID    ] reg_data1, reg_data2, imm, pc_out,
+    output logic [`DATA_WID    ] reg_data1, reg_data2, imm_out, pc_out,
     output logic                 IF_ID_Write, PC_Write,
     output logic                 predict_result,
+    output logic                 predict_fail,
     // signal to IF stage
     output logic [`DATA_WID    ] new_pc
 );
@@ -28,6 +29,7 @@ module Stage_ID (
     logic [`REGS_WID] rs1, rs2, rd;
     logic stall, branch, predict, ujtype;
     logic [`CTRL_WID] total_ctrl, ctrl_out;
+    logic [`DATA_WID] rs1_data, rs2_data, imm;
 
     assign rs1 = ujtype ? 0 : inst[19:15];
     assign rs2 = inst[24:20];
@@ -40,6 +42,9 @@ module Stage_ID (
     assign EX_ctrl  = ctrl_out[15:8];
     assign MEM_ctrl = ctrl_out[7:3];
     assign WB_ctrl  = ctrl_out[2:0];
+    assign reg_data1 = rs1_data;
+    assign reg_data2 = rs2_data;
+    assign imm_out = imm;
     
     ImmGen immgen_inst (
         .inst,
@@ -54,8 +59,8 @@ module Stage_ID (
         .write_reg(MEM_WB_rd),
         .write_data(data_WB),
         .RegWrite,
-        .read_data_1(reg_data1),
-        .read_data_2(reg_data2)
+        .read_data_1(rs1_data),
+        .read_data_2(rs2_data)
     );
 
     Hazard hazard_inst (
@@ -74,6 +79,24 @@ module Stage_ID (
         .branch,
         .predict,
         .ujtype
+    );
+
+    Branch_Predictor bp_inst (
+        .clk,
+        .rst,
+        .branch,
+        .predict,
+        .rs1_data,
+        .ujtype,
+        .pc(pc_in),
+        .imm,
+        .old_pc,
+        .old_predict,
+        .old_actual(branch_result),
+        .old_branch,
+        .target_pc(new_pc),
+        .predict_result,
+        .predict_fail
     );
 
 endmodule

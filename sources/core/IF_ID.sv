@@ -14,13 +14,13 @@ module IF_ID (
     assign pc_out = pc;
 
     always @(posedge clk) begin
-        if (rst) begin
+        if (rst | flush) begin
             inst <= 0;
             pc <= 0;
         end
         else begin
-            inst <= (IF_ID_Write == 1'b1) ? inst : ((flush == 1'b1) ? 8'h00 : inst_in);
-            pc <= (IF_ID_Write == 1'b0 & flush == 1'b0) ? pc_in : pc;
+            inst <= (IF_ID_Write == 1'b1) ? inst : inst_in;
+            pc <= (IF_ID_Write == 1'b1) ? pc : pc_in;
         end
     end
 

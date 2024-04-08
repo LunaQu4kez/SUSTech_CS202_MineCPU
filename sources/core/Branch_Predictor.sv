@@ -7,7 +7,7 @@ module Branch_Predictor (
     // process jalr
     input  logic [`DATA_WID] rs1_data,
     input  logic             ujtype,
-    // pc, imm is from IF, old_pc is from EX
+    // pc is from IF, imm is from ID, old_pc is from EX
     input  logic [`DATA_WID] pc, imm, old_pc,
     input  logic             old_predict, old_actual, old_branch,
     // target pc is predicted pc, pass predict_result to EX, predict_fail to flush
