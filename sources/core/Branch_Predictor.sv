@@ -16,7 +16,7 @@ module Branch_Predictor (
 );
 
     reg [1:0] History_Table [0: (1 << 10) - 1];
-    reg [1:0] start_flag; // 01: first cycle does nothing, 10: enable pc update
+    reg start_flag; // 0: first cycle does nothing, 1: enable pc update
 
     initial begin
         for (int i = 0; i < (1 << 10); i = i + 1) begin
@@ -31,16 +31,14 @@ module Branch_Predictor (
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            start_flag <= 2'b00;
-        end else if (start_flag == 2'b10) begin
-            start_flag <= start_flag;
+            start_flag <= 0;
         end else begin
-            start_flag <= start_flag + 1;
+            start_flag <= 1;
         end
     end
 
     always_comb begin : Predict // 0: strongly not taken, 1: weakly not taken, 2: weakly taken, 3: strongly taken
-        if (rst || start_flag != 2'b01) begin
+        if (rst || ~start_flag) begin
             predict_result = 1'b0;
             target_pc = 0;
         end else if (predict_fail) begin

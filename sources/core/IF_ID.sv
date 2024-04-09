@@ -7,7 +7,7 @@ module IF_ID (
 );
 
     reg [`DATA_WID] inst = 0;
-    reg [`DATA_WID] pc = -4;
+    reg [`DATA_WID] pc = 0;
     assign inst_out = inst;
     assign pc_out = pc;
 

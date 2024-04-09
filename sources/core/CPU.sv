@@ -216,10 +216,13 @@ module CPU (
     logic [`DATA_WID] WB_data1_in, WB_data2_in, WB_pc_4_in;
     logic [`WB_CTRL_WID] WB_WB_ctrl_in;
     logic [`DATA_WID] uart_mem_data, uart_mem_addr;
+    logic [`LDST_WID] uart_LDST;
     assign MEM_WB_RegWrite = WB_WB_ctrl_in[1];
+    // select uart or internal access
     assign uart_mem_addr = uart_finish ? mem_addr : uart_addr;
     assign uart_mem_data = uart_finish ? mem_write_data : uart_data;
-    assign web = uart_finish ? mem_write_data : 1;
+    assign uart_LDST = uart_finish ? LDST : 7;
+    assign web = uart_finish ? MemWrite : 1;
 
     MEM_WB mem_wb_inst (
         .clk(cpuclk),
@@ -247,10 +250,10 @@ module CPU (
     Memory memory_inst (
         .clka(memclk),
         .clkb(memclk),
-        .LDST,
+        .LDST(uart_LDST),
         .addra(mem_pc),
-        .addrb(mem_addr),
-        .write_datab(mem_write_data),
+        .addrb(uart_mem_addr),
+        .write_datab(uart_mem_data),
         .web,
         .dataa(mem_inst),
         .datab(mem_data),
