@@ -10,8 +10,6 @@ module PC (
     logic [`DATA_WID] pc /*verilator public*/;
     assign pc_out = pc;
 
-    initial pc = 0;
-
     always_ff @(negedge clk) begin
         if (rst) pc <= 0;
         else pc <= (PC_Write == 1'b0) ? new_pc : pc;
