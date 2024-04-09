@@ -1,17 +1,17 @@
 `include "Const.svh"
 
 module Memory (
-    input                       clka, clkb, // rst,
-    input  logic [`LDST_WID]    LDST,
-    input  logic [`DATA_WID]    addra, addrb,
-    input  logic [`DATA_WID]    write_datab,
-    input  logic                web, // port b write enable
-    output logic [`DATA_WID]    dataa, datab,
+    input                    clka, clkb, // rst,
+    input  logic [`LDST_WID] LDST,
+    input  logic [`DATA_WID] addra, addrb,
+    input  logic [`DATA_WID] write_datab,
+    input  logic             web, // port b write enable
+    output logic [`DATA_WID] dataa, datab,
     // uart related
     // ......
     // IO related
-    input  logic [7:0]          switches,
-    output logic [31:0]         led_out
+    input  logic [7:0      ] switches,
+    output logic [31:0     ] led_out
 );
 
     reg [1:0] cnt = 2'b00;
@@ -31,7 +31,7 @@ module Memory (
 
     
     // IP RAM
-    /*
+    ///*
     MemoryAnalog test_inst (
         .clka(~clka),
         .clkb(~clkb),
@@ -42,9 +42,9 @@ module Memory (
         .dataa,
         .datab(rdatab)
     );
-    */
+    //*/
     
-    
+    /*
     Mem mem_inst (
         .clka(~clka),
         .clkb(~clkb),
@@ -59,7 +59,7 @@ module Memory (
         .wea(1'b0),
         .web(we)
     );
-    
+    */
 
     always_comb begin
         unique case (LDST)
@@ -116,7 +116,7 @@ module Memory (
 
     // MMIO Regs
     // output
-    logic [31:0] led = 0;
+    logic [31:0] led;
     assign led_out = led;
 
     always_comb begin

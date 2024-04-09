@@ -57,7 +57,7 @@ module CPU (
     logic [`REGS_WID] ID_EX_rd, MEM_WB_rd;
     logic EX_old_predict_out, EX_old_branch_out, EX_branch_result_out;
     logic ID_EX_MemRead, MEM_WB_RegWrite;
-    logic [`DATA_WID] EX_old_pc_out, WB_data_out;
+    logic [`DATA_WID] EX_old_pc_out, WB_data_out, ID_old_branch_pc;
     logic [`EX_CTRL_WID] IF_EX_ctrl_out;
     logic [`MEM_CTRL_WID] IF_MEM_ctrl_out;
     logic [`WB_CTRL_WID] IF_WB_ctrl_out;
@@ -77,6 +77,7 @@ module CPU (
         .old_branch(EX_old_branch_out),
         .branch_result(EX_branch_result_out),
         .old_pc(EX_old_pc_out),
+        .old_branch_pc(ID_old_branch_pc),
         .ID_EX_MemRead,
         .data_WB(WB_data_out),
         .RegWrite(MEM_WB_RegWrite),
@@ -108,6 +109,7 @@ module CPU (
     assign EX_data2_t = EX_data2_in;
     assign EX_imm_t = EX_imm_in;
     assign flush = predict_fail | IF_ID_Write;
+    assign ID_old_branch_pc = EX_pc_in;
 
     ID_EX id_ex_inst (
         .clk(cpuclk),
@@ -274,6 +276,5 @@ module CPU (
         .switches,
         .led_out
     );
-
 
 endmodule

@@ -1,12 +1,12 @@
 `include "Const.svh"
 
 module Stage_IF (
-    input  logic [`DATA_WID]        new_pc,
-    output logic [`DATA_WID]        pc_out,
-    output logic [`DATA_WID]        inst,
+    input  logic [`DATA_WID] new_pc,
+    output logic [`DATA_WID] pc_out,
+    output logic [`DATA_WID] inst,
     // interact with Memory
-    input  logic [`DATA_WID]        mem_inst,
-    output logic [`DATA_WID]        mem_pc
+    input  logic [`DATA_WID] mem_inst,
+    output logic [`DATA_WID] mem_pc
 );
 
     assign inst = mem_inst;

@@ -1,9 +1,9 @@
 `include "Const.svh"
 
 module IF_ID (
-    input                   clk, rst,
-    input  [`DATA_WID]      inst_in, pc_in,
-    output [`DATA_WID]      inst_out, pc_out
+    input              clk, rst,
+    input  [`DATA_WID] inst_in, pc_in,
+    output [`DATA_WID] inst_out, pc_out
 );
 
     reg [`DATA_WID] inst = 0;

@@ -8,7 +8,7 @@ module Stage_ID (
     // signal from EX stage
     input  logic [`REGS_WID    ] ID_EX_rd, MEM_WB_rd,
     input  logic                 old_predict, old_branch, branch_result,
-    input  logic [`DATA_WID    ] old_pc,
+    input  logic [`DATA_WID    ] old_pc, old_branch_pc,
     input  logic                 ID_EX_MemRead,
     // signal from WB stage
     input  logic [`DATA_WID    ] data_WB,
@@ -94,6 +94,7 @@ module Stage_ID (
         .old_predict,
         .old_actual(branch_result),
         .old_branch,
+        .old_branch_pc,
         .target_pc(new_pc),
         .predict_result,
         .predict_fail

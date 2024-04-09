@@ -1,12 +1,13 @@
 `include "Const.svh"
 
 module MemoryAnalog (
-    input                       clka, clkb,
-    input  logic [13:0     ]    addra, addrb,
-    input  logic [`DATA_WID]    write_datab,
-    input  logic                web,            // port b write enable
-    output logic [`DATA_WID]    dataa, datab
+    input                    clka, clkb,
+    input  logic [13:0     ] addra, addrb,
+    input  logic [`DATA_WID] write_datab,
+    input  logic             web,          // port b write enable
+    output logic [`DATA_WID] dataa, datab
 );
+
     reg [`DATA_WID] mem [16383:0] /*verilator public*/;
     reg [`DATA_WID] dataa_temp = 0;
     reg [`DATA_WID] datab_temp = 0;

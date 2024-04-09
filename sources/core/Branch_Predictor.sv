@@ -8,24 +8,25 @@ module Branch_Predictor (
     input  logic [`DATA_WID] rs1_data,
     input  logic             ujtype,
     // pc is from IF, imm is from ID, old_pc is from EX
-    input  logic [`DATA_WID] pc, imm, old_pc,
+    input  logic [`DATA_WID] pc, imm, old_pc, old_branch_pc,
     input  logic             old_predict, old_actual, old_branch,
     // target pc is predicted pc, pass predict_result to EX, predict_fail to flush
     output logic [`DATA_WID] target_pc,
     output logic             predict_result, predict_fail
 );
 
-    reg [1:0] History_Table [0: (1 << 12) - 1];
+    reg [1:0] History_Table [0: (1 << 10) - 1];
     reg [1:0] start_flag; // 01: first cycle does nothing, 10: enable pc update
 
     initial begin
-        for (int i = 0; i < (1 << 12); i = i + 1) begin
+        for (int i = 0; i < (1 << 10); i = i + 1) begin
             History_Table[i] = 2'b01;
         end
     end
 
-    logic [11:0] table_addr; // use pc[13:2] as index since last 2 bits are always 0
-    assign table_addr = pc[13:2];
+    logic [9:0] table_addr, update_addr; // use pc[11:2] as index since last 2 bits are always 0
+    assign table_addr = pc[11:2];
+    assign update_addr = old_branch_pc[11:2];
     assign predict_fail = old_predict != old_actual;
 
     always_ff @(posedge clk) begin
@@ -70,24 +71,24 @@ module Branch_Predictor (
 
     always_ff @(posedge clk) begin : Update_Table
         if (rst) begin
-            for (int i = 0; i < (1 << 12); i = i + 1) begin
+            for (int i = 0; i < (1 << 10); i = i + 1) begin
                 History_Table[i] <= 2'b00;
             end
         end else if (old_branch) begin // update table
             if (old_actual) begin
-                if (History_Table[table_addr] < 2'b11) begin
-                    History_Table[table_addr] <= History_Table[table_addr] + 1;
+                if (History_Table[update_addr] < 2'b11) begin
+                    History_Table[update_addr] <= History_Table[update_addr] + 1;
                 end else
-                    History_Table[table_addr] <= History_Table[table_addr];
+                    History_Table[update_addr] <= History_Table[update_addr];
             end else begin
-                if (History_Table[table_addr] > 2'b00) begin
-                    History_Table[table_addr] <= History_Table[table_addr] - 1;
+                if (History_Table[update_addr] > 2'b00) begin
+                    History_Table[update_addr] <= History_Table[update_addr] - 1;
                 end else begin
-                    History_Table[table_addr] <= History_Table[table_addr];
+                    History_Table[update_addr] <= History_Table[update_addr];
                 end
             end
         end else begin
-            History_Table[table_addr] <= History_Table[table_addr];
+            History_Table[update_addr] <= History_Table[update_addr];
         end
     end
 

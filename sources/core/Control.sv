@@ -36,12 +36,12 @@ module Control (
         unique case (inst[`OP_WID])
             `ART_LOG_OP: begin
                 unique case (inst[`FUNC3_WID])
-                    `ADD_FUNC3: ALUOp = inst[`FUNC7_WID] ? `ALU_SUB : `ALU_ADD;
+                    `ADD_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SUB : `ALU_ADD;
                     `SLL_FUNC3: ALUOp = `ALU_SLL;
                     `SLT_FUNC3: ALUOp = `ALU_SLT;
                    `SLTU_FUNC3: ALUOp = `ALU_SLTU;
                     `XOR_FUNC3: ALUOp = `ALU_XOR;
-                    `SRL_FUNC3: ALUOp = inst[`FUNC7_WID] ? `ALU_SRA : `ALU_SRL;
+                    `SRL_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SRA : `ALU_SRL;
                      `OR_FUNC3: ALUOp = `ALU_OR;
                     `AND_FUNC3: ALUOp = `ALU_AND;
                        default: ALUOp = 0;
@@ -64,7 +64,7 @@ module Control (
                     `SLT_FUNC3: ALUOp = `ALU_SLT;
                    `SLTU_FUNC3: ALUOp = `ALU_SLTU;
                     `XOR_FUNC3: ALUOp = `ALU_XOR;
-                    `SRL_FUNC3: ALUOp = inst[`FUNC7_WID] ? `ALU_SRA : `ALU_SRL;
+                    `SRL_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SRA : `ALU_SRL;
                      `OR_FUNC3: ALUOp = `ALU_OR;
                     `AND_FUNC3: ALUOp = `ALU_AND;
                        default: ALUOp = 0;
