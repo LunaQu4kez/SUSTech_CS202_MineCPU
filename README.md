@@ -6,26 +6,40 @@
 
 </div>
 
+
+
 ## 功能
 
-管他**，能跑再说...
+能跑再说...
+
+
 
 ## 小组成员及分工
 
-| 成员 | 分工 |
-| --- | --- |
-| [**zz**](https://github.com/wLUOw) |  |
-| [**ysy**](https://github.com/Yao1OoO) |  |
-| [**cb** ~~电灯泡~~](https://github.com/chanbengz) |  |
+| 成员 | CPU核心 | IO & UART | 仿真 & 测试 | 汇编 | 报告 |
+| --- | --- | --- | --- | --- | --- |
+| [@wLUOw](https://github.com/wLUOw) |  |  |  |  |  |
+| [@Yao1OoO](https://github.com/Yao1OoO) |  |  |  |  |  |
+| [@chanbengz](https://github.com/chanbengz) |  |  |  |  |  |
 
-分工先略...
+
 
 ## 项目结构
 
 ```
 MineCPU
+├── docs
+│   ├── CPU.*                  # design draft
+│   ├── Report.md              # report of this project
+│   ├── cpu_design.pdf         # CPU design from textbook
+│   └── riscv-card.pdf         # ISA reference
+├── program
+│   ├── lib                    # 
+│   └── list.md                # maybe useful
 ├── sources                                              
-│   ├── assembly               # program embedded for fun
+│   ├── assembly               # assembly program for test and fun
+│   │   ├── *.asm              
+│   │   └── *.cie             
 │   ├── constrain
 │   │   └── constr.xdc         # constrain file
 │   ├── core
@@ -33,27 +47,54 @@ MineCPU
 │   ├── io
 │   │   └── *.sv               # code related to IO
 │   ├── sim
-│   │   └── *.cpp              # verilator simulation
+│   │   ├── *.cpp              # verilator simulation
+│   │   └── *.sv               # vivado simulation
 │   └── Top.v                  # top module of MineCPU
-├── docs
-│   ├── Report.md              # report of this project
-│   ├── riscv-card.pdf         # ISA reference
-│   └── cpu.*                  # design draft
 ├── test
-│   ├── DiffTest.cpp           # differential test of CPU
-│   └── Others                 # other tests
+│   └── DiffTest.cpp           # differential test of CPU
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
 
-## 完成任务列表
 
-也先略...
+
+## 完成列表
+
+- [x] CPU 核心
+  - [x] IF Stage
+  - [x] ID Stage
+    - [x] 立即数生成模块
+    - [x] 寄存器模块
+    - [x] 控制模块
+    - [x] 数据冒险停顿模块
+    - [x] 分支预测模块
+  - [x] EX Stage
+    - [x] ALU
+    - [x] BRU
+    - [x] 前递模块
+  - [x] MEM Stage
+  - [x] WB Stage
+- [ ] 内存
+  - [x] Memory
+  - [ ] Cache
+- [ ] IO
+  - [ ] Led & 7 段数码管
+  - [ ] 拨码开关 & 按钮
+  - [ ] VGA
+  - [ ] UART
+- [ ] 软件
+  - [ ] 测试场景1
+  - [ ] 测试场景2
+  - [ ] Pac-Man
+
+
 
 ## 使用方法
 
 还是先略...
+
+
 
 ## 总结与注意事项
 
