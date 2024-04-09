@@ -23,8 +23,6 @@ module Stage_EX (
 	output logic              	 ID_EX_MemRead,
 	output logic                 branch_result, old_branch, old_predict,
 	output logic [`DATA_WID    ] old_pc
-	// used for debug
-	// ,output logic [`FW_WID      ] fwB_out
 );
 
 	logic [`ALUOP_WID] ALU_op;
@@ -66,8 +64,6 @@ module Stage_EX (
 		  default: src2_mux = 0;
 		endcase
 	end
-
-	// assign fwB_out = fwB;
 
 	// source of ALU and write address
 	assign src2 = ALU_src ? imm : src2_mux;

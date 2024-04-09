@@ -7,18 +7,6 @@ module CPU (
     input  logic [31:0]         uart_addr,
     input  logic                uart_finish,
     output logic [31:0]         led_out
-    // debug use
-    //, output logic [31:0]         pc,
-    // output logic [31:0]         inst,
-    // output logic [31:0]         EX_data1_t,
-    // output logic [31:0]         EX_data2_t,
-    // output logic [31:0]         EX_imm_t,
-    // output logic [31:0]         MEM_addr_t,
-    // output logic [31:0]         MEM_data_t,
-    // output logic [31:0]         WB_data_t,
-    // output logic [31:0]         WB_mem_t,
-    // output logic [31:0]         WB_data_ot,
-    // output logic [1:0]          fwB_t
 );
 
     logic PC_Write;
@@ -44,9 +32,6 @@ module CPU (
 
     logic IF_ID_Write, flush, predict_fail;
     logic [`DATA_WID] ID_inst_in, ID_pc_in;
-
-    // assign pc = IF_pc_in;
-    // assign inst = ID_inst_in;
 
     IF_ID if_id_inst (
         .clk(cpuclk),
@@ -108,9 +93,6 @@ module CPU (
     logic [`MEM_CTRL_WID] EX_MEM_ctrl_in;
     logic [`WB_CTRL_WID] EX_WB_ctrl_in;
 
-    // assign EX_data1_t = EX_data1_in;
-    // assign EX_data2_t = EX_data2_in;
-    // assign EX_imm_t = EX_imm_in;
     assign flush = predict_fail | IF_ID_Write;
     assign ID_old_branch_pc = EX_pc_in;
 
@@ -179,16 +161,12 @@ module CPU (
         .old_branch(EX_old_branch_out),
         .old_predict(EX_old_predict_out),
         .old_pc(EX_old_pc_out)
-        // , .fwB_out(fwB_t)
     );
 
     logic [`DATA_WID] MEM_data1_in, MEM_data2_in, MEM_pc_4_in;
     logic [`MEM_CTRL_WID] MEM_MEM_ctrl_in;
     logic [`WB_CTRL_WID] MEM_WB_ctrl_in;
     assign EX_MEM_RegWrite = MEM_WB_ctrl_in[1];
-
-    // assign MEM_addr_t = MEM_data1_in;
-    // assign MEM_data_t = MEM_data2_in;
 
     EX_MEM ex_mem_inst (
         .clk(cpuclk),
@@ -242,10 +220,6 @@ module CPU (
     assign uart_mem_addr = uart_finish ? mem_addr : uart_addr;
     assign uart_mem_data = uart_finish ? mem_write_data : uart_data;
     assign web = uart_finish ? mem_write_data : 1;
-
-    // assign WB_data_t = WB_data1_in;
-    // assign WB_mem_t = WB_data2_in;
-    // assign WB_data_ot = WB_data_out;
 
     MEM_WB mem_wb_inst (
         .clk(cpuclk),

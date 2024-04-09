@@ -38,7 +38,7 @@ module Memory (
         .addra(addra[15:2]),
         .addrb(addrb[15:2]),
         .write_datab(bool_io ? 0 : wdatab),
-        .web(we),
+        .web(we & ~bool_io),
         .dataa,
         .datab(rdatab)
     );
@@ -57,7 +57,7 @@ module Memory (
         .ena(1'b1),
         .enb(1'b1),
         .wea(1'b0),
-        .web(we)
+        .web(we & ~bool_io)
     );
     */
 
