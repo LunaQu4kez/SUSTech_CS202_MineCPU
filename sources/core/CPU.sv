@@ -1,16 +1,19 @@
 `include "Const.svh"
 
 module CPU (
-    input  logic                cpuclk, memclk, rst,
-    input  logic [7:0]          switches,
-    input  logic [31:0]         uart_data,
-    input  logic [31:0]         uart_addr,
-    input  logic                uart_finish,
-    output logic [31:0]         led_out
+    input  logic        cpuclk, memclk, rst_n,
+    // uart related
+    input  logic [31:0] uart_data,
+    input  logic [31:0] uart_addr,
+    input  logic        uart_finish,
+    // interact with devices
+    input  logic [7:0 ] switches,
+    output logic [31:0] led_out
 );
 
-    logic PC_Write;
+    logic PC_Write, rst;
     logic [`DATA_WID] new_pc, IF_pc_in;
+    assign rst = ~rst_n | ~uart_finish;
 
     PC pc_inst (
         .clk(cpuclk),

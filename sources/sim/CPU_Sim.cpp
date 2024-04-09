@@ -35,23 +35,41 @@ int get_value(vpiHandle vh) {
 	return v.value.integer;
 }
 
-void load_program() {
-    top->uart_addr = 0;
-    top->uart_data = 0x00d30313;
-    for(int i = 0; i < 4; i++) {
-        if ((i >> 2) & 1) {
-            top->uart_addr = i;
-        }
-        top->memclk = 0;
-        top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
+void run_one_cycle() {
+    top->cpuclk = 1;
+    top->eval();
+    for(int i = 0; i < 2; i++) {
         top->memclk = 1;
         top->eval();
         contextp->timeInc(1);
         tfp->dump(contextp->time());
+        top->memclk = 0;
+        top->eval();
+        contextp->timeInc(1);
+        tfp->dump(contextp->time());
+    }
+    top->cpuclk = 0;
+    top->eval();
+    for(int i = 0; i < 2; i++) {
+        top->memclk = 1;
+        top->eval();
+        contextp->timeInc(1);
+        tfp->dump(contextp->time());
+        top->memclk = 0;
+        top->eval();
+        contextp->timeInc(1);
+        tfp->dump(contextp->time());
+    }
+}
+
+void load_program() {
+    for(int i = 0; i < 4; i++) {
+        top->uart_addr = i * 4;
+        top->uart_data = 0x00d30313;
+        run_one_cycle();
     }
     printf("0x%x\n", get_value(mem[0]));
+    printf("0x%x\n", get_value(mem[1]));
 }
 
 void diff_check() {
@@ -83,33 +101,12 @@ int main(int argc, char** argv) {
 
     long long time = 0;
 
+    top->rst_n = 1;
     top->uart_finish = 0;
     load_program();
+    top->uart_finish = 1;
     while (time < SIM_TIME) {
-        top->cpuclk = 0;
-        top->eval();
-        for(int i = 0; i < 2; i++) {
-            top->memclk = 0;
-            top->eval();
-            contextp->timeInc(1);
-            tfp->dump(contextp->time());
-            top->memclk = 1;
-            top->eval();
-            contextp->timeInc(1);
-            tfp->dump(contextp->time());
-        }
-        top->cpuclk = 1;
-        top->eval();
-        for(int i = 0; i < 2; i++) {
-            top->memclk = 0;
-            top->eval();
-            contextp->timeInc(1);
-            tfp->dump(contextp->time());
-            top->memclk = 1;
-            top->eval();
-            contextp->timeInc(1);
-            tfp->dump(contextp->time());
-        }
+        run_one_cycle();
 
     	VerilatedVpi::callValueCbs();
         time++;
