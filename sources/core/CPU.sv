@@ -119,7 +119,7 @@ module CPU (
         .rd_in(ID_rd_out),
         .rs1_in(ID_rs1_out),
         .rs2_in(ID_rs2_out),
-        .predict_fail,
+        .flush,
         .predict_result_in(ID_predict_result_out),
         .pc_out(EX_pc_in),
         .data1_out(EX_data1_in),

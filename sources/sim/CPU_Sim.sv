@@ -44,7 +44,7 @@ module CPU_Sim ();
     join
 
     initial fork
-        #500 $finish;
+        #1000 $finish;
     join
     
 endmodule
