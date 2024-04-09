@@ -30,7 +30,7 @@ module CPU_Sim ();
     initial begin
         rst = 0;
         cpuclk = 0;
-        memclk = 0;
+        memclk = 1;
         switches = 0;
         forever begin
             #5 memclk = ~memclk;

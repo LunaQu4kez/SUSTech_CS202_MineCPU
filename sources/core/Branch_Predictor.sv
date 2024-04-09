@@ -19,8 +19,6 @@ module Branch_Predictor (
     reg [1:0] start_flag; // 01: first cycle does nothing, 10: enable pc update
 
     initial begin
-        target_pc = 0;
-        start_flag = 2'b00;
         for (int i = 0; i < (1 << 12); i = i + 1) begin
             History_Table[i] = 2'b01;
         end
