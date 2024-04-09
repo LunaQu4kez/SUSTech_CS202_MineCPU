@@ -16,10 +16,13 @@ module Branch_Predictor (
 );
 
     reg [1:0] History_Table [0: (1 << 12) - 1];
+    reg [1:0] start_flag; // 01: first cycle does nothing, 10: enable pc update
+
     initial begin
         target_pc = 0;
+        start_flag = 2'b00;
         for (int i = 0; i < (1 << 12); i = i + 1) begin
-            History_Table[i] = 2'b00;
+            History_Table[i] = 2'b01;
         end
     end
 
@@ -27,8 +30,18 @@ module Branch_Predictor (
     assign table_addr = pc[13:2];
     assign predict_fail = old_predict != old_actual;
 
-    always_comb begin : Predict // 0: strongly not taken, 1: weakly not taken, 2: weakly taken, 3: strongly taken
+    always_ff @(posedge clk) begin
         if (rst) begin
+            start_flag <= 2'b00;
+        end else if (start_flag == 2'b10) begin
+            start_flag <= start_flag;
+        end else begin
+            start_flag <= start_flag + 1;
+        end
+    end
+
+    always_comb begin : Predict // 0: strongly not taken, 1: weakly not taken, 2: weakly taken, 3: strongly taken
+        if (rst || start_flag != 2'b01) begin
             predict_result = 1'b0;
             target_pc = 0;
         end else if (predict_fail) begin
@@ -47,7 +60,7 @@ module Branch_Predictor (
                 end
                 2'b11: begin // branch, predict: beq, bne, blt, bge, bltu, bgeu
                     predict_result = History_Table[table_addr] > 2'b01;
-                    target_pc = pc + imm;
+                    target_pc = predict_result ? pc + imm : pc + 4;
                 end
                 default: begin // dont care case: continue
                     predict_result = 1'b0;
