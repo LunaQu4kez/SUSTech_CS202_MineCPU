@@ -39,7 +39,7 @@ module CPU (
         .mem_pc
     );
 
-    logic IF_ID_Write, flush;
+    logic IF_ID_Write, flush, predict_fail;
     logic [`DATA_WID] ID_inst_in, ID_pc_in;
 
     assign pc = IF_pc_in;
@@ -48,8 +48,6 @@ module CPU (
     IF_ID if_id_inst (
         .clk(cpuclk),
         .rst,
-        .IF_ID_Write,
-        .flush,
         .inst_in(IF_inst_out),
         .pc_in(IF_pc_out),
         .inst_out(ID_inst_in),
@@ -95,7 +93,7 @@ module CPU (
         .IF_ID_Write,
         .PC_Write,
         .predict_result(ID_predict_result_out),
-        .predict_fail(flush),
+        .predict_fail,
         .new_pc
     );
 
@@ -109,6 +107,7 @@ module CPU (
     assign EX_data1_t = EX_data1_in;
     assign EX_data2_t = EX_data2_in;
     assign EX_imm_t = EX_imm_in;
+    assign flush = predict_fail | IF_ID_Write;
 
     ID_EX id_ex_inst (
         .clk(cpuclk),
@@ -120,7 +119,7 @@ module CPU (
         .rd_in(ID_rd_out),
         .rs1_in(ID_rs1_out),
         .rs2_in(ID_rs2_out),
-        .flush,
+        .predict_fail,
         .predict_result_in(ID_predict_result_out),
         .pc_out(EX_pc_in),
         .data1_out(EX_data1_in),
