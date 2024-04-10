@@ -15,13 +15,13 @@ const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
 VCPU *top = new VCPU(contextp.get());
 VerilatedVcdC* tfp = new VerilatedVcdC;
 
-const uint64_t inst[8] = {
-    0x00400393,
-    0x00735663,
-    0x00130313,
-    0xfe000ce3,
-    0x0061a223,
-};
+// const uint64_t inst[8] = {
+//     0x00400393,
+//     0x00735663,
+//     0x00130313,
+//     0xfe000ce3,
+//     0x0061a223,
+// };
 
 // unicorn simulator
 uc_engine *uc;
@@ -88,29 +88,25 @@ void run_one_cycle() {
 }
 
 size_t load_program() {
-    // vector<char> data = read_binary("../assembly/test1.bin");
-    // uint64_t concat_data, size = data.size() / 4;
-    int size = 5;
+    vector<char> data = read_binary("../assembly/fib.bin");
+    uint64_t concat_data, size = data.size() / 4;
+
     for(int i = 0; i < size; i++) {
-        // for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
+        concat_data = 0;
+        for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
         top->uart_addr = i * 4;
-        top->uart_data = inst[i];
+        top->uart_data = concat_data;
         run_one_cycle();
     }
     return size;
 }
 
 void diff_check() {
-    for (int i = 0; i < 32; i++) {
-        printf("%3s: 0x%x\n", REG_NAMES[i], get_value(regs[i]));
-    }
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 32; i++) printf("%3s: 0x%x\n", REG_NAMES[i], get_value(regs[i]));
+    printf("Stack: \n");
+    for (uint32_t i = 0xfaf >> 2; i < 0xfff >> 2; i++) {
         printf("mem[%d] = 0x%x\n", i, get_value(mem[i]));
     }
-    // printf("Stack: \n");
-    // for (uint32_t i = 0xfaf >> 2; i < 0xfff >> 2; i++) {
-    //     printf("mem[%d] = 0x%x\n", i, get_value(mem[i]));
-    // }
 }
 
 int main(int argc, char** argv) {
@@ -140,7 +136,7 @@ int main(int argc, char** argv) {
     top->uart_finish = 1;
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
-    while (time < 20) {
+    while (time < 100) {
         run_one_cycle();
     	VerilatedVpi::callValueCbs();
         time++;

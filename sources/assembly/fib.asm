@@ -1,12 +1,8 @@
 .text
 main:
-	li a7, 5
-	ecall            # input integer
+	li a0, 5
 	jal fib
-	li a7, 1
-	ecall            # output result
-	li a7, 10
-    ecall            # end
+	j exit
 fib:
 	addi sp, sp, -12 # adjust stack for 2 items
 	sw ra, 4(sp)     # save the return address
@@ -29,3 +25,5 @@ L1:
 	lw t1, 8(sp)     # restore fib(n-1)
 	addi sp, sp, 12  # adjust stack pointer to pop 2 items
 	jr ra            # return to the caller
+exit:
+	nop
