@@ -15,6 +15,14 @@ const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
 VCPU *top = new VCPU(contextp.get());
 VerilatedVcdC* tfp = new VerilatedVcdC;
 
+const uint64_t inst[8] = {
+    0x00400393,
+    0x00735663,
+    0x00130313,
+    0xfe000ce3,
+    0x0061a223,
+};
+
 // unicorn simulator
 uc_engine *uc;
 
@@ -23,6 +31,7 @@ vpiHandle pc;
 vpiHandle regs[32];
 vpiHandle mem[16383];
 
+// from Monad's code
 vector<char> read_binary(const char *name) {
     std::ifstream f;
     f.open(name, std::ios::binary);
@@ -79,14 +88,14 @@ void run_one_cycle() {
 }
 
 size_t load_program() {
-    vector<char> data = read_binary("../assembly/test1.bin");
-    uint64_t concat_data, size = data.size() / 4;
+    // vector<char> data = read_binary("../assembly/test1.bin");
+    // uint64_t concat_data, size = data.size() / 4;
+    int size = 5;
     for(int i = 0; i < size; i++) {
-        for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
+        // for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
         top->uart_addr = i * 4;
-        top->uart_data = concat_data;
+        top->uart_data = inst[i];
         run_one_cycle();
-        printf("mem[%d] = 0x%x\n", i, get_value(mem[i]));
     }
     return size;
 }
@@ -95,6 +104,13 @@ void diff_check() {
     for (int i = 0; i < 32; i++) {
         printf("%3s: 0x%x\n", REG_NAMES[i], get_value(regs[i]));
     }
+    for (int i = 0; i < 12; i++) {
+        printf("mem[%d] = 0x%x\n", i, get_value(mem[i]));
+    }
+    // printf("Stack: \n");
+    // for (uint32_t i = 0xfaf >> 2; i < 0xfff >> 2; i++) {
+    //     printf("mem[%d] = 0x%x\n", i, get_value(mem[i]));
+    // }
 }
 
 int main(int argc, char** argv) {
@@ -113,12 +129,8 @@ int main(int argc, char** argv) {
 
     // initialize vpi handles
     pc = get_handle("TOP.CPU.pc_inst.pc");
-    for (int i = 0; i < 32; i++) {
-        regs[i] = vpi_handle_by_index(get_handle("TOP.CPU.id_inst.reg_inst.regs"), i);
-    }
-    for (int i = 0; i < 16383; i++) {
-        mem[i] = vpi_handle_by_index(get_handle("TOP.CPU.memory_inst.test_inst.mem"), i);
-    }
+    for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.CPU.id_inst.reg_inst.regs"), i);
+    for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.CPU.memory_inst.test_inst.mem"), i);
 
     long long time = 0;
 
@@ -126,12 +138,14 @@ int main(int argc, char** argv) {
     top->uart_finish = 0;
     size_t program_size = load_program();
     top->uart_finish = 1;
-    while (time < program_size) {
+    // run four cycles to get warm up
+    for(int i = 0; i < 3; i++) run_one_cycle();
+    while (time < 20) {
         run_one_cycle();
     	VerilatedVpi::callValueCbs();
         time++;
     }
-    // diff_check();
+    diff_check();
 
 	top->final(), tfp->close();
     delete top;

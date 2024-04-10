@@ -3,4 +3,5 @@ addi t2, t2, 13
 sw t2, 0(t1)
 lw t3, 0(t1)
 xori t3, t3, -1
-sw t3, 4(gp)
+addi t0, zero, 10
+sw t3, 4(t0)

@@ -19,4 +19,4 @@ $(TARGET).bin: %.bin: %.hex
 
 .PHONY: clean
 clean:
-	rm *.o *.hex $(TARGET) $(TARGET).bin
+	rm *.o *.hex $(TARGET)
