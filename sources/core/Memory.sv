@@ -31,7 +31,7 @@ module Memory (
 
     
     // IP RAM
-    ///*
+    /*
     MemoryAnalog test_inst (
         .clka(~clka),
         .clkb(~clkb),
@@ -42,9 +42,9 @@ module Memory (
         .dataa,
         .datab(rdatab)
     );
-    //*/
+    */
     
-    /*
+    ///*
     Mem mem_inst (
         .clka(~clka),
         .clkb(~clkb),
@@ -59,7 +59,7 @@ module Memory (
         .wea(1'b0),
         .web(we & ~bool_io)
     );
-    */
+    //*/
 
     always_comb begin
         unique case (LDST)

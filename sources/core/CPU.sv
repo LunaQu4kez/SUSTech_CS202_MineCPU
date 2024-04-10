@@ -8,7 +8,18 @@ module CPU (
     input  logic        uart_finish,
     // interact with devices
     input  logic [7:0 ] switches,
-    output logic [31:0] led_out
+    output logic [31:0] led_out,
+    // debug use
+    output logic [31:0]         pc_t,
+    output logic [31:0]         inst_t,
+    output logic [31:0]         EX_data1_t,
+    output logic [31:0]         EX_data2_t,
+    output logic [31:0]         EX_imm_t,
+    output logic [31:0]         MEM_addr_t,
+    output logic [31:0]         MEM_data_t,
+    output logic [31:0]         WB_data_t,
+    output logic [31:0]         WB_mem_t,
+    output logic [31:0]         WB_data_ot
 );
 
     logic PC_Write, rst;
@@ -263,5 +274,17 @@ module CPU (
         .switches,
         .led_out
     );
+
+    // debug use
+    assign pc_t = IF_pc_in;
+    assign inst_t = ID_inst_in;
+    assign EX_data1_t = EX_data1_in;
+    assign EX_data2_t = EX_data2_in;
+    assign EX_imm_t = EX_imm_in;
+    assign MEM_addr_t = MEM_data1_in;
+    assign MEM_data_t = MEM_data2_in;
+    assign WB_data_t = WB_data1_in;
+    assign WB_mem_t = WB_data2_in;
+    assign WB_data_ot = WB_data_out;
 
 endmodule

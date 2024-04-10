@@ -1,21 +1,20 @@
 module CPU_Sim ();
 
-    logic cpuclk, memclk, rst;
+    logic cpuclk, memclk, rst_n, uart_finish;
     logic [7:0] switches;
     logic [31:0] led;
-    logic [31:0] pc;
-    logic [31:0] inst;
+    logic [31:0] pc_t, inst_t;
     logic [31:0] EX_data1_t, EX_data2_t, EX_imm_t, MEM_addr_t, MEM_data_t, WB_data_t, WB_mem_t, WB_data_ot;
-    logic [1:0] fwB_t;
     
     CPU cpu_inst (
         .cpuclk,
         .memclk,
-        .rst,
+        .rst_n,
+        .uart_finish,
         .switches,
         .led_out(led),
-        .pc,
-        .inst,
+        .pc_t,
+        .inst_t,
         .EX_data1_t, 
         .EX_data2_t, 
         .EX_imm_t, 
@@ -23,14 +22,14 @@ module CPU_Sim ();
         .MEM_data_t, 
         .WB_data_t, 
         .WB_mem_t, 
-        .WB_data_ot,
-        .fwB_t
+        .WB_data_ot
     );
 
     initial begin
-        rst = 0;
+        rst_n = 1;
         cpuclk = 0;
         memclk = 1;
+        uart_finish = 1;
         switches = 0;
         forever begin
             #5 memclk = ~memclk;
@@ -44,7 +43,7 @@ module CPU_Sim ();
     join
 
     initial fork
-        #1000 $finish;
+        #800 $finish;
     join
     
 endmodule
