@@ -34,12 +34,12 @@ MineCPU
 │   ├── cpu_design.pdf         # CPU design from textbook
 │   └── riscv-card.pdf         # ISA reference
 ├── program
-│   ├── lib                    # 
+│   ├── lib                    # liabrary of some API
 │   └── list.md                # maybe useful
 ├── sources                                              
 │   ├── assembly               # assembly program for test and fun
 │   │   ├── *.asm              
-│   │   └── *.cie             
+│   │   └── *.coe             
 │   ├── constrain
 │   │   └── constr.xdc         # constrain file
 │   ├── core
