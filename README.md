@@ -75,9 +75,7 @@ MineCPU
     - [x] 前递模块
   - [x] MEM Stage
   - [x] WB Stage
-- [ ] 内存
-  - [x] Memory
-  - [ ] Cache
+  - [ ] Memory
 - [ ] IO
   - [ ] Led & 7 段数码管
   - [ ] 拨码开关 & 按钮
