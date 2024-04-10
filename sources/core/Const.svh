@@ -74,4 +74,6 @@
 `define SB_OP      3'b101
 `define SH_OP      3'b110
 `define SW_OP      3'b111
-
+// Address and gp register
+`define MMIO_ADDR  32'hffffff00
+`define STAK_ADDR  32'h0000ffff

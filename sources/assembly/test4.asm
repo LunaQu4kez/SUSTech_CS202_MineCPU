@@ -4,4 +4,5 @@ beq zero, zero, out
 addi t2, t2, 1
 addi t2, t2, 1
 addi t2, t2, 1
-out: sw t2, 4(gp)
+out:
+    sw t2, 4(gp)

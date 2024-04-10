@@ -1,9 +1,12 @@
-// #include <unicorn/unicorn.h>
+#include <unicorn/unicorn.h>
 #include <verilated.h>
 #include <verilated_vpi.h>
 #include "verilated_vcd_c.h"
+#include <vector>
+#include <fstream>
 #include "VCPU.h"
 
+using std::vector;
 const char *REG_NAMES[32] = {"x0", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 const int SIM_TIME = 7;
 
@@ -13,12 +16,25 @@ VCPU *top = new VCPU(contextp.get());
 VerilatedVcdC* tfp = new VerilatedVcdC;
 
 // unicorn simulator
-// uc_engine *uc;
+uc_engine *uc;
 
 // vpi handles
 vpiHandle pc;
 vpiHandle regs[32];
 vpiHandle mem[16383];
+
+vector<char> read_binary(const char *name) {
+    std::ifstream f;
+    f.open(name, std::ios::binary);
+    f.seekg(0, std::ios::end);
+    size_t size = f.tellg();
+
+    std::vector<char> data;
+    data.resize(size);
+    f.seekg(0, std::ios::beg);
+    f.read(&data[0], size);
+    return data;
+}
 
 vpiHandle get_handle(const char *name) {
     vpiHandle vh = vpi_handle_by_name((PLI_BYTE8*)name, NULL);
@@ -62,14 +78,17 @@ void run_one_cycle() {
     }
 }
 
-void load_program() {
-    for(int i = 0; i < 4; i++) {
+size_t load_program() {
+    vector<char> data = read_binary("../assembly/test1.bin");
+    uint64_t concat_data, size = data.size() / 4;
+    for(int i = 0; i < size; i++) {
+        for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
         top->uart_addr = i * 4;
-        top->uart_data = 0x00d30313;
+        top->uart_data = concat_data;
         run_one_cycle();
+        printf("mem[%d] = 0x%x\n", i, get_value(mem[i]));
     }
-    printf("0x%x\n", get_value(mem[0]));
-    printf("0x%x\n", get_value(mem[1]));
+    return size;
 }
 
 void diff_check() {
@@ -85,10 +104,12 @@ int main(int argc, char** argv) {
     tfp->open("cpu_sim.vcd");
 
     // initialize unicorn
-    // if ((uc_err err = uc_open(UC_ARCH_RISCV, UC_MODE_32, &uc)) != UC_ERR_OK) {
-    //     printf("Failed on uc_open() with error returned: %u\n", err);
-    //     return -1;
-    // }
+    uc_err err;
+    if ((err = uc_open(UC_ARCH_RISCV, UC_MODE_32, &uc)) != UC_ERR_OK) {
+        printf("Failed on uc_open() with error returned: %u\n", err);
+        return -1;
+    }
+    uc_mem_map(uc, 0x0, 16384 * 4, UC_PROT_ALL);
 
     // initialize vpi handles
     pc = get_handle("TOP.CPU.pc_inst.pc");
@@ -103,15 +124,14 @@ int main(int argc, char** argv) {
 
     top->rst_n = 1;
     top->uart_finish = 0;
-    load_program();
+    size_t program_size = load_program();
     top->uart_finish = 1;
-    while (time < SIM_TIME) {
+    while (time < program_size) {
         run_one_cycle();
-
     	VerilatedVpi::callValueCbs();
         time++;
     }
-    diff_check();
+    // diff_check();
 
 	top->final(), tfp->close();
     delete top;

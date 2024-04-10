@@ -13,8 +13,8 @@ module RegisterFile (
     initial begin
         regs[0] = 0;
         regs[1] = 0;
-        regs[2] = 32'h7fffeffc;    // sp
-        regs[3] = 32'hffffff00;    // gp, base addr of IO
+        regs[2] = `STAK_ADDR;  // sp
+        regs[3] = `MMIO_ADDR;  // gp, base addr of IO
         for (int i = 4; i < 32; i++) begin
             regs[i] = 0;
         end
@@ -27,8 +27,8 @@ module RegisterFile (
         if (rst) begin
             regs[0] <= 0;
             regs[1] <= 0;
-            regs[2] <= 32'h7fffeffc;    // sp
-            regs[3] <= 32'hffffff00;    // gp, base addr of IO
+            regs[2] <= `STAK_ADDR;  // sp
+            regs[3] <= `MMIO_ADDR;  // gp, base addr of IO
             for (int i = 4; i < 32; i++) begin
                 regs[i] <= 0;
             end

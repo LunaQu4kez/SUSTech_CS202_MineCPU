@@ -1,5 +1,5 @@
-# LDFLAGS := -lunicorn -lSDL2
-# export LDFLAGS
+LDFLAGS := -lunicorn -lSDL2
+export LDFLAGS
 
 TARGET := CPU
 VERILATOR_FLAGS :=  --cc --vpi --build -j 0 -Wall -Wno-ALWCOMBORDER -Wno-UNUSEDSIGNAL --unroll-count 2048 --trace
