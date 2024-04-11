@@ -78,7 +78,7 @@ MineCPU
   - [x] MEM Stage
   - [x] WB Stage
   - [x] Memory
-  - [ ] 异常控制*
+  - [ ] 异常控制 *
 - [ ] IO
   - [ ] Led & 7 段数码管
   - [ ] 拨码开关 & 按钮
