@@ -34,7 +34,7 @@ MineCPU
 │   ├── cpu_design.pdf         # CPU design from textbook
 │   └── riscv-card.pdf         # ISA reference
 ├── program
-│   ├── lib                    # liabrary of some API
+│   ├── lib                    # library of some API
 │   └── list.md                # maybe useful
 ├── sources                                              
 │   ├── assembly               # assembly program for test and fun
@@ -71,20 +71,23 @@ MineCPU
     - [x] 分支预测模块
   - [x] EX Stage
     - [x] ALU
+      - [x] RV32I
+      - [ ] RV32M *
     - [x] BRU
     - [x] 前递模块
   - [x] MEM Stage
   - [x] WB Stage
-  - [ ] Memory
+  - [x] Memory
+  - [ ] 异常控制*
 - [ ] IO
   - [ ] Led & 7 段数码管
   - [ ] 拨码开关 & 按钮
-  - [ ] VGA
-  - [ ] UART
+  - [ ] VGA *
+  - [ ] UART *
 - [ ] 软件
   - [ ] 测试场景1
   - [ ] 测试场景2
-  - [ ] Pac-Man
+  - [ ] Pac-Man *
 
 
 
