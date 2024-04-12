@@ -44,7 +44,8 @@ module CPU (
         .mem_pc
     );
 
-    logic IF_ID_Write, flush, predict_fail;
+    logic IF_ID_Write, predict_fail;
+    logic flush /*verilator public*/;
     logic [`DATA_WID] ID_inst_in, ID_pc_in;
 
     IF_ID if_id_inst (

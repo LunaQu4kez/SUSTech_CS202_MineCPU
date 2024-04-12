@@ -67,7 +67,7 @@ module Branch_Predictor (
         end
     end
 
-    always_ff @(posedge clk) begin : Update_Table
+    always_ff @(negedge clk) begin : Update_Table
         if (rst) begin
             for (int i = 0; i < (1 << 10); i = i + 1) begin
                 History_Table[i] <= 2'b00;

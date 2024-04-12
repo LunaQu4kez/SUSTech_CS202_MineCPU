@@ -30,6 +30,7 @@ uc_engine *uc;
 vpiHandle pc;
 vpiHandle regs[32];
 vpiHandle mem[16383];
+vpiHandle flush;
 
 // from Monad's code
 vector<char> read_binary(const char *name) {
@@ -61,21 +62,9 @@ int get_value(vpiHandle vh) {
 }
 
 void run_one_cycle() {
-    top->cpuclk = 1;
-    top->eval();
-    for(int i = 0; i < 2; i++) {
-        top->memclk = 1;
-        top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
-        top->memclk = 0;
-        top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
-    }
     top->cpuclk = 0;
     top->eval();
-    for(int i = 0; i < 2; i++) {
+    for(int i = 0; i < 4; i++) {
         top->memclk = 1;
         top->eval();
         contextp->timeInc(1);
@@ -84,29 +73,46 @@ void run_one_cycle() {
         top->eval();
         contextp->timeInc(1);
         tfp->dump(contextp->time());
+        if (i % 2 == 0) {
+            top->cpuclk = !top->cpuclk;
+            top->eval();
+        }
     }
 }
 
-size_t load_program() {
-    vector<char> data = read_binary("../assembly/fib.bin");
-    uint64_t concat_data, size = data.size() / 4;
+vector<uint32_t> load_program() {
+    vector<char> data = read_binary("../assembly/test5.bin");
+    vector<unsigned int> inst;
+    uint32_t concat_data, size = data.size() / 4;
+
+    if (uc_mem_write(uc, 0x0, data.data(), data.size())) {
+        printf("Failed to write emulation code to memory, quit!\n");
+        return vector<uint32_t>();
+    }
 
     for(int i = 0; i < size; i++) {
         concat_data = 0;
         for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
         top->uart_addr = i * 4;
         top->uart_data = concat_data;
+        inst.push_back(concat_data);
         run_one_cycle();
     }
-    return size;
+
+    return inst;
 }
 
-void diff_check() {
-    for (int i = 0; i < 32; i++) printf("%3s: 0x%x\n", REG_NAMES[i], get_value(regs[i]));
-    printf("Stack: \n");
-    for (uint32_t i = 0xfaf >> 2; i < 0xfff >> 2; i++) {
-        printf("mem[%d] = 0x%x\n", i, get_value(mem[i]));
+bool diff_check() {
+    bool pass = true;
+    for (int i = 0, v; i < 32; i++) {
+        uc_reg_read(uc, i + 1, &v);
+        if (v != get_value(regs[i])) {
+            pass = false;
+            printf("regs: uc, cpu\n");
+            printf("%4s: 0x%x, 0x%x\n", REG_NAMES[i], v, get_value(regs[i]));
+        }
     }
+    return pass;
 }
 
 int main(int argc, char** argv) {
@@ -116,32 +122,48 @@ int main(int argc, char** argv) {
     tfp->open("cpu_sim.vcd");
 
     // initialize unicorn
+
     uc_err err;
     if ((err = uc_open(UC_ARCH_RISCV, UC_MODE_32, &uc)) != UC_ERR_OK) {
         printf("Failed on uc_open() with error returned: %u\n", err);
         return -1;
     }
-    uc_mem_map(uc, 0x0, 16384 * 4, UC_PROT_ALL);
+    uc_mem_map(uc, 0x0, 1024 * 1024 * 4, UC_PROT_ALL);
+    int uc_sp = 0x7ffc, uc_gp = 0xffffff00;
+    uc_reg_write(uc, UC_RISCV_REG_SP, &uc_sp);
+    uc_reg_write(uc, UC_RISCV_REG_GP, &uc_gp);
 
     // initialize vpi handles
     pc = get_handle("TOP.CPU.pc_inst.pc");
+    flush = get_handle("TOP.CPU.flush");
     for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.CPU.id_inst.reg_inst.regs"), i);
     for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.CPU.memory_inst.test_inst.mem"), i);
 
-    long long time = 0;
+    long long time = 0, uc_pc = 0;
 
+    // load program
     top->rst_n = 1;
     top->uart_finish = 0;
-    size_t program_size = load_program();
+    vector<uint32_t> inst = load_program();
     top->uart_finish = 1;
+
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
-    while (time < 100) {
+
+    while (time < 12 && uc_pc != 0x5c) {
         run_one_cycle();
+        if(get_value(flush)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
+        // run one instruction on unicorn
+        if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1)))
+            printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
+        
+        uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
         time++;
     }
+
     diff_check();
+    printf("pc: 0x%x\n", get_value(pc));
 
 	top->final(), tfp->close();
     delete top;

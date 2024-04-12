@@ -3,7 +3,7 @@ LD := riscv64-unknown-elf-ld
 AS := riscv64-unknown-elf-as
 OBJCOPY := riscv64-unknown-elf-objcopy
 
-TARGET = test1
+TARGET = fib
 
 .PHONY: all
 all: $(TARGET).bin

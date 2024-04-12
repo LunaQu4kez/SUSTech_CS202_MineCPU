@@ -24,6 +24,8 @@ L1:
 	lw ra, 4(sp)     # restore the return address
 	lw t1, 8(sp)     # restore fib(n-1)
 	addi sp, sp, 12  # adjust stack pointer to pop 2 items
+	nop
+	nop
 	jr ra            # return to the caller
 exit:
 	nop
