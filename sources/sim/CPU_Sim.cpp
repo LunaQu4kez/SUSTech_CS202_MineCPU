@@ -15,14 +15,6 @@ const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
 VCPU *top = new VCPU(contextp.get());
 VerilatedVcdC* tfp = new VerilatedVcdC;
 
-// const uint64_t inst[8] = {
-//     0x00400393,
-//     0x00735663,
-//     0x00130313,
-//     0xfe000ce3,
-//     0x0061a223,
-// };
-
 // unicorn simulator
 uc_engine *uc;
 
@@ -81,7 +73,7 @@ void run_one_cycle() {
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/test5.bin");
+    vector<char> data = read_binary("../assembly/fib.bin");
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -150,7 +142,7 @@ int main(int argc, char** argv) {
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
 
-    while (time < 12 && uc_pc != 0x5c) {
+    while (uc_pc != 0x64) {
         run_one_cycle();
         if(get_value(flush)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
