@@ -70,16 +70,16 @@ module Branch_Predictor (
     always_ff @(negedge clk) begin : Update_Table
         if (rst) begin
             for (int i = 0; i < (1 << 10); i = i + 1) begin
-                History_Table[i] <= 2'b00;
+                History_Table[i] <= 2'b01;
             end
         end else if (old_branch) begin // update table
             if (old_actual) begin
-                if (History_Table[update_addr] < 2'b11) begin
+                if (History_Table[update_addr] != 2'b11) begin
                     History_Table[update_addr] <= History_Table[update_addr] + 1;
                 end else
                     History_Table[update_addr] <= History_Table[update_addr];
             end else begin
-                if (History_Table[update_addr] > 2'b00) begin
+                if (History_Table[update_addr] != 2'b00) begin
                     History_Table[update_addr] <= History_Table[update_addr] - 1;
                 end else begin
                     History_Table[update_addr] <= History_Table[update_addr];
