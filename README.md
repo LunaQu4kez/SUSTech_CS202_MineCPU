@@ -71,12 +71,12 @@ MineCPU
   - [x] WB Stage
   - [x] Memory
     - [ ] Cache *
+    - [ ] UART *
   - [ ] 异常控制 *
 - [ ] IO
   - [ ] Led & 7 段数码管
   - [ ] 拨码开关 & 按钮
   - [ ] VGA *
-  - [ ] UART *
 - [ ] 软件
   - [ ] 测试场景1
   - [ ] 测试场景2
