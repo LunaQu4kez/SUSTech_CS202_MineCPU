@@ -3,12 +3,11 @@
 module BRU (
 	input  logic [`DATA_WID ] src1, src2, pc, imm,
 	input  logic [`BRUOP_WID] BRU_op,
-	output logic [`DATA_WID ] old_pc, pc_4,
+	output logic [`DATA_WID ] old_pc,
 	output logic              old_branch, result
 );
 
 	assign old_branch = (BRU_op != `BRU_NOP);
-	assign pc_4 = pc + 4;
 
 	always_comb begin : BRU
 		unique case (BRU_op)

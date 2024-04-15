@@ -15,7 +15,6 @@ module Stage_EX (
 	output logic [`DATA_WID    ] data_out,
 	output logic [`DATA_WID    ] write_addr,
 	output logic [`REGS_WID    ] EX_rd_out,
-	output logic [`DATA_WID    ] pc_4,
 	output logic [`MEM_CTRL_WID] MEM_ctrl_out,
 	output logic [`WB_CTRL_WID ] WB_ctrl_out,
 	// signals to pass back to ID stage
@@ -25,16 +24,16 @@ module Stage_EX (
 	output logic [`DATA_WID    ] old_pc
 );
 
-	logic [`ALUOP_WID] ALU_op;
-	logic              ALU_src;
-	logic [`BRUOP_WID] BRU_op;
-	logic [`DATA_WID ] src1, src2, src2_mux;
-	logic [`FW_WID   ] fwA, fwB;
+	logic [`ALUOP_WID ] ALU_op;
+	logic [`ALUSRC_WID] ALU_src;
+	logic [`BRUOP_WID ] BRU_op;
+	logic [`DATA_WID  ] src1, src2, src1_mux, src2_mux;
+	logic [`FW_WID    ] fwA, fwB;
 
 	// control signals
-	assign BRU_op = EX_ctrl_in[7:5];
-	assign ALU_op = EX_ctrl_in[4:1];
-	assign ALU_src = EX_ctrl_in[0];
+	assign BRU_op = EX_ctrl_in[8:6];
+	assign ALU_op = EX_ctrl_in[5:2];
+	assign ALU_src = EX_ctrl_in[1:0];
 
 	// pass control signals to EX_MEM reg
 	assign MEM_ctrl_out = MEM_ctrl_in;
@@ -49,10 +48,10 @@ module Stage_EX (
 	// determine whether to forward
 	always_comb begin : Mux_A
 		unique case (fwA)
-			2'b00: src1 = reg_data1;
-			2'b01: src1 = MEM_WB_data;
-			2'b10: src1 = EX_MEM_data;
-		  default: src1 = 0;
+			2'b00: src1_mux = reg_data1;
+			2'b01: src1_mux = MEM_WB_data;
+			2'b10: src1_mux = EX_MEM_data;
+		  default: src1_mux = 0;
 		endcase
 	end
 
@@ -65,8 +64,18 @@ module Stage_EX (
 		endcase
 	end
 
+	assign src1 = ALU_src[1] ? pc : src1_mux;
+
 	// source of ALU and write address
-	assign src2 = ALU_src ? imm : src2_mux;
+	always_comb begin  
+		unique case (ALU_src)
+			2'b00: src2 = src2_mux;
+			2'b01: src2 = imm;
+			2'b10: src2 = 4;
+		    2'b11: src2 = imm;
+		endcase
+	end
+
 	assign data_out = src2_mux;
 
 	Forward forward_unit (
@@ -95,7 +104,6 @@ module Stage_EX (
 		.BRU_op,
 		.result(branch_result),
 		.old_pc,
-		.pc_4,
 		.old_branch
 	);
 

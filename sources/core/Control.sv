@@ -7,14 +7,13 @@ module Control (
 );
 
     // atom ctrl wire
-    logic [`ALUOP_WID] ALUOp;
-    logic [`BRUOP_WID] BRUOp;
-    logic ALUSrc;       // 1: imm, 0: reg
+    logic [`ALUOP_WID]  ALUOp;
+    logic [`BRUOP_WID]  BRUOp;
+    logic [`ALUSRC_WID] ALUSrc;       // 1: imm, 0: reg
     logic MemWrite;     // 1: write to memory, 0: no write
     logic MemRead;      // 1: read from memory, 0: no read
     logic RegWrite;     // 1: write to regs, 0: no write
     logic MemtoReg;     // 1: data from memory to regs, 0: ALU res to regs
-    logic jal;          // 1: jal or jalr, 0: not
 
     // stage ctrl wire
     logic [`EX_CTRL_WID]  EX_ctrl;
@@ -25,12 +24,12 @@ module Control (
     // part control signal
     assign EX_ctrl  = {BRUOp, ALUOp, ALUSrc};
     assign MEM_ctrl = {LDST, MemWrite, MemRead};
-    assign WB_ctrl  = {jal ,RegWrite, MemtoReg};
+    assign WB_ctrl  = {RegWrite, MemtoReg};
 
     // total control
     assign total_ctrl = {EX_ctrl, MEM_ctrl, WB_ctrl};
 
-    assign jal = (inst[`OP_WID] == `JALR_OP | inst[`OP_WID] == `JAL_OP);
+    
 
     always_comb begin : Ctrl_Signal_Gen
         unique case (inst[`OP_WID])
@@ -142,7 +141,7 @@ module Control (
             `JALR_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_JMP;
-                ALUSrc   = 1;
+                ALUSrc   = 2;
                 MemWrite = 0;
                 MemRead  = 0;
                 RegWrite = 1;
@@ -155,7 +154,7 @@ module Control (
             `JAL_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_JMP;
-                ALUSrc   = 1;
+                ALUSrc   = 2;
                 MemWrite = 0;
                 MemRead  = 0;
                 RegWrite = 1;
@@ -180,13 +179,13 @@ module Control (
             end
             `AUIPC_OP: begin
                 ALUOp    = `ALU_ADD;
-                BRUOp    = `BRU_JMP;
-                ALUSrc   = 1;
+                BRUOp    = `BRU_NOP;
+                ALUSrc   = 3;
                 MemWrite = 0;
                 MemRead  = 0;
                 RegWrite = 1;
                 MemtoReg = 0;
-                branch   = 1;
+                branch   = 0;
                 predict  = 0;
                 ujtype   = 1;
                 LDST     = 0;

@@ -142,7 +142,7 @@ module CPU (
     logic [`DATA_WID] MEMtoEX_data;
     logic [`REGS_WID] MEM_rd_in, EX_rd_out;
     logic EX_MEM_RegWrite;
-    logic [`DATA_WID] EX_data_out, EX_ALU_res_out, EX_pc_4_out;
+    logic [`DATA_WID] EX_data_out, EX_ALU_res_out;
     logic [`MEM_CTRL_WID] EX_MEM_ctrl_out;
     logic [`WB_CTRL_WID] EX_WB_ctrl_out;
 
@@ -167,7 +167,6 @@ module CPU (
         .data_out(EX_data_out),
         .write_addr(EX_ALU_res_out),
         .EX_rd_out,
-        .pc_4(EX_pc_4_out),
         .MEM_ctrl_out(EX_MEM_ctrl_out),
         .WB_ctrl_out(EX_WB_ctrl_out),
         .ID_EX_rd_out(ID_EX_rd),
@@ -178,7 +177,7 @@ module CPU (
         .old_pc(EX_old_pc_out)
     );
 
-    logic [`DATA_WID] MEM_data1_in, MEM_data2_in, MEM_pc_4_in;
+    logic [`DATA_WID] MEM_data1_in, MEM_data2_in;
     logic [`MEM_CTRL_WID] MEM_MEM_ctrl_in;
     logic [`WB_CTRL_WID] MEM_WB_ctrl_in;
     assign EX_MEM_RegWrite = MEM_WB_ctrl_in[1];
@@ -188,11 +187,9 @@ module CPU (
         .rst,
         .ALUres_in(EX_ALU_res_out), 
         .data2_in(EX_data_out),
-        .pc_4_in(EX_pc_4_out),
         .rd_in(EX_rd_out),
         .ALUres_out(MEM_data1_in),
         .data2_out(MEM_data2_in),
-        .pc_4_out(MEM_pc_4_in),
         .rd_out(MEM_rd_in),
         .MEM_ctrl_in(EX_MEM_ctrl_out),
         .WB_ctrl_in(EX_WB_ctrl_out),
@@ -201,7 +198,7 @@ module CPU (
     );
 
     logic [`REGS_WID] MEM_rd_out;
-    logic [`DATA_WID] MEM_data1_out, MEM_data2_out, MEM_pc_4_out;
+    logic [`DATA_WID] MEM_data1_out, MEM_data2_out;
     logic [`WB_CTRL_WID] MEM_WB_ctrl_out;
     logic [`DATA_WID] mem_addr, mem_write_data, mem_data;
     logic MemWrite, web;
@@ -215,12 +212,10 @@ module CPU (
         .write_addr(MEM_data1_in),
         .write_data(MEM_data2_in),
         .EX_MEM_rd(MEM_rd_in),
-        .pc_4(MEM_pc_4_in),
         .MEM_rd_out,
         .addr_out(MEM_data1_out),
         .data_out(MEM_data2_out),
         .WB_ctrl_out(MEM_WB_ctrl_out),
-        .pc_4_out(MEM_pc_4_out),
         .mem_addr,
         .mem_write_data,
         .MemWrite,
@@ -228,7 +223,7 @@ module CPU (
         .mem_data
     );
 
-    logic [`DATA_WID] WB_data1_in, WB_data2_in, WB_pc_4_in;
+    logic [`DATA_WID] WB_data1_in, WB_data2_in;
     logic [`WB_CTRL_WID] WB_WB_ctrl_in;
     logic [`DATA_WID] uart_mem_data, uart_mem_addr;
     logic [`LDST_WID] uart_LDST;
@@ -244,11 +239,9 @@ module CPU (
         .rst,
         .addr_in(MEM_data1_out),
         .data_in(MEM_data2_out),
-        .pc_4_in(MEM_pc_4_out),
         .rd_in(MEM_rd_out),
         .addr_out(WB_data1_in),
         .data_out(WB_data2_in),
-        .pc_4_out(WB_pc_4_in),
         .rd_out(MEM_WB_rd),
         .WB_ctrl_in(MEM_WB_ctrl_out),
         .WB_ctrl_out(WB_WB_ctrl_in)
@@ -258,7 +251,6 @@ module CPU (
         .WB_ctrl(WB_WB_ctrl_in),
         .data(WB_data2_in),
         .ALU_res(WB_data1_in),
-        .pc_4(WB_pc_4_in),
         .write_data(WB_data_out)
     );
 

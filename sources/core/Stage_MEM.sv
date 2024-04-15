@@ -6,12 +6,10 @@ module Stage_MEM (
     input  logic [`DATA_WID    ] write_addr,
     input  logic [`DATA_WID    ] write_data,
     input  logic [`REGS_WID    ] EX_MEM_rd,
-    input  logic [`DATA_WID    ] pc_4,
     output logic [`REGS_WID    ] MEM_rd_out,
     output logic [`DATA_WID    ] addr_out,
     output logic [`DATA_WID    ] data_out,
     output logic [`WB_CTRL_WID ] WB_ctrl_out,
-    output logic [`DATA_WID    ] pc_4_out,
     // interact with Memory
     output logic [`DATA_WID    ] mem_addr,
     output logic [`DATA_WID    ] mem_write_data,
@@ -24,7 +22,6 @@ module Stage_MEM (
     assign MEM_rd_out = EX_MEM_rd;
     assign addr_out = write_addr;
     assign data_out = mem_data;
-    assign pc_4_out = pc_4;
 
     assign mem_addr = write_addr;
     assign mem_write_data = write_data;

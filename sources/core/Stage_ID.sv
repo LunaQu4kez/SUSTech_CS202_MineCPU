@@ -39,9 +39,9 @@ module Stage_ID (
     assign rd_out  = rd;
     assign pc_out = pc_in;
     assign ctrl_out = (stall == 1'b0) ? total_ctrl : 0;
-    assign EX_ctrl  = ctrl_out[15:8];
-    assign MEM_ctrl = ctrl_out[7:3];
-    assign WB_ctrl  = ctrl_out[2:0];
+    assign EX_ctrl  = ctrl_out[15:7];
+    assign MEM_ctrl = ctrl_out[6:2];
+    assign WB_ctrl  = ctrl_out[1:0];
     assign reg_data1 = rs1_data;
     assign reg_data2 = rs2_data;
     assign imm_out = imm;
