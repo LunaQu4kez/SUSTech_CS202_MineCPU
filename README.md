@@ -6,23 +6,17 @@
 
 </div>
 
-
-
 ## 功能
 
 能跑再说...
 
-
-
 ## 小组成员及分工
 
-| 成员 | CPU核心 | IO & UART | 仿真 & 测试 | 汇编 | 报告 |
+| 成员 | CPU核心 | IO & UART | 仿真 & 测试 | 汇编 & 应用 | 报告 |
 | --- | --- | --- | --- | --- | --- |
-| [@wLUOw](https://github.com/wLUOw) |  |  |  |  |  |
-| [@Yao1OoO](https://github.com/Yao1OoO) |  |  |  |  |  |
-| [@chanbengz](https://github.com/chanbengz) |  |  |  |  |  |
-
-
+| [@wLUOw](https://github.com/wLUOw) | :heavy_check_mark: |  | :heavy_check_mark: |  |  |
+| [@Yao1OoO](https://github.com/Yao1OoO) |  | :heavy_check_mark: |  | :heavy_check_mark: |  |
+| [@chanbengz](https://github.com/chanbengz) | :heavy_check_mark: |  | :heavy_check_mark: |  |  |
 
 ## 项目结构
 
@@ -57,8 +51,6 @@ MineCPU
 └── README.md
 ```
 
-
-
 ## 完成列表
 
 - [x] CPU 核心
@@ -78,32 +70,28 @@ MineCPU
   - [x] MEM Stage
   - [x] WB Stage
   - [x] Memory
+    - [ ] Cache *
+    - [ ] UART *
   - [ ] 异常控制 *
 - [ ] IO
   - [ ] Led & 7 段数码管
   - [ ] 拨码开关 & 按钮
   - [ ] VGA *
-  - [ ] UART *
 - [ ] 软件
   - [ ] 测试场景1
   - [ ] 测试场景2
   - [ ] Pac-Man *
 
-
-
 ## 使用方法
 
 还是先略...
-
-
 
 ## 总结与注意事项
 
 最后再写
 
-
 ## 问题及解决方案
 
-+ **[Data Hazard]** `ret (jalr zero, ra, 0)` 指令必须在ld ra, 0(sp)4个指令之后，或者函数指令数必须大于4，否则会出现异常.
++ **[Data Hazard]** `ret (jalr zero, ra, 0)` 指令必须在`ld ra, 0(sp)` 4个指令之后，或者函数指令数必须大于4，否则会出现异常.
   - **原因**: ra寄存器的更改发生在4个周期后，而ret指令在访问ra寄存器时导致数据冒险
   - **解决方案**: 1. 保证ret指令在ld ra, 0(sp)之后执行; 2. 在ret指令之前插入nop指令
