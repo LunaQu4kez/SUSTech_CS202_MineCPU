@@ -12,7 +12,7 @@
 
 ## 小组成员及分工
 
-| 成员 | CPU核心 | IO & UART | 仿真 & 测试 | 汇编 & 应用 | 报告 |
+| 成员 | CPU核心 | IO | 仿真 & 测试 | 汇编 & 应用 | 报告 |
 | --- | --- | --- | --- | --- | --- |
 | [@wLUOw](https://github.com/wLUOw) | :heavy_check_mark: |  | :heavy_check_mark: |  |  |
 | [@Yao1OoO](https://github.com/Yao1OoO) |  | :heavy_check_mark: |  | :heavy_check_mark: |  |
