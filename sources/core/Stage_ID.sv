@@ -23,11 +23,13 @@ module Stage_ID (
     output logic                 predict_result,
     output logic                 predict_fail,
     // signal to IF stage
-    output logic [`DATA_WID    ] new_pc
+    output logic [`DATA_WID    ] new_pc,
+    // signal to Memory
+    output logic [`DATA_WID    ] SEPC
 );
 
     logic [`REGS_WID] rs1, rs2, rd;
-    logic stall, branch, predict, ujtype;
+    logic stall, branch, predict, ujtype, excp;
     logic [`CTRL_WID] total_ctrl, ctrl_out;
     logic [`DATA_WID] rs1_data, rs2_data, imm;
 
@@ -78,7 +80,8 @@ module Stage_ID (
         .total_ctrl,
         .branch,
         .predict,
-        .ujtype
+        .ujtype,
+        .excp
     );
 
     Branch_Predictor bp_inst (
@@ -88,6 +91,7 @@ module Stage_ID (
         .predict,
         .rs1_data,
         .ujtype,
+        .excp,
         .pc(pc_in),
         .imm,
         .old_pc,
@@ -97,7 +101,8 @@ module Stage_ID (
         .old_branch_pc,
         .target_pc(new_pc),
         .predict_result,
-        .predict_fail
+        .predict_fail,
+        .SEPC
     );
 
 endmodule

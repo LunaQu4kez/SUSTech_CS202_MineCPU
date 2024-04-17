@@ -6,12 +6,14 @@ module Memory (
     input  logic [`DATA_WID] addra, addrb,
     input  logic [`DATA_WID] write_datab,
     input  logic             web, // port b write enable
+    input  logic [`DATA_WID] SEPC,
     output logic [`DATA_WID] dataa, datab,
     // uart related
     // ......
     // IO related
-    input  logic [7:0      ] switches,
-    output logic [31:0     ] led_out
+    input  logic [7:0      ] switches1, switches2, switches3,
+    input                    bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
+    output logic [7:0      ] led1_out, led2_out, led3_out 
 );
 
     reg [1:0] cnt = 2'b00;
@@ -28,6 +30,11 @@ module Memory (
     logic bool_io;
     assign bool_io = (addrb[31:16] == 16'hffff);  // 1: io, 0: mem
     assign datab = bool_io ? datab_io : datab_mem;
+
+    logic [`DATA_WID] rdataa, edataa;
+    logic bool_exc;  // exception or not
+    assign bool_exc = (addra[31:16] == 16'h1c09);
+    assign dataa = bool_exc ? edataa : rdataa;
 
     
     // IP RAM
@@ -52,7 +59,7 @@ module Memory (
         .addrb(addrb[15:2]),
         .dina(0),
         .dinb(bool_io ? 0 : wdatab),
-        .douta(dataa),
+        .douta(rdataa),
         .doutb(rdatab),
         .ena(1'b1),
         .enb(1'b1),
@@ -113,25 +120,115 @@ module Memory (
         endcase
     end
 
+    always_comb begin : Exception_Instruction
+        unique case (addra[15:0])
+            16'h0000: edataa = `addi_sp_sp_m8;
+            16'h0004: edataa = `sw_t0_4_sp;
+            16'h0008: edataa = `sw_t1_0_sp;
+            16'h000c: edataa = `addi_t1_zero_1;
+            16'h0010: edataa = `lw_t0_24_gp;
+            16'h0014: edataa = `beq_t0_t1_out;
+            16'h0018: edataa = `beq_zero_zero_loop;
+            16'h001c: edataa = `lw_a0_0_gp;
+            16'h0020: edataa = `lw_t1_0_sp;
+            16'h0024: edataa = `lw_t0_4_sp;
+            16'h0028: edataa = `addi_sp_sp_8;
+            16'h002c: edataa = `lw_tp_44_gp;
+            16'h0030: edataa = `nop;
+            16'h0034: edataa = `nop;
+            16'h0038: edataa = `nop;
+            16'h003c: edataa = `jalr_zero_tp_0;
+            default:  edataa = `nop;
+        endcase
+    end
+
 
     // MMIO Regs
     // output
-    logic [31:0] led;
-    assign led_out = led;
+    logic [7:0] led1, led2, led3;
+    assign led1_out = led1;
+    assign led2_out = led2;
+    assign led3_out = led3;
 
     always_comb begin
         unique case (addrb)
-            32'hffff_ff00: begin     // switches
-                datab_io = {24'h000000, switches};
-                led = led;
+            32'hffff_ff00: begin     // switches1
+                datab_io = {24'h000000, switches1};
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
             end
-            32'hffff_ff04: begin     // led
+            32'hffff_ff04: begin     // switches2
+                datab_io = {24'h000000, switches2};
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff08: begin     // switches3
+                datab_io = {24'h000000, switches3};
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff0c: begin     // led1
                 datab_io = 0;
-                led = write_datab;
+                led1 = write_datab[7:0];
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff10: begin     // led2
+                datab_io = 0;
+                led1 = led1;
+                led2 = write_datab[7:0];
+                led3 = led3;
+            end
+            32'hffff_ff14: begin     // led3
+                datab_io = 0;
+                led1 = led1;
+                led2 = led2;
+                led3 = write_datab[7:0];
+            end
+            32'hffff_ff18: begin     // button1 middle
+                datab_io = bt1 ? 32'h00000001 : 32'h00000000;
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff1c: begin     // button2 up
+                datab_io = bt2 ? 32'h00000001 : 32'h00000000;
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff20: begin     // button3 down
+                datab_io = bt3 ? 32'h00000001 : 32'h00000000;
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff24: begin     // button4 left
+                datab_io = bt4 ? 32'h00000001 : 32'h00000000;
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff28: begin     // button5 right
+                datab_io = bt5 ? 32'h00000001 : 32'h00000000;
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
+            end
+            32'hffff_ff2c: begin     // SEPC
+                datab_io = SEPC;
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
             end
             default: begin
                 datab_io = 0;
-                led = led;
+                led1 = led1;
+                led2 = led2;
+                led3 = led3;
             end
         endcase
     end

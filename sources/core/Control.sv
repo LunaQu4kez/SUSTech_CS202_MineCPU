@@ -3,7 +3,7 @@
 module Control (
     input  logic [`DATA_WID] inst, 
     output logic [`CTRL_WID] total_ctrl,
-    output logic             branch, predict, ujtype
+    output logic             branch, predict, ujtype, excp
 );
 
     // atom ctrl wire
@@ -55,6 +55,7 @@ module Control (
                 predict  = 0;
                 ujtype   = 0;
                 LDST     = 0;
+                excp     = 0;
             end
             `ART_IMM_OP: begin
                 unique case (inst[`FUNC3_WID])
@@ -78,6 +79,7 @@ module Control (
                 predict  = 0;
                 ujtype   = 0;
                 LDST     = 0;
+                excp     = 0;
             end
             `LOAD_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -98,6 +100,7 @@ module Control (
                     `LHU_FUNC3: LDST = `LHU_OP;  
                     default:    LDST = 0;
                 endcase
+                excp     = 0;
             end
             `STORE_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -116,6 +119,7 @@ module Control (
                     `SW_FUNC3 : LDST = `SW_OP; 
                     default:    LDST = 0;
                 endcase
+                excp     = 0;
             end
             `BRANCH_OP: begin
                 unique case (inst[`FUNC3_WID])
@@ -137,6 +141,7 @@ module Control (
                 predict  = 1;
                 ujtype   = 0;
                 LDST     = 0;
+                excp     = 0;
             end
             `JALR_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -150,6 +155,7 @@ module Control (
                 predict  = 0;
                 ujtype   = 0;
                 LDST     = 0;
+                excp     = 0;
             end
             `JAL_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -163,6 +169,7 @@ module Control (
                 predict  = 0;
                 ujtype   = 1;
                 LDST     = 0;
+                excp     = 0;
             end
             `LUI_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -176,6 +183,7 @@ module Control (
                 predict  = 0;
                 ujtype   = 1;
                 LDST     = 0;
+                excp     = 0;
             end
             `AUIPC_OP: begin
                 ALUOp    = `ALU_ADD;
@@ -189,6 +197,21 @@ module Control (
                 predict  = 0;
                 ujtype   = 1;
                 LDST     = 0;
+                excp     = 0;
+            end
+            `ECALL_OP: begin
+                ALUOp    = `ALU_ADD;
+                BRUOp    = `BRU_NOP;
+                ALUSrc   = 0;
+                MemWrite = 0;
+                MemRead  = 0;
+                RegWrite = 0;
+                MemtoReg = 0;
+                branch   = 0;
+                predict  = 0;
+                ujtype   = 0;
+                LDST     = 0;
+                excp     = 1;
             end
             default: begin
                 ALUOp    = 0;
@@ -202,6 +225,7 @@ module Control (
                 predict  = 0;
                 ujtype   = 0;
                 LDST     = 0;
+                excp     = 0;
             end
         endcase
     end

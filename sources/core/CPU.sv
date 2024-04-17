@@ -7,8 +7,9 @@ module CPU (
     input  logic [31:0] uart_addr,
     input  logic        uart_finish,
     // interact with devices
-    input  logic [7:0 ] switches,
-    output logic [31:0] led_out,
+    input  logic [7:0 ] switches1, switches2, switches3,
+    input  logic        bt1, bt2, bt3, bt4, bt5,
+    output logic [7:0 ] led1_out, led2_out, led3_out,
     // debug use
     output logic [31:0]         pc_t,
     output logic [31:0]         inst_t,
@@ -19,7 +20,8 @@ module CPU (
     output logic [31:0]         MEM_data_t,
     output logic [31:0]         WB_data_t,
     output logic [31:0]         WB_mem_t,
-    output logic [31:0]         WB_data_ot
+    output logic [31:0]         WB_data_ot,
+    output logic [31:0]         SEPC_t
 );
 
     logic PC_Write, rst;
@@ -67,6 +69,7 @@ module CPU (
     logic [`REGS_WID] ID_rs1_out, ID_rs2_out, ID_rd_out;
     logic [`DATA_WID] ID_data1_out, ID_data2_out, ID_imm_out, ID_pc_out;
     logic ID_predict_result_out;
+    logic [`DATA_WID] SEPC;
 
 
     Stage_ID id_inst (
@@ -98,7 +101,8 @@ module CPU (
         .PC_Write,
         .predict_result(ID_predict_result_out),
         .predict_fail,
-        .new_pc
+        .new_pc,
+        .SEPC
     );
 
     logic [`DATA_WID] EX_pc_in, EX_data1_in, EX_data2_in, EX_imm_in;
@@ -262,10 +266,20 @@ module CPU (
         .addrb(uart_mem_addr),
         .write_datab(uart_mem_data),
         .web,
+        .SEPC,
         .dataa(mem_inst),
         .datab(mem_data),
-        .switches,
-        .led_out
+        .switches1,
+        .switches2,
+        .switches3,
+        .bt1,
+        .bt2,
+        .bt3,
+        .bt4,
+        .bt5,
+        .led1_out,
+        .led2_out,
+        .led3_out
     );
 
     // debug use
@@ -279,5 +293,6 @@ module CPU (
     assign WB_data_t = WB_data1_in;
     assign WB_mem_t = WB_data2_in;
     assign WB_data_ot = WB_data_out;
+    assign SEPC_t = SEPC;
 
 endmodule
