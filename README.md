@@ -43,7 +43,7 @@ MineCPU
 │   ├── sim
 │   │   ├── *.cpp              # verilator simulation
 │   │   └── *.sv               # vivado simulation
-│   └── Top.v                  # top module of MineCPU
+│   └── Top.sv                 # top module of MineCPU
 ├── test
 │   └── DiffTest.cpp           # differential test of CPU
 ├── .gitignore
@@ -72,7 +72,7 @@ MineCPU
   - [x] Memory
     - [ ] Cache *
     - [ ] UART *
-  - [ ] 异常控制 *
+  - [x] 异常控制 *
 - [ ] IO
   - [ ] Led & 7 段数码管
   - [ ] 拨码开关 & 按钮
