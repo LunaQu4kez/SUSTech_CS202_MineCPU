@@ -121,6 +121,7 @@ int main(int argc, char** argv) {
         return -1;
     }
     uc_mem_map(uc, 0x0, 1024 * 1024 * 4, UC_PROT_ALL);
+    uc_mem_map(uc, 0xffffff00, 1024 * 4, UC_PROT_ALL);
     int uc_sp = 0x7ffc, uc_gp = 0xffffff00;
     uc_reg_write(uc, UC_RISCV_REG_SP, &uc_sp);
     uc_reg_write(uc, UC_RISCV_REG_GP, &uc_gp);
@@ -142,13 +143,16 @@ int main(int argc, char** argv) {
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
 
-    while (uc_pc != 0x64) {
+    while (uc_pc != 0x1c) {
         run_one_cycle();
         if(get_value(flush)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
         // run one instruction on unicorn
-        if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1)))
+        if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
+            printf("pc: 0x%llx\n", uc_pc);
             printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
+            break;
+        }
         
         uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
         time++;

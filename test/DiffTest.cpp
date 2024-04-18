@@ -1,39 +1,168 @@
 #include <unicorn/unicorn.h>
 #include <verilated.h>
 #include <verilated_vpi.h>
+#include "verilated_vcd_c.h"
+#include <vector>
+#include <fstream>
 #include "VTop.h"
 
+using std::vector;
 const char *REG_NAMES[32] = {"x0", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
+const int SIM_TIME = 7;
+
+// verilator
 const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
+VTop *top = new VTop(contextp.get());
+VerilatedVcdC* tfp = new VerilatedVcdC;
+
+// unicorn simulator
 uc_engine *uc;
+
+// vpi handles
+vpiHandle pc;
+vpiHandle regs[32];
+vpiHandle mem[16383];
+vpiHandle flush;
+
+// from Monad's code
+vector<char> read_binary(const char *name) {
+    std::ifstream f;
+    f.open(name, std::ios::binary);
+    f.seekg(0, std::ios::end);
+    size_t size = f.tellg();
+
+    std::vector<char> data;
+    data.resize(size);
+    f.seekg(0, std::ios::beg);
+    f.read(&data[0], size);
+    return data;
+}
 
 vpiHandle get_handle(const char *name) {
     vpiHandle vh = vpi_handle_by_name((PLI_BYTE8*)name, NULL);
-    if (!vh) {
+    if (vh == NULL) {
         printf("name: %s\n", name);
         vl_fatal(__FILE__, __LINE__, "get_handle", "No handle found");
     }
     return vh;
 }
 
-void read_and_check() {
-      vpiHandle vh1 = get_handle();
-      const char* name = vpi_get_str(vpiName, vh1);
-      s_vpi_value v; v.format = vpiIntVal;
-      vpi_get_value(vh1, &v);
-      printf("Value of %s: %d\n", name, v.value.integer);      
-  }
+int get_value(vpiHandle vh) {
+	s_vpi_value v; v.format = vpiIntVal;
+	vpi_get_value(vh, &v);
+	return v.value.integer;
+}
 
-int main(int argc, char** argv[]) {
-    contextp->commandArgs(argc, argv);
+void run_one_cycle() {
+    top->cpuclk = 0;
+    top->eval();
+    for(int i = 0; i < 4; i++) {
+        top->memclk = 1;
+        top->eval();
+        contextp->timeInc(1);
+        tfp->dump(contextp->time());
+        top->memclk = 0;
+        top->eval();
+        contextp->timeInc(1);
+        tfp->dump(contextp->time());
+        if (i % 2 == 0) {
+            top->cpuclk = !top->cpuclk;
+            top->eval();
+        }
+    }
+}
 
-	uc_err err;
+vector<uint32_t> load_program() {
+    vector<char> data = read_binary("../assembly/fib.bin");
+    vector<unsigned int> inst;
+    uint32_t concat_data, size = data.size() / 4;
+
+    if (uc_mem_write(uc, 0x0, data.data(), data.size())) {
+        printf("Failed to write emulation code to memory, quit!\n");
+        return vector<uint32_t>();
+    }
+
+    for(int i = 0; i < size; i++) {
+        concat_data = 0;
+        for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
+        top->uart_addr = i * 4;
+        top->uart_data = concat_data;
+        inst.push_back(concat_data);
+        run_one_cycle();
+    }
+
+    return inst;
+}
+
+bool diff_check() {
+    bool pass = true;
+    for (int i = 0, v; i < 32; i++) {
+        uc_reg_read(uc, i + 1, &v);
+        if (v != get_value(regs[i])) {
+            pass = false;
+            printf("regs: uc, cpu\n");
+            printf("%4s: 0x%x, 0x%x\n", REG_NAMES[i], v, get_value(regs[i]));
+        }
+    }
+    return pass;
+}
+
+int main(int argc, char** argv) {
+    Verilated::commandArgs(argc, argv);
+    Verilated::traceEverOn(true);
+    top->trace(tfp, 1);
+    tfp->open("cpu_sim.vcd");
+
+    // initialize unicorn
+
+    uc_err err;
     if ((err = uc_open(UC_ARCH_RISCV, UC_MODE_32, &uc)) != UC_ERR_OK) {
         printf("Failed on uc_open() with error returned: %u\n", err);
         return -1;
     }
+    uc_mem_map(uc, 0x0, 1024 * 1024 * 4, UC_PROT_ALL);
+    uc_mem_map(uc, 0xffffff00, 1024 * 4, UC_PROT_ALL);
+    int uc_sp = 0x7ffc, uc_gp = 0xffffff00;
+    uc_reg_write(uc, UC_RISCV_REG_SP, &uc_sp);
+    uc_reg_write(uc, UC_RISCV_REG_GP, &uc_gp);
 
-    VerilatedVpi::callValueCbs();
-	
+    // initialize vpi handles
+    pc = get_handle("TOP.Top.cpu.pc_inst.pc");
+    flush = get_handle("TOP.Top.cpu.flush");
+    for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.Top.cpu.id_inst.reg_inst.regs"), i);
+    for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.Top.cpu.memory_inst.test_inst.mem"), i);
+
+    long long time = 0, uc_pc = 0;
+
+    // load program
+    top->rst_n = 1;
+    top->uart_finish = 0;
+    vector<uint32_t> inst = load_program();
+    top->uart_finish = 1;
+
+    // run four cycles to get warm up
+    for(int i = 0; i < 3; i++) run_one_cycle();
+
+    while (uc_pc != 0x1c) {
+        run_one_cycle();
+        if(get_value(flush)) run_one_cycle(); // penalty one cycle
+    	VerilatedVpi::callValueCbs();
+        // run one instruction on unicorn
+        if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
+            printf("pc: 0x%llx\n", uc_pc);
+            printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
+            break;
+        }
+        
+        uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
+        time++;
+    }
+
+    diff_check();
+    printf("pc: 0x%x\n", get_value(pc));
+
+	top->final(), tfp->close();
+    delete top;
+
 	return 0;
 }
