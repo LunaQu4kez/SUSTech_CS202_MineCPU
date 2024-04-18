@@ -22,11 +22,12 @@
 MineCPU
 ├── docs
 │   ├── CPU.*                  # design draft
-│   ├── Report.md              # report of this project
+│   ├── report.md              # report of this project
 │   ├── cpu_design.pdf         # CPU design from textbook
 │   └── riscv-card.pdf         # ISA reference
 ├── program
 │   ├── lib                    # library of some API
+│   ├── pacman                 # game adapted to CPU
 │   └── list.md                # maybe useful
 ├── sources                                              
 │   ├── assembly               # assembly program for test and fun
@@ -134,15 +135,15 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | `jalr rd, rs1, imm`    | I        | rd = PC + 4; PC = rs1 + imm               |
 | `lui rd, imm`          | U        | rd = imm « 12                             |
 | `auipc rd, imm`        | U        | rd = PC + (imm « 12)                      |
-| `ecall`                | I        | 控制权交给操作系统 (采用输入设备模拟)     |
-| `mul rd, rs1, rs2`     | R        | rd = (rs1 * rs2)[31:0]                    |
-| `mulh rd, rs1, rs2`    | R        | rd = (rs1 * rs2)[63:32]                   |
-| `mulhsu rd, rs1, rs2`  | R        | rd = (rs1 * (u)rs2)[63:32]                |
-| `mulhu rd, rs1, rs2`   | R        | rd = ( (u)rs1 * (u)rs2 )[63:32]           |
-| `div rd, rs1, rs2`     | R        | rd = rs1 / rs2                            |
-| `divu rd, rs1, rs2`    | R        | rd = (u)rs1 / (u)rs2                      |
-| `rem rd, rs1, rs2`     | R        | rd = rs1 % rs2                            |
-| `remu rd, rs1, rs2`    | R        | rd = (u)rs1 % (u)rs2                      |
+| `ecall`                | I        | 控制权交给固件 (采用输入设备模拟)              |
+| `mul rd, rs1, rs2` *   | R        | rd = (rs1 * rs2)[31:0]                    |
+| `mulh rd, rs1, rs2` *  | R        | rd = (rs1 * rs2)[63:32]                   |
+| `mulhsu rd, rs1, rs2` *| R        | rd = (rs1 * (u)rs2)[63:32]                |
+| `mulhu rd, rs1, rs2` * | R        | rd = ( (u)rs1 * (u)rs2 )[63:32]           |
+| `div rd, rs1, rs2` *   | R        | rd = rs1 / rs2                            |
+| `divu rd, rs1, rs2` *  | R        | rd = (u)rs1 / (u)rs2                      |
+| `rem rd, rs1, rs2` *   | R        | rd = rs1 % rs2                            |
+| `remu rd, rs1, rs2` *  | R        | rd = (u)rs1 % (u)rs2                      |
 
 ### IO
 
@@ -178,7 +179,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | 0xFFFFFF20 | R     | 按钮 3 (下)            | 0x00 - 0x01          |
 | 0xFFFFFF24 | R     | 按钮 4 (左)            | 0x00 - 0x01          |
 | 0xFFFFFF28 | R     | 按钮 5 (右)            | 0x00 - 0x01          |
-| 0xFFFFFF2C | R     | 异常中断后跳转的 PC    | 无固定范围           |
+| 0xFFFFFF2C | R     | 异常中断后跳转的 PC     | 无固定范围           |
 |            |       |                        |                      |
 
 
@@ -200,6 +201,5 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 + **[Data Hazard]** `ret (jalr zero, ra, 0)` 指令必须在 `ld ra, 0(sp)` 4 条指令之后，或者函数指令数必须大于 4，否则会出现异常.
   - **原因**: ra 寄存器的更改发生在 4 个周期后，而 `ret` 指令在访问 ra 寄存器时导致数据冒险
   - **解决方案**: 
-    1. 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行
-    2. 在 `ret` 指令之前插入 nop 指令
-    3. 进行停顿 ~~(懒得改了)~~ 
+    1. 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行（如在 `ret` 指令之前插入 nop 指令）
+    2. 进行停顿/改进转发单元 ~~(懒得改了)~~ 
