@@ -15,8 +15,8 @@ module Branch_Predictor (
     // target pc is predicted pc, pass predict_result to EX, predict_fail to flush
     output logic [`DATA_WID] target_pc,
     output logic             predict_result, predict_fail,
-    // SEPC
-    output logic [`DATA_WID] SEPC
+    // sepc
+    output logic [`DATA_WID] sepc
 );
 
     reg [1:0] History_Table [0: (1 << 10) - 1];
@@ -32,9 +32,9 @@ module Branch_Predictor (
     end
 
     always_ff @(negedge clk) begin
-        if (rst) SEPC <= 0;
-        else if (excp) SEPC <= pc + 4;
-        else SEPC <= SEPC;
+        if (rst) sepc <= 0;
+        else if (excp) sepc <= pc + 4;
+        else sepc <= sepc;
     end
 
     logic [9:0] table_addr, update_addr; // use pc[11:2] as index since last 2 bits are always 0

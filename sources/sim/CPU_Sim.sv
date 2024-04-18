@@ -4,7 +4,7 @@ module CPU_Sim ();
     logic [7:0] switches1;
     logic [7:0] led1;
     logic [31:0] pc_t, inst_t;
-    logic [31:0] EX_data1_t, EX_data2_t, EX_imm_t, MEM_addr_t, MEM_data_t, WB_data_t, WB_mem_t, WB_data_ot, SEPC_t;
+    logic [31:0] EX_data1_t, EX_data2_t, EX_imm_t, MEM_addr_t, MEM_data_t, WB_data_t, WB_mem_t, WB_data_ot, sepc_t;
     logic [7:0] switches2, switches3;
     logic [7:0] led2, led3;
     logic bt1, bt2, bt3, bt4, bt5;
@@ -35,7 +35,7 @@ module CPU_Sim ();
         .WB_data_t, 
         .WB_mem_t, 
         .WB_data_ot,
-        .SEPC_t
+        .sepc_t
     );
 
     initial begin

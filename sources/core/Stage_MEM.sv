@@ -14,7 +14,7 @@ module Stage_MEM (
     output logic [`DATA_WID    ] mem_addr,
     output logic [`DATA_WID    ] mem_write_data,
     output                       MemWrite,
-    output logic [`LDST_WID    ] LDST,
+    output logic [`LDST_WID    ] ldst,
     input  logic [`DATA_WID    ] mem_data
 );
 
@@ -26,6 +26,6 @@ module Stage_MEM (
     assign mem_addr = write_addr;
     assign mem_write_data = write_data;
     assign MemWrite = MEM_ctrl_in[1];
-    assign LDST = MEM_ctrl_in[4:2];
+    assign ldst = MEM_ctrl_in[4:2];
 
 endmodule

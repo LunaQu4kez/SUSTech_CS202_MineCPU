@@ -1,7 +1,7 @@
 module Memory_Sim ();
     logic cpuclk;
     logic clka, clkb;
-    logic [2:0] LDST;
+    logic [2:0] ldst;
     logic [31:0] addra, addrb;
     logic [31:0] write_datab;
     logic [0:0] web;            // port b write enable
@@ -12,7 +12,7 @@ module Memory_Sim ();
     Memory mem_test_inst (
         .clka,
         .clkb,
-        .LDST,
+        .ldst,
         .addra,
         .addrb,
         .write_datab,
@@ -29,7 +29,7 @@ module Memory_Sim ();
         cpuclk = 0;
 
         clkb = 0;
-        LDST = 0;
+        ldst = 0;
         addrb = 0;
         write_datab = 0;
         web = 0;
@@ -62,54 +62,54 @@ module Memory_Sim ();
     join
 
     initial fork
-        #5 LDST = 7; // store word
+        #5 ldst = 7; // store word
         #5 addrb = 100;
         #5 write_datab = 32'h123456f8;
         #5 web = 1;
 
-        #45 LDST = 7; // store word
+        #45 ldst = 7; // store word
         #45 addrb = 32'hffff_ff04;
         #45 write_datab = 32'h0000_0005;
         #45 web = 1;
 
         /*
-        #45 LDST = 2; // load word
+        #45 ldst = 2; // load word
         #45 addrb = 100;
         #45 write_datab = 32'h000fff00;
         #45 web = 0;
         */
 
-        #85 LDST = 1; // load half
+        #85 ldst = 1; // load half
         #85 addrb = 102;
         #85 write_datab = 32'h000fff00;
         #85 web = 0;
 
-        #125 LDST = 0; // load byte
+        #125 ldst = 0; // load byte
         #125 addrb = 100;
         #125 write_datab = 32'h000fff00;
         #125 web = 0;
 
-        #165 LDST = 0; // load byte
+        #165 ldst = 0; // load byte
         #165 addrb = 100;
         #165 write_datab = 32'h000fff00;
         #165 web = 0;
 
-        #205 LDST = 5; // store byte
+        #205 ldst = 5; // store byte
         #205 addrb = 101;
         #205 write_datab = 32'hffffffab;
         #205 web = 1;
 
-        #245 LDST = 2; // load word
+        #245 ldst = 2; // load word
         #245 addrb = 100;
         #245 write_datab = 32'h000fff00;
         #245 web = 0;
 
-        #285 LDST = 6; // store half
+        #285 ldst = 6; // store half
         #285 addrb = 102;
         #285 write_datab = 32'hffffde98;
         #285 web = 1;
 
-        #325 LDST = 2; // load word
+        #325 ldst = 2; // load word
         #325 addrb = 100;
         #325 write_datab = 32'h000fff00;
         #325 web = 0;

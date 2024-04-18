@@ -25,7 +25,7 @@ module Stage_ID (
     // signal to IF stage
     output logic [`DATA_WID    ] new_pc,
     // signal to Memory
-    output logic [`DATA_WID    ] SEPC
+    output logic [`DATA_WID    ] sepc
 );
 
     logic [`REGS_WID] rs1, rs2, rd;
@@ -102,7 +102,7 @@ module Stage_ID (
         .target_pc(new_pc),
         .predict_result,
         .predict_fail,
-        .SEPC
+        .sepc
     );
 
 endmodule

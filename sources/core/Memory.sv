@@ -2,14 +2,12 @@
 
 module Memory (
     input                    clka, clkb, // rst,
-    input  logic [`LDST_WID] LDST,
+    input  logic [`LDST_WID] ldst,
     input  logic [`DATA_WID] addra, addrb,
     input  logic [`DATA_WID] write_datab,
     input  logic             web, // port b write enable
-    input  logic [`DATA_WID] SEPC,
+    input  logic [`DATA_WID] sepc,
     output logic [`DATA_WID] dataa, datab,
-    // uart related
-    // ......
     // IO related
     input  logic [7:0      ] switches1, switches2, switches3,
     input                    bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
@@ -37,7 +35,7 @@ module Memory (
     assign dataa = bool_exc ? edataa : rdataa;
 
     
-    // IP RAM
+    // IP RAM Simulation
     /*
     MemoryAnalog test_inst (
         .clka(~clka),
@@ -51,7 +49,6 @@ module Memory (
     );
     */
     
-    ///*
     Mem mem_inst (
         .clka(~clka),
         .clkb(~clkb),
@@ -66,10 +63,9 @@ module Memory (
         .wea(1'b0),
         .web(we & ~bool_io)
     );
-    //*/
 
     always_comb begin
-        unique case (LDST)
+        unique case (ldst)
             `LW_OP: begin
                 datab_mem = rdatab;
                 wdatab = 0;
@@ -218,8 +214,8 @@ module Memory (
                 led2 = led2;
                 led3 = led3;
             end
-            32'hffff_ff2c: begin     // SEPC
-                datab_io = SEPC;
+            32'hffff_ff2c: begin     // sepc
+                datab_io = sepc;
                 led1 = led1;
                 led2 = led2;
                 led3 = led3;

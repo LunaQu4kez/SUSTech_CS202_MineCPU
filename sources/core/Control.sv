@@ -19,11 +19,11 @@ module Control (
     logic [`EX_CTRL_WID]  EX_ctrl;
     logic [`MEM_CTRL_WID] MEM_ctrl;
     logic [`WB_CTRL_WID]  WB_ctrl;
-    logic [`LDST_WID]     LDST;
+    logic [`LDST_WID]     ldst;
 
     // part control signal
     assign EX_ctrl  = {BRUOp, ALUOp, ALUSrc};
-    assign MEM_ctrl = {LDST, MemWrite, MemRead};
+    assign MEM_ctrl = {ldst, MemWrite, MemRead};
     assign WB_ctrl  = {RegWrite, MemtoReg};
 
     // total control
@@ -54,7 +54,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
             `ART_IMM_OP: begin
@@ -78,7 +78,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
             `LOAD_OP: begin
@@ -93,12 +93,12 @@ module Control (
                 predict  = 0;
                 ujtype   = 0;
                 unique case (inst[`FUNC3_WID])
-                    `LB_FUNC3:  LDST = `LB_OP;
-                    `LH_FUNC3:  LDST = `LH_OP;
-                    `LW_FUNC3:  LDST = `LW_OP;
-                    `LBU_FUNC3: LDST = `LBU_OP;
-                    `LHU_FUNC3: LDST = `LHU_OP;  
-                    default:    LDST = 0;
+                    `LB_FUNC3:  ldst = `LB_OP;
+                    `LH_FUNC3:  ldst = `LH_OP;
+                    `LW_FUNC3:  ldst = `LW_OP;
+                    `LBU_FUNC3: ldst = `LBU_OP;
+                    `LHU_FUNC3: ldst = `LHU_OP;  
+                    default:    ldst = 0;
                 endcase
                 excp     = 0;
             end
@@ -114,10 +114,10 @@ module Control (
                 predict  = 0;
                 ujtype   = 0;
                 unique case (inst[`FUNC3_WID])
-                    `SB_FUNC3 : LDST = `SB_OP; 
-                    `SH_FUNC3 : LDST = `SH_OP; 
-                    `SW_FUNC3 : LDST = `SW_OP; 
-                    default:    LDST = 0;
+                    `SB_FUNC3 : ldst = `SB_OP; 
+                    `SH_FUNC3 : ldst = `SH_OP; 
+                    `SW_FUNC3 : ldst = `SW_OP; 
+                    default:    ldst = 0;
                 endcase
                 excp     = 0;
             end
@@ -140,7 +140,7 @@ module Control (
                 branch   = 1;
                 predict  = 1;
                 ujtype   = 0;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
             `JALR_OP: begin
@@ -154,7 +154,7 @@ module Control (
                 branch   = 1;
                 predict  = 0;
                 ujtype   = 0;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
             `JAL_OP: begin
@@ -168,7 +168,7 @@ module Control (
                 branch   = 1;
                 predict  = 0;
                 ujtype   = 1;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
             `LUI_OP: begin
@@ -182,7 +182,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 1;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
             `AUIPC_OP: begin
@@ -196,7 +196,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 1;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
             `ECALL_OP: begin
@@ -210,7 +210,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 1;
             end
             default: begin
@@ -224,7 +224,7 @@ module Control (
                 branch   = 0;
                 predict  = 0;
                 ujtype   = 0;
-                LDST     = 0;
+                ldst     = 0;
                 excp     = 0;
             end
         endcase

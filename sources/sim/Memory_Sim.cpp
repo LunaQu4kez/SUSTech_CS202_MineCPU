@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     tfp->open("Memory_Sim.vcd");
 
 	int time = 0, mem_addr = 0;
-    top->LDST = 7, top->web = 1;
+    top->ldst = 7, top->web = 1;
 
 	while(time < SIM_TIME) {
         top->clka = top->clkb = 0;

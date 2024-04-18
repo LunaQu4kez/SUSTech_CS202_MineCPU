@@ -21,7 +21,7 @@ module CPU (
     output logic [31:0]         WB_data_t,
     output logic [31:0]         WB_mem_t,
     output logic [31:0]         WB_data_ot,
-    output logic [31:0]         SEPC_t
+    output logic [31:0]         sepc_t
 );
 
     logic PC_Write, rst;
@@ -69,7 +69,7 @@ module CPU (
     logic [`REGS_WID] ID_rs1_out, ID_rs2_out, ID_rd_out;
     logic [`DATA_WID] ID_data1_out, ID_data2_out, ID_imm_out, ID_pc_out;
     logic ID_predict_result_out;
-    logic [`DATA_WID] SEPC;
+    logic [`DATA_WID] sepc;
 
 
     Stage_ID id_inst (
@@ -102,7 +102,7 @@ module CPU (
         .predict_result(ID_predict_result_out),
         .predict_fail,
         .new_pc,
-        .SEPC
+        .sepc
     );
 
     logic [`DATA_WID] EX_pc_in, EX_data1_in, EX_data2_in, EX_imm_in;
@@ -206,7 +206,7 @@ module CPU (
     logic [`WB_CTRL_WID] MEM_WB_ctrl_out;
     logic [`DATA_WID] mem_addr, mem_write_data, mem_data;
     logic MemWrite, web;
-    logic [`LDST_WID] LDST;
+    logic [`LDST_WID] ldst;
 
     assign MEMtoEX_data = mem_addr;
 
@@ -223,7 +223,7 @@ module CPU (
         .mem_addr,
         .mem_write_data,
         .MemWrite,
-        .LDST,
+        .ldst,
         .mem_data
     );
 
@@ -235,7 +235,7 @@ module CPU (
     // select uart or internal access
     assign uart_mem_addr = uart_finish ? mem_addr : uart_addr;
     assign uart_mem_data = uart_finish ? mem_write_data : uart_data;
-    assign uart_LDST = uart_finish ? LDST : 7;
+    assign uart_LDST = uart_finish ? ldst : 7;
     assign web = uart_finish ? MemWrite : 1;
 
     MEM_WB mem_wb_inst (
@@ -261,12 +261,12 @@ module CPU (
     Memory memory_inst (
         .clka(memclk),
         .clkb(memclk),
-        .LDST(uart_LDST),
+        .ldst(uart_LDST),
         .addra(mem_pc),
         .addrb(uart_mem_addr),
         .write_datab(uart_mem_data),
         .web,
-        .SEPC,
+        .sepc,
         .dataa(mem_inst),
         .datab(mem_data),
         .switches1,
@@ -293,6 +293,6 @@ module CPU (
     assign WB_data_t = WB_data1_in;
     assign WB_mem_t = WB_data2_in;
     assign WB_data_ot = WB_data_out;
-    assign SEPC_t = SEPC;
+    assign sepc_t = sepc;
 
 endmodule
