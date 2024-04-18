@@ -44,7 +44,7 @@ module Memory (
         .addrb(addrb[15:2]),
         .write_datab(bool_io ? 0 : wdatab),
         .web(we & ~bool_io),
-        .dataa,
+        .dataa(rdataa),
         .datab(rdatab)
     );
     */
@@ -122,18 +122,15 @@ module Memory (
             16'h0004: edataa = `sw_t0_4_sp;
             16'h0008: edataa = `sw_t1_0_sp;
             16'h000c: edataa = `addi_t1_zero_1;
-            16'h0010: edataa = `lw_t0_24_gp;
-            16'h0014: edataa = `beq_t0_t1_out;
-            16'h0018: edataa = `beq_zero_zero_loop;
-            16'h001c: edataa = `lw_a0_0_gp;
-            16'h0020: edataa = `lw_t1_0_sp;
-            16'h0024: edataa = `lw_t0_4_sp;
-            16'h0028: edataa = `addi_sp_sp_8;
-            16'h002c: edataa = `lw_tp_44_gp;
-            16'h0030: edataa = `nop;
-            16'h0034: edataa = `nop;
-            16'h0038: edataa = `nop;
-            16'h003c: edataa = `jalr_zero_tp_0;
+            16'h0010: edataa = `lw_tp_44_gp;
+            16'h0014: edataa = `lw_t0_24_gp;
+            16'h0018: edataa = `beq_t0_t1_out;
+            16'h001c: edataa = `beq_zero_zero_loop;
+            16'h0020: edataa = `lw_a0_0_gp;
+            16'h0024: edataa = `lw_t1_0_sp;
+            16'h0028: edataa = `lw_t0_4_sp;
+            16'h002c: edataa = `addi_sp_sp_8;
+            16'h0030: edataa = `jalr_zero_tp_0;
             default:  edataa = `nop;
         endcase
     end
