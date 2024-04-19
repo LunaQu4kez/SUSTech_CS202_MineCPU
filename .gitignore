@@ -1,7 +1,7 @@
 .DS_Store
 **/.DS_Store
 .DS_Store?
-sources/sim/obj_dir_*
 .vscode
 vivado_project
 **/*.vcd
+**/obj_dir_*

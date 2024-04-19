@@ -1,17 +1,20 @@
 LDFLAGS := -lunicorn -lSDL2
 export LDFLAGS
 
-TARGET ?= main
+TARGET := Top
+VERILATOR_FLAGS :=  --cc --vpi --build -j 0 -Wall -Wno-ALWCOMBORDER -Wno-UNUSEDSIGNAL --unroll-count 2048 --trace
 
 .PHONY: all
-all: obj_dir_$(TARGET)/VTop
+all: obj_dir_$(TARGET)/V$(TARGET)
 
-obj_dir_$(TARGET)/VTop: obj_dir_$(TARGET)/VTop.mk $(TARGET).cpp
-    make OPT_FAST="-Os" -C obj_dir_$(TARGET) -f VTop.mk -j
+obj_dir_$(TARGET)/V$(TARGET): ../sources/$(TARGET).sv DiffTest.cpp
+	verilator $(VERILATOR_FLAGS) -I../sources/core -I../sources/io --Mdir ./obj_dir_$(TARGET) ../sources/$(TARGET).sv --exe DiffTest.cpp
 
-obj_dir_$(TARGET)/VTop.mk: ../sources/Top.sv
-    verilator --cc --Mdir obj_dir_$(TARGET) Top.sv --exe $(TARGET).cpp
+.PHONY: test
+test: all
+	./obj_dir_$(TARGET)/V$(TARGET)
 
-.PHONY: run
-run: all
-    ./obj_dir_$(TARGET)/VTop
+.PHONY: clean
+clean:
+	rm -rf obj_dir_*
+	rm *.vcd

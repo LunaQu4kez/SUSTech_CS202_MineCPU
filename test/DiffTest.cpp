@@ -72,28 +72,6 @@ void run_one_cycle() {
     }
 }
 
-vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/fib.bin");
-    vector<unsigned int> inst;
-    uint32_t concat_data, size = data.size() / 4;
-
-    if (uc_mem_write(uc, 0x0, data.data(), data.size())) {
-        printf("Failed to write emulation code to memory, quit!\n");
-        return vector<uint32_t>();
-    }
-
-    for(int i = 0; i < size; i++) {
-        concat_data = 0;
-        for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
-        top->uart_addr = i * 4;
-        top->uart_data = concat_data;
-        inst.push_back(concat_data);
-        run_one_cycle();
-    }
-
-    return inst;
-}
-
 bool diff_check() {
     bool pass = true;
     for (int i = 0, v; i < 32; i++) {
@@ -107,14 +85,52 @@ bool diff_check() {
     return pass;
 }
 
+void uart_one_bit() {
+    for(int i = 0; i < 868; i++) run_one_cycle();
+}
+
+void send_uart(char msg) {
+    top->rx = 1;
+    uart_one_bit();
+    top->rx = 0;
+    uart_one_bit();
+    for(int i = 0; i < 8; i++) {
+        top->rx = (msg >> i) & 1;
+        uart_one_bit();
+    }
+    // idle state
+    top->rx = 1;
+    uart_one_bit();
+}
+
+vector<uint32_t> load_program() {
+    vector<char> data = read_binary("../sources/assembly/test/fib.bin");
+    vector<unsigned int> inst;
+    uint32_t size = data.size() / 4;
+
+    if (uc_mem_write(uc, 0x0, data.data(), data.size())) {
+        printf("Failed to write emulation code to memory, quit!\n");
+        return vector<uint32_t>();
+    }
+
+    for(int i = 0; i < data.size(); i++) send_uart(data[i]);
+
+    for(int i = 0, concat_data = 0; i < size; i++) {
+        concat_data = 0;
+        for(int j = 3; j >= 0; j--) concat_data = (concat_data << 8) | ((data[4 * i + j]) & 0xff);
+        inst.push_back(concat_data);
+    }
+
+    return inst;
+}
+
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
     Verilated::traceEverOn(true);
     top->trace(tfp, 1);
-    tfp->open("cpu_sim.vcd");
+    tfp->open("difftest.vcd");
 
     // initialize unicorn
-
     uc_err err;
     if ((err = uc_open(UC_ARCH_RISCV, UC_MODE_32, &uc)) != UC_ERR_OK) {
         printf("Failed on uc_open() with error returned: %u\n", err);
@@ -127,23 +143,22 @@ int main(int argc, char** argv) {
     uc_reg_write(uc, UC_RISCV_REG_GP, &uc_gp);
 
     // initialize vpi handles
-    pc = get_handle("TOP.Top.cpu.pc_inst.pc");
-    flush = get_handle("TOP.Top.cpu.flush");
-    for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.Top.cpu.id_inst.reg_inst.regs"), i);
-    for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.Top.cpu.memory_inst.test_inst.mem"), i);
+    pc = get_handle("TOP.Top.cpu_inst.pc_inst.pc");
+    flush = get_handle("TOP.Top.cpu_inst.flush");
+    for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.Top.cpu_inst.id_inst.reg_inst.regs"), i);
+    for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.Top.cpu_inst.memory_inst.test_inst.mem"), i);
 
     long long time = 0, uc_pc = 0;
 
     // load program
     top->rst_n = 1;
-    top->uart_finish = 0;
     vector<uint32_t> inst = load_program();
-    top->uart_finish = 1;
+    for(int i = 0; i < 15; i++) uart_one_bit(); // finish uart by idle
 
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
 
-    while (uc_pc != 0x1c) {
+    while (uc_pc != 0xc) {
         run_one_cycle();
         if(get_value(flush)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
@@ -157,6 +172,7 @@ int main(int argc, char** argv) {
         uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
         time++;
     }
+    top->rst_n = 0;
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));
