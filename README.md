@@ -103,38 +103,38 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | `xor rd, rs1, rs2`     | R        | rd = rs1 ^ rs2                            |
 | `or rd, rs1, rs2`      | R        | rd = rs1 \| rs2                           |
 | `and rd, rs1, rs2`     | R        | rd = rs1 & rs2                            |
-| `sll rd, rs1, rs2`     | R        | rd = rs1 « rs2                            |
-| `srl rd, rs1, rs2`     | R        | rd = rs1 » rs2                            |
-| `sra rd, rs1, rs2`     | R        | rd = rs1 » rs2 (Arith*)                   |
+| `sll rd, rs1, rs2`     | R        | rd = rs1 << rs2                           |
+| `srl rd, rs1, rs2`     | R        | rd = rs1 >> rs2                           |
+| `sra rd, rs1, rs2`     | R        | rd = rs1 >> rs2 (sign-extend)             |
 | `slt rd, rs1, rs2`     | R        | rd = ( rs1 < rs2 ) ? 1 : 0                |
 | `sltu rd, rs1, rs2`    | R        | rd = ( (u)rs1 < (u)rs2 ) ? 1 : 0          |
 | `addi rd, rs1, rs2`    | I        | rd = rs1 + imm                            |
 | `xori rd, rs1, rs2`    | I        | rd = rs1 ^ imm                            |
 | `ori rd, rs1, rs2`     | I        | rd = rs1 \| imm                           |
 | `andi rd, rs1, rs2`    | I        | rd = rs1 & imm                            |
-| `slli rd, rs1, rs2`    | I        | rd = rs1 « imm[4:0]                       |
-| `srli rd, rs1, rs2`    | I        | rd = rs1 » imm[4:0]                       |
-| `srai rd, rs1, rs2`    | I        | rd = rs1 » imm[4:0] (Arith*)              |
+| `slli rd, rs1, rs2`    | I        | rd = rs1 << imm[4:0]                      |
+| `srli rd, rs1, rs2`    | I        | rd = rs1 >> imm[4:0]                      |
+| `srai rd, rs1, rs2`    | I        | rd = rs1 >> imm[4:0] (sign-extend)        |
 | `slti rd, rs1, rs2`    | I        | rd = (rs1 < imm) ? 1 : 0                  |
 | `sltiu rd, rs1, rs2`   | I        | rd = ( (u)rs1 < (u)imm ) ? 1 : 0          |
-| `lb rd, imm(rs1)`      | I        | 读取 1 byte 并做符号位扩展                |
-| `lh rd, imm(rs1)`      | I        | 读取 2 byte 并做符号位扩展                |
-| `lw rd, imm(rs1)`      | I        | 读取 4 byte                               |
-| `lbu rd, imm(rs1)`     | I        | 读取 1 byte 并做 0 扩展                   |
-| `lhu rd, imm(rs1)`     | I        | 读取 2 byte 并做 0 扩展                   |
+| `lb rd, imm(rs1)`      | I        | 读取 1 byte 并做符号位扩展                   |
+| `lh rd, imm(rs1)`      | I        | 读取 1 half-word (2 bytes) 并做符号位扩展    |
+| `lw rd, imm(rs1)`      | I        | 读取 1 word (4 bytes)                     |
+| `lbu rd, imm(rs1)`     | I        | 读取 1 byte 并做 0 扩展                     |
+| `lhu rd, imm(rs1)`     | I        | 读取 2 byte 并做 0 扩展                     |
 | `sb rd, imm(rs1)`      | S        | 存入 1 byte                               |
-| `sh rd, imm(rs1)`      | S        | 存入 2 byte                               |
-| `sw rd, imm(rs1)`      | S        | 存入 4 byte                               |
-| `beq rs1, rs2, label`  | B        | if (rs1 == rs2)  PC += {imm,1’b0}         |
-| `bne rs1, rs2, label`  | B        | if (rs1 != rs2)  PC += {imm,1’b0}         |
-| `blt rs1, rs2, label`  | B        | if (rs1 < rs2)  PC += {imm,1’b0}          |
-| `bge rs1, rs2, label`  | B        | if (rs1 >= rs2)  PC += {imm,1’b0}         |
-| `bltu rs1, rs2, label` | B        | if ( (u)rs1 < (u)rs2 )  PC += {imm,1’b0}  |
-| `bgeu rs1, rs2, label` | B        | if ( (u)rs1 >= (u)rs2 )  PC += {imm,1’b0} |
-| `jal rd, label`        | J        | rd = PC + 4; PC += {imm,1’b0}             |
+| `sh rd, imm(rs1)`      | S        | 存入 1 half-word (2 bytes)                |
+| `sw rd, imm(rs1)`      | S        | 存入 1 word (4 bytes)                     |
+| `beq rs1, rs2, label`  | B        | if (rs1 == rs2)  PC += (imm << 1)         |
+| `bne rs1, rs2, label`  | B        | if (rs1 != rs2)  PC += (imm << 1)         |
+| `blt rs1, rs2, label`  | B        | if (rs1 < rs2)  PC += (imm << 1)          |
+| `bge rs1, rs2, label`  | B        | if (rs1 >= rs2)  PC += (imm << 1)         |
+| `bltu rs1, rs2, label` | B        | if ( (u)rs1 < (u)rs2 )  PC += (imm << 1)  |
+| `bgeu rs1, rs2, label` | B        | if ( (u)rs1 >= (u)rs2 )  PC += (imm << 1) |
+| `jal rd, label`        | J        | rd = PC + 4; PC += (imm << 1)             |
 | `jalr rd, rs1, imm`    | I        | rd = PC + 4; PC = rs1 + imm               |
-| `lui rd, imm`          | U        | rd = imm « 12                             |
-| `auipc rd, imm`        | U        | rd = PC + (imm « 12)                      |
+| `lui rd, imm`          | U        | rd = imm << 12                            |
+| `auipc rd, imm`        | U        | rd = PC + (imm << 12)                     |
 | `ecall`                | I        | 控制权交给固件 (采用输入设备模拟)              |
 | `mul rd, rs1, rs2` *   | R        | rd = (rs1 * rs2)[31:0]                    |
 | `mulh rd, rs1, rs2` *  | R        | rd = (rs1 * rs2)[63:32]                   |
