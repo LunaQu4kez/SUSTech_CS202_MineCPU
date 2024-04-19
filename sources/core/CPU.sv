@@ -5,7 +5,7 @@ module CPU (
     // uart related
     input  logic [31:0] uart_data,
     input  logic [31:0] uart_addr,
-    input  logic        uart_finish,
+    input  logic        uart_done,
     // interact with devices
     input  logic [7:0 ] switches1, switches2, switches3,
     input  logic        bt1, bt2, bt3, bt4, bt5,
@@ -26,7 +26,7 @@ module CPU (
 
     logic PC_Write, rst;
     logic [`DATA_WID] new_pc, IF_pc_in;
-    assign rst = ~rst_n | ~uart_finish;
+    assign rst = ~rst_n | ~uart_done;
 
     PC pc_inst (
         .clk(cpuclk),
@@ -233,10 +233,10 @@ module CPU (
     logic [`LDST_WID] uart_LDST;
     assign MEM_WB_RegWrite = WB_WB_ctrl_in[1];
     // select uart or internal access
-    assign uart_mem_addr = uart_finish ? mem_addr : uart_addr;
-    assign uart_mem_data = uart_finish ? mem_write_data : uart_data;
-    assign uart_LDST = uart_finish ? ldst : 7;
-    assign web = uart_finish ? MemWrite : 1;
+    assign uart_mem_addr = uart_done ? mem_addr : uart_addr;
+    assign uart_mem_data = uart_done ? mem_write_data : uart_data;
+    assign uart_LDST = uart_done ? ldst : 7;
+    assign web = uart_done ? MemWrite : 1;
 
     MEM_WB mem_wb_inst (
         .clk(cpuclk),
