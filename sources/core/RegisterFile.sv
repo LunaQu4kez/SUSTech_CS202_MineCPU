@@ -34,7 +34,7 @@ module RegisterFile (
             end
         end 
         else if (RegWrite) begin
-            if (write_reg != 0 & write_reg != 0) regs[write_reg] <= write_data;
+            if (write_reg != 0) regs[write_reg] <= write_data;
         end
     end
     

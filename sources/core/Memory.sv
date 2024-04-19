@@ -11,7 +11,7 @@ module Memory (
     // IO related
     input  logic [7:0      ] switches1, switches2, switches3,
     input                    bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
-    output logic [7:0      ] led1_out, led2_out, led3_out 
+    output logic [7:0      ] led1_out, led2_out 
 );
 
     reg [1:0] cnt = 2'b00;
@@ -116,32 +116,19 @@ module Memory (
         endcase
     end
 
-    always_comb begin : Exception_Instruction
-        unique case (addra[15:0])
-            16'h0000: edataa = `addi_sp_sp_m8;
-            16'h0004: edataa = `sw_t0_4_sp;
-            16'h0008: edataa = `sw_t1_0_sp;
-            16'h000c: edataa = `addi_t1_zero_1;
-            16'h0010: edataa = `lw_tp_44_gp;
-            16'h0014: edataa = `lw_t0_24_gp;
-            16'h0018: edataa = `beq_t0_t1_out;
-            16'h001c: edataa = `beq_zero_zero_loop;
-            16'h0020: edataa = `lw_a0_0_gp;
-            16'h0024: edataa = `lw_t1_0_sp;
-            16'h0028: edataa = `lw_t0_4_sp;
-            16'h002c: edataa = `addi_sp_sp_8;
-            16'h0030: edataa = `jalr_zero_tp_0;
-            default:  edataa = `nop;
-        endcase
-    end
+
+    Excp_ROM excp_rom_inst (
+        .addra(addra[7:2]),
+        .clka(~clka),
+        .douta(edataa)
+    );
 
 
     // MMIO Regs
     // output
-    logic [7:0] led1, led2, led3;
+    logic [7:0] led1, led2;
     assign led1_out = led1;
     assign led2_out = led2;
-    assign led3_out = led3;
 
     always_comb begin
         unique case (addrb)
@@ -149,79 +136,61 @@ module Memory (
                 datab_io = {24'h000000, switches1};
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
             32'hffff_ff04: begin     // switches2
                 datab_io = {24'h000000, switches2};
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
             32'hffff_ff08: begin     // switches3
                 datab_io = {24'h000000, switches3};
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
             32'hffff_ff0c: begin     // led1
                 datab_io = 0;
                 led1 = write_datab[7:0];
                 led2 = led2;
-                led3 = led3;
             end
             32'hffff_ff10: begin     // led2
                 datab_io = 0;
                 led1 = led1;
                 led2 = write_datab[7:0];
-                led3 = led3;
             end
-            32'hffff_ff14: begin     // led3
-                datab_io = 0;
-                led1 = led1;
-                led2 = led2;
-                led3 = write_datab[7:0];
-            end
-            32'hffff_ff18: begin     // button1 middle
+            32'hffff_ff14: begin     // button1 middle
                 datab_io = bt1 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
-            32'hffff_ff1c: begin     // button2 up
+            32'hffff_ff18: begin     // button2 up
                 datab_io = bt2 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
-            32'hffff_ff20: begin     // button3 down
+            32'hffff_ff1c: begin     // button3 down
                 datab_io = bt3 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
-            32'hffff_ff24: begin     // button4 left
+            32'hffff_ff20: begin     // button4 left
                 datab_io = bt4 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
-            32'hffff_ff28: begin     // button5 right
+            32'hffff_ff24: begin     // button5 right
                 datab_io = bt5 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
-            32'hffff_ff2c: begin     // sepc
+            32'hffff_ff28: begin     // sepc
                 datab_io = sepc;
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
             default: begin
                 datab_io = 0;
                 led1 = led1;
                 led2 = led2;
-                led3 = led3;
             end
         endcase
     end

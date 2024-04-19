@@ -278,8 +278,7 @@ module CPU (
         .bt4,
         .bt5,
         .led1_out,
-        .led2_out,
-        .led3_out
+        .led2_out
     );
 
     // debug use

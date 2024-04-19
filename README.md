@@ -173,14 +173,12 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | 0xFFFFFF08 | R     | 第 3 组拨码开关 (8 个) | 0x00 - 0xFF          |
 | 0xFFFFFF0C | W     | 第 1 组 LED (8 个)     | 0x00 - 0xFF          |
 | 0xFFFFFF10 | W     | 第 2 组 LED (8 个)     | 0x00 - 0xFF          |
-| 0xFFFFFF14 | W     | 第 3 组 LED (8 个)     | 0x00 - 0xFF          |
-| 0xFFFFFF18 | R     | 按钮 1 (中)            | 0x00 - 0x01          |
-| 0xFFFFFF1C | R     | 按钮 2 (上)            | 0x00 - 0x01          |
-| 0xFFFFFF20 | R     | 按钮 3 (下)            | 0x00 - 0x01          |
-| 0xFFFFFF24 | R     | 按钮 4 (左)            | 0x00 - 0x01          |
-| 0xFFFFFF28 | R     | 按钮 5 (右)            | 0x00 - 0x01          |
-| 0xFFFFFF2C | R     | 异常中断后跳转的 PC     | 无固定范围           |
-|            |       |                        |                      |
+| 0xFFFFFF14 | R     | 按钮 1 (中)            | 0x00 - 0x01          |
+| 0xFFFFFF18 | R     | 按钮 2 (上)            | 0x00 - 0x01          |
+| 0xFFFFFF1C | R     | 按钮 3 (下)            | 0x00 - 0x01          |
+| 0xFFFFFF20 | R     | 按钮 4 (左)            | 0x00 - 0x01          |
+| 0xFFFFFF24 | R     | 按钮 5 (右)            | 0x00 - 0x01          |
+| 0xFFFFFF28 | R     | 异常中断后跳转的 PC     | 无固定范围           |
 
 
 

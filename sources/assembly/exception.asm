@@ -7,16 +7,11 @@ entry:
     # process
     addi t0, zero, 10
     beq a7, t0, ecall_exit
-    addi t0, zero, 1
-    beq a7, t0, ecall_getled
+    addi t0, zero, 5
+    beq a7, t0, ecall_getint
+    beq zero, zero, exit
 
-# getled: read led value
-ecall_getled:
-    addi a0, zero, 0
-    addi a7, zero, 17
-    j exit
-
-# exit: infinite loop
+# ecall_exit: infinite loop
 ecall_exit:
     j ecall_exit
 
@@ -26,3 +21,8 @@ exit:
     lw t0, 4(sp)
     addi sp, sp, 8
     jalr zero, tp, 0
+
+# getint: read switches1 value
+ecall_getint:
+    lw a0, 0(gp)
+    j exit
