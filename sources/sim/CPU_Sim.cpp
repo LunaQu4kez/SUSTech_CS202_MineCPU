@@ -73,7 +73,7 @@ void run_one_cycle() {
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/fib.bin");
+    vector<char> data = read_binary("../assembly/test/fib.bin");
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
 
-    while (uc_pc != 0x1c) {
+    while (uc_pc != 0x68) {
         run_one_cycle();
         if(get_value(flush)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
