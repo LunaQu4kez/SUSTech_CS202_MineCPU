@@ -10,11 +10,8 @@ module UART (
     output logic        done
 );
 
-    reg rxd_t, rxd_t1, rxd_t2, rx_done, received;
+    reg       rx_done;
     reg [7:0] rx_data;
-    reg [15:0] idle_cnt;
-    reg [9:0] idle_cnt0;
-    assign done = (addr_out >= `MAX_DATA) || (received && idle_cnt == `MAX_IDLE);
 
     Queue queue (
         .clk(clk),
@@ -25,6 +22,11 @@ module UART (
         .addr_out
     );
 
+    // timeout detection
+    reg [15:0] idle_cnt;
+    reg [9:0]  idle_cnt0;
+    reg        received;
+    assign done = (addr_out >= `MAX_DATA) || (received && idle_cnt == `MAX_IDLE);
     always_ff @(posedge clk) begin
         if (rst | en_state) begin
             idle_cnt0 <= 10'h0;
@@ -43,19 +45,22 @@ module UART (
         end
     end
     
+    // filter unexpected noise
+    reg rxd_t0, rxd_t1, rxd_t2;
     always_ff @(posedge clk) begin
         if (rst) begin
-            rxd_t <= 1'b1;
+            rxd_t0 <= 1'b1;
             rxd_t1 <= 1'b1;
             rxd_t2 <= 1'b1;
         end else begin
-            rxd_t <= rx;
-            rxd_t1 <= rxd_t;
+            rxd_t0 <= rx;
+            rxd_t1 <= rxd_t0;
             rxd_t2 <= rxd_t1;
         end
     end
 
-    reg en_state;
+    // detect start bit
+    reg  en_state;
     wire nedge;
     assign nedge = !rxd_t1 & rxd_t2;
     
@@ -65,29 +70,29 @@ module UART (
         else if (rx_done) en_state <= 1'b0;
         else en_state <= en_state;
     end
-
-    parameter bit_tim = `BPS_CNT;
+    
+    // count baud
     reg [9:0] baud_cnt;
-
     always_ff @(posedge clk) begin
         if (rst) baud_cnt <= 10'b0;
         else if (en_state) begin
-            if(baud_cnt == bit_tim - 1'b1) baud_cnt <= 10'b0;
+            if(baud_cnt == `BPS_CNT - 1) baud_cnt <= 10'b0;
             else baud_cnt <= baud_cnt + 1'b1;
         end else baud_cnt <= 10'b0;
     end
     
+    // count bits
     reg [3:0] bit_cnt;
     always_ff @(posedge clk) begin
         if (rst) bit_cnt <= 4'd0;
         else if (en_state) begin
             if(bit_cnt == 4'd0) bit_cnt <= bit_cnt + 1'b1;
-            else if(baud_cnt == bit_tim - 1'b1) bit_cnt <= bit_cnt + 1'b1;
+            else if(baud_cnt == `BPS_CNT - 1) bit_cnt <= bit_cnt + 1'b1;
             else bit_cnt <= bit_cnt;
         end else bit_cnt <= 4'b0;
     end
 
-    //rx_data
+    // receive data
     always_ff @(posedge clk) begin
         if (rst) begin
             rx_data <= 8'd0;
@@ -111,13 +116,13 @@ module UART (
         end
     end
 
-    //rx_done
+    // receive done logic
     always_ff @(posedge clk) begin
         if (rst) begin
             rx_done <= 1'b0;
         end else if (en_state) begin
             if(bit_cnt == 0) rx_done <= 1'b0;
-            else if(bit_cnt == 10 && baud_cnt == bit_tim - 1) rx_done <= 1'b1;
+            else if(bit_cnt == 10 && baud_cnt == `BPS_CNT - 1) rx_done <= 1'b1;
             else if(rx_done == 1'b1) rx_done <= 1'b0;
             else rx_done <= rx_done;
         end else if(rx_done == 1'b1) rx_done <= 1'b0;
