@@ -1,4 +1,5 @@
 `define BPS_CNT 868
+`define MAX_DATA 32'h7fff
 
 module UART (
     input               clk, rst, rx,
@@ -10,7 +11,8 @@ module UART (
 
     reg rxd_t, rxd_t1, rxd_t2, rx_done;
     reg [7:0] rx_data;
-    assign done = addr_out >= 32'h0008;
+    reg [15:0] idle_cnt;
+    assign done = (addr_out >= `MAX_DATA) || (idle_cnt == 16'hf);
 
     Queue queue (
         .clk(clk),
@@ -20,6 +22,14 @@ module UART (
         .data_out,
         .addr_out
     );
+
+    always_ff @(posedge clk) begin
+        if (rst | en_state) begin
+            idle_cnt <= 16'h0;
+        end else begin
+            idle_cnt <= idle_cnt + 1'b1;
+        end
+    end
     
     always_ff @(posedge clk) begin
         if (rst) begin
