@@ -1,5 +1,6 @@
 `define BPS_CNT 868
 `define MAX_DATA 32'h7fff
+`define MAX_IDLE 16'hf
 
 module UART (
     input               clk, rst, rx,
@@ -9,10 +10,11 @@ module UART (
     output logic        done
 );
 
-    reg rxd_t, rxd_t1, rxd_t2, rx_done;
+    reg rxd_t, rxd_t1, rxd_t2, rx_done, received;
     reg [7:0] rx_data;
     reg [15:0] idle_cnt;
-    assign done = (addr_out >= `MAX_DATA) || (idle_cnt == 16'hf);
+    reg [9:0] idle_cnt0;
+    assign done = (addr_out >= `MAX_DATA) || (received && idle_cnt == `MAX_IDLE);
 
     Queue queue (
         .clk(clk),
@@ -25,9 +27,19 @@ module UART (
 
     always_ff @(posedge clk) begin
         if (rst | en_state) begin
-            idle_cnt <= 16'h0;
+            idle_cnt0 <= 10'h0;
         end else begin
-            idle_cnt <= idle_cnt + 1'b1;
+            idle_cnt0 <= (idle_cnt0 == `BPS_CNT - 1) ? 0 : idle_cnt0 + 1'b1;
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if (rst | en_state) begin
+            idle_cnt <= 16'h0;
+        end else if (idle_cnt == `MAX_IDLE) begin
+            idle_cnt <= idle_cnt;
+        end else begin
+            idle_cnt <= (idle_cnt0 == `BPS_CNT - 1) ? idle_cnt + 1'b1 : idle_cnt;
         end
     end
     
@@ -77,8 +89,11 @@ module UART (
 
     //rx_data
     always_ff @(posedge clk) begin
-        if (rst) rx_data <= 8'd0;    
-        else if (en_state) begin
+        if (rst) begin
+            rx_data <= 8'd0;
+            received <= 1'b0;
+        end else if (en_state) begin
+            received <= 1'b1;
             case (bit_cnt)
                 4'd2: rx_data[0] <= rxd_t2;
                 4'd3: rx_data[1] <= rxd_t2;
@@ -92,6 +107,7 @@ module UART (
             endcase
         end else begin
             rx_data <= rx_data;
+            received <= received;
         end
     end
 
