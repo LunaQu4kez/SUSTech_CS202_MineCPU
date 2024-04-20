@@ -57,22 +57,23 @@ MineCPU
 - [x] CPU 核心
   - [x] IF Stage
   - [x] ID Stage
-    - [x] 立即数生成模块
-    - [x] 寄存器模块
-    - [x] 控制模块
-    - [x] 数据冒险停顿模块
-    - [x] 分支预测模块
+    - [x] 立即数生成模块(ImmGen)
+    - [x] 寄存器模块(Register File)
+    - [x] 控制模块(Control Unit)
+    - [x] 数据冒险停顿模块(Hazard Detection)
+    - [x] 分支预测模块(Branch Prediction) *
   - [x] EX Stage
-    - [x] ALU
+    - [x] 算术逻辑(ALU)
       - [x] RV32I
       - [ ] RV32M *
-    - [x] BRU
-    - [x] 前递模块
+    - [x] 分支判断(BRU)
+    - [x] 前递模块(Forward Unit) *
   - [x] MEM Stage
+    - bytes/halfword/word 的存取
   - [x] WB Stage
   - [x] Memory
+    - [x] UART *
     - [ ] Cache *
-    - [ ] UART *
   - [x] 异常控制 *
 - [ ] IO
   - [ ] 拨码开关 & 按钮
@@ -90,7 +91,10 @@ MineCPU
 ### CPU
 
 - **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU
-- 时钟频率：
+- 时钟频率:
+  + CPU: 100MHz (未测试)
+  + MEM: 400MHz (搓完Cache之前先这样吧)
+  + VGA: 40MHz  (还没开始写)
 
 ### ISA
 
@@ -150,14 +154,14 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 - 使用 **MMIO** (Memory Mapping IO，内存映射) 进行 IO 操作并支持 UART
 - UART
   - 支持通过软件而非重新烧写 FPGA 的方式进行程序与数据的加载
-  - 115200Hz 比特率
-  - 
+  - 规格：115200Hz 波特率, 8 data bits, 1 stop bits
+  - 数据直接写入内存，在接收过数据后超过*秒空闲会触发超时中断，启动CPU
 - 输入 (Input)
   - 支持 24 个拨码开关
   - 5 个按钮
   - 4 × 4 小键盘
 - 输出 (Output)
-  - 支持 24 个 LED 灯
+  - 支持 24 个 LED 灯, 其中 8 个用于显示CPU状态
   - 7 段数码管
   - VGA
     - 使用软硬件协同的方式实现
@@ -166,26 +170,28 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 
 **MMIO 对应地址** 
 
-| 地址       | 读/写 | 映射内容               | 取值范围 (省略前导0) |
-| :--------- | ----- | ---------------------- | -------------------- |
-| 0xFFFFFF00 | R     | 第 1 组拨码开关 (8 个) | 0x00 - 0xFF          |
-| 0xFFFFFF04 | R     | 第 2 组拨码开关 (8 个) | 0x00 - 0xFF          |
-| 0xFFFFFF08 | R     | 第 3 组拨码开关 (8 个) | 0x00 - 0xFF          |
-| 0xFFFFFF0C | W     | 第 1 组 LED (8 个)     | 0x00 - 0xFF          |
-| 0xFFFFFF10 | W     | 第 2 组 LED (8 个)     | 0x00 - 0xFF          |
-| 0xFFFFFF14 | R     | 按钮 1 (中)            | 0x00 - 0x01          |
-| 0xFFFFFF18 | R     | 按钮 2 (上)            | 0x00 - 0x01          |
-| 0xFFFFFF1C | R     | 按钮 3 (下)            | 0x00 - 0x01          |
-| 0xFFFFFF20 | R     | 按钮 4 (左)            | 0x00 - 0x01          |
-| 0xFFFFFF24 | R     | 按钮 5 (右)            | 0x00 - 0x01          |
-| 0xFFFFFF28 | R     | 异常中断后跳转的 PC     | 无固定范围           |
+| 地址        | 读/写 | 映射内容                 | 取值范围 (省略前导0)    |
+| :--------- | ----- | ---------------------- | --------------------- |
+| 0xFFFFFF00 | R     | 第 1 组拨码开关 (8 个)   | 0x00 - 0xFF           |
+| 0xFFFFFF04 | R     | 第 2 组拨码开关 (8 个)   | 0x00 - 0xFF           |
+| 0xFFFFFF08 | R     | 第 3 组拨码开关 (8 个)   | 0x00 - 0xFF           |
+| 0xFFFFFF0C | W     | 第 1 组 LED (8 个)     | 0x00 - 0xFF            |
+| 0xFFFFFF10 | W     | 第 2 组 LED (8 个)     | 0x00 - 0xFF            |
+| 0xFFFFFF14 | R     | 按钮 1 (中)            | 0x00 - 0x01            |
+| 0xFFFFFF18 | R     | 按钮 2 (上)            | 0x00 - 0x01            |
+| 0xFFFFFF1C | R     | 按钮 3 (下)            | 0x00 - 0x01            |
+| 0xFFFFFF20 | R     | 按钮 4 (左)            | 0x00 - 0x01            |
+| 0xFFFFFF24 | R     | 按钮 5 (右)            | 0x00 - 0x01            |
+| 0xFFFFFF28 | R     | 异常中断后跳转的 PC     | 0x00000000 - 0xFFFFFFFF |
+| 0xFFFFFF2C | W     | 七段数码管 1           | 0x00000000 - 0xFFFFFFFF |
+| 0xFFFFFF30 | W     | 七段数码管 2           | 0x00000000 - 0xFFFFFFFF |
 
 
 
 ## 使用方法
-
- - uart 在接收过数据后超过1秒空闲会触发超时中断，直接运行CPU
-
+ 1. 创建vivado项目，导入[sources](./sources)的所有代码
+ 2. 导入ip核，然后Synthesis -> Implementation -> Generate Bitstream
+ 3. 烧写板子，然后用Uart串口工具加载测试程序/游戏/whatever you like
 
 
 ## 总结与注意事项
@@ -199,6 +205,6 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 + **[Data Hazard/Solved]** `ret (jalr zero, ra, 0)` 指令必须在 `ld ra, 0(sp)` 4 条指令之后，或者函数指令数必须大于 4，否则会出现异常.
   - **原因**: ra 寄存器的更改发生在 4 个周期后，而 `ret` 指令在访问 ra 寄存器时导致数据冒险
   - **解决方案**:
-    1. 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
-    2. 进行停顿/改进转发单元。前者过于简单，后者工作量太大，且`ld`指令的冒险难以解决。~~考虑后续增加记分板~~
-    3. 折中方案，在分支预测中加入RAS (Return Address Stack)结构，在遇到`call/ret`指令时将压入/弹出ra寄存器的内容。~~那要`ld/sd ra, 4(sp)`有何用~~但这个方案仅解决了遵守Convention时，ra寄存器的数据冒险。若程序不遵守，用其他寄存器作为跳转base，该冒险仍存在。
+    1. :negative_squared_cross_mark: 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
+    2. :negative_squared_cross_mark: 进行停顿/改进转发单元。前者过于简单，后者工作量太大，且`ld`指令的冒险难以解决。~~考虑后续增加记分板~~
+    3. :white_check_mark: 折中方案，在分支预测中加入RAS (Return Address Stack)结构，在遇到`call/ret`指令时将压入/弹出ra寄存器的内容。~~那要`ld/sd ra, 4(sp)`有何用~~但这个方案仅解决了遵守Convention时，ra寄存器的数据冒险。若程序不遵守，用其他寄存器作为跳转base，该冒险仍存在。
