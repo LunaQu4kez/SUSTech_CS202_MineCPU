@@ -91,6 +91,8 @@ module Stage_ID (
         .predict,
         .rs1_data,
         .ujtype,
+        .rs1,
+        .rd,
         .excp,
         .pc(pc_in),
         .imm,

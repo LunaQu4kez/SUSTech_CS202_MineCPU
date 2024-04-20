@@ -7,6 +7,7 @@ module Branch_Predictor (
     // process jalr, ujtype indicates jal
     input  logic [`DATA_WID] rs1_data,
     input  logic             ujtype,
+    input  logic [`REGS_WID] rs1, rd,
     // process exception
     input  logic             excp,
     // pc is from IF, imm is from ID, old_pc is from EX
@@ -19,10 +20,13 @@ module Branch_Predictor (
     output logic [`DATA_WID] sepc
 );
 
-    reg [1:0] History_Table [0: (1 << 10) - 1];
+    reg [`BHT_WID ] History_Table [0: (1 << 10) - 1]; // BHT/PHT
+    reg [`DATA_WID] Return_Addr   [0: (1 <<  7) - 1]; // RAS
+    reg [`RAS_WID ] RAS_top = -1; // RAS top pointer
     reg start_flag = 0; // 0: first cycle does nothing, 1: enable pc update
 
     logic [`DATA_WID] target_pc0;
+    wire  [`DATA_WID] pc_plus_4 = pc + 4;
     assign target_pc = excp ? `EXCP_ADDR : target_pc0;
 
     initial begin
@@ -33,12 +37,12 @@ module Branch_Predictor (
 
     always_ff @(negedge clk) begin
         if (rst) sepc <= 0;
-        else if (excp) sepc <= pc + 4;
+        else if (excp) sepc <= pc_plus_4;
         else sepc <= sepc;
     end
 
     logic [9:0] table_addr, update_addr; // use pc[11:2] as index since last 2 bits are always 0
-    assign table_addr = pc[11:2];
+    assign table_addr  = pc[11:2];
     assign update_addr = old_branch_pc[11:2];
     assign predict_fail = old_predict != old_actual;
 
@@ -61,20 +65,20 @@ module Branch_Predictor (
             unique case ({branch, predict})
                 2'b00: begin // no branch, no predict: continue
                     predict_result = 1'b0;
-                    target_pc0 = pc + 4;
+                    target_pc0 = pc_plus_4;
                 end
                 2'b10: begin // branch, no predict: jump
                     predict_result = 1'b1;
-                    if (ujtype) target_pc0 = predict_result ? pc + imm : pc + 4; // jal
-                    else target_pc0 = predict_result ? rs1_data + imm : pc + 4; // jalr
+                    if (ujtype) target_pc0 = pc + imm; // jal(call rd == 1)
+                    else target_pc0 = (rs1 == 1) ? Return_Addr[RAS_top] : rs1_data + imm;  // jalr(ret rs1 == 1)
                 end
                 2'b11: begin // branch, predict: beq, bne, blt, bge, bltu, bgeu
                     predict_result = History_Table[table_addr] > 2'b01;
-                    target_pc0 = predict_result ? pc + imm : pc + 4;
+                    target_pc0 = predict_result ? pc + imm : pc_plus_4;
                 end
                 default: begin // dont care case: continue
                     predict_result = 1'b0;
-                    target_pc0 = pc + 4;
+                    target_pc0 = pc_plus_4;
                 end
             endcase
         end
@@ -100,6 +104,23 @@ module Branch_Predictor (
             end
         end else begin
             History_Table[update_addr] <= History_Table[update_addr];
+        end
+    end
+
+    always_ff @(negedge clk) begin : Update_RAS
+        if (rst) begin
+            RAS_top <= -1;
+        end else if ({branch, predict} == 2'b10) begin
+            if (rd == 1) begin // push return address
+                Return_Addr[RAS_top + 1] <= pc_plus_4;
+                RAS_top <= RAS_top + 1;
+            end else if (rs1 == 1) begin // pop return address
+                RAS_top <= RAS_top - 1;
+            end else begin
+                RAS_top <= RAS_top;
+            end
+        end else begin
+            RAS_top <= RAS_top;
         end
     end
 
