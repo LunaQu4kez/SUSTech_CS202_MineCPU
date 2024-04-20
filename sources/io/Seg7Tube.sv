@@ -3,8 +3,8 @@
 module Seg7Tube(
     input        clk, rst_n,                      // clock, reset
     input  [7:0] p0, p1, p2, p3, p4, p5, p6, p7,  // data input
-    output logic [7:0] seg_en,                          // scan signal
-    output logic [7:0] seg_out0, seg_out1               // 7-segment display
+    output logic [7:0] seg_en,                    // scan signal
+    output logic [7:0] seg_out0, seg_out1         // 7-segment display
     );
 
     logic        clk_500hz;                       // 500Hz clock
@@ -31,15 +31,6 @@ module Seg7Tube(
             `IND: seg_out0 = `SEGD; // Display 'd'
             `INE: seg_out0 = `SEGE; // Display 'E'
             `INF: seg_out0 = `SEGF; // Display 'F'
-            `INH: seg_out0 = `SEGH; // Display 'H'
-            `INL: seg_out0 = `SEGL; // Display 'L'
-            `INo: seg_out0 = `SEGo; // Display 'o'
-            `INR: seg_out0 = `SEGR; // Display 'R'
-            `INt: seg_out0 = `SEGt; // Display 't'
-            `INu: seg_out0 = `SEGu; // Display 'u'
-            `INn: seg_out0 = `SEGn; // Display 'n'
-            `INN: seg_out0 = `SEGN; // Display 'N'
-            `INU: seg_out0 = `SEGU; // Display 'U'
          default: seg_out0 = 0;     // Display nothing
         endcase
     end
@@ -62,15 +53,6 @@ module Seg7Tube(
             `IND: seg_out1 = `SEGD; // Display 'd'
             `INE: seg_out1 = `SEGE; // Display 'E'
             `INF: seg_out1 = `SEGF; // Display 'F'
-            `INH: seg_out1 = `SEGH; // Display 'H'
-            `INL: seg_out1 = `SEGL; // Display 'L'
-            `INo: seg_out1 = `SEGo; // Display 'o'
-            `INR: seg_out1 = `SEGR; // Display 'R'
-            `INt: seg_out1 = `SEGt; // Display 't'
-            `INu: seg_out1 = `SEGu; // Display 'u'
-            `INn: seg_out1 = `SEGn; // Display 'n'
-            `INN: seg_out1 = `SEGN; // Display 'N'
-            `INU: seg_out1 = `SEGU; // Display 'U'
          default: seg_out1 = 0;     // Display nothing
         endcase
     end
