@@ -136,14 +136,14 @@ int main(int argc, char** argv) {
 
     // load program
     top->rst_n = 1;
-    top->uart_finish = 0;
+    top->uart_done = 0;
     vector<uint32_t> inst = load_program();
-    top->uart_finish = 1;
+    top->uart_done = 1;
 
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
 
-    while (uc_pc != 0x68) {
+    while (uc_pc != 0x60) {
         run_one_cycle();
         if(get_value(flush)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
