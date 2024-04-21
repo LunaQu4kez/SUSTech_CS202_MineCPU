@@ -84,3 +84,7 @@
 `define MMIO_ADDR  32'hffffff00
 `define STAK_ADDR  32'h00007ffc
 `define EXCP_ADDR  32'h1c090000
+// VGA
+`define INFO_WID  7:0
+`define INFO_NUM  0:3071  // 96*32
+`define COLOR_WID 4:0

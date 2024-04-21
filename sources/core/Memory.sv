@@ -1,17 +1,22 @@
 `include "Const.svh"
 
 module Memory (
-    input                    clka, clkb, // rst,
-    input  logic [`LDST_WID] ldst,
-    input  logic [`DATA_WID] addra, addrb,
-    input  logic [`DATA_WID] write_datab,
-    input  logic             web, // port b write enable
-    input  logic [`DATA_WID] sepc,
-    output logic [`DATA_WID] dataa, datab,
+    input                     clka, clkb, clkvga, // rst,
+    input  logic [`LDST_WID]  ldst,
+    input  logic [`DATA_WID]  addra, addrb,
+    input  logic [`DATA_WID]  write_datab,
+    input  logic              web, // port b write enable
+    input  logic [`DATA_WID]  sepc,
+    output logic [`DATA_WID]  dataa, datab,
     // IO related
-    input  logic [7:0      ] switches1, switches2, switches3,
-    input                    bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
-    output logic [7:0      ] led1_out, led2_out 
+    input  logic [7:0      ]  switches1, switches2, switches3,
+    input                     bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
+    output logic [7:0      ]  led1_out, led2_out,
+    output logic              hsync,              // line synchronization signal
+    output logic              vsync,              // vertical synchronization signal
+    output logic [`COLOR_WID] red,
+    output logic [`COLOR_WID] green,
+    output logic [`COLOR_WID] blue 
 );
 
     reg [1:0] cnt = 2'b00;
@@ -124,11 +129,15 @@ module Memory (
     );
 
 
-    // MMIO Regs
+    // MMIO related
     // output
     logic [7:0] led1, led2;
     assign led1_out = led1;
     assign led2_out = led2;
+
+    logic [`INFO_WID] chars [`INFO_NUM];
+    logic [`INFO_WID] color [`INFO_NUM];
+
 
     always_comb begin
         unique case (addrb)
@@ -195,5 +204,33 @@ module Memory (
         endcase
     end
 
+    
+    always_comb begin
+        unique case (addrb[31:12])
+            20'hffffe: begin
+                chars[addrb[11:0]] = write_datab[7:0];
+                color = color;
+            end
+            20'hffffd: begin
+                chars = chars;
+                color[addrb[11:0]] = write_datab[7:0];
+            end
+            default: begin
+                chars = chars;
+                color = color;
+            end
+        endcase
+    end
+    
+    VGA vga_inst (
+        .clk(clkvga),
+        .chars,
+        .color,
+        .hsync,
+        .vsync,
+        .red,
+        .green,
+        .blue
+    );
 
 endmodule

@@ -1,6 +1,6 @@
 module CPU_Sim ();
 
-    logic cpuclk, memclk, rst_n, uart_finish;
+    logic cpuclk, memclk, rst_n, uart_done;
     logic [7:0] switches1;
     logic [7:0] led1;
     logic [31:0] pc_t, inst_t;
@@ -13,7 +13,7 @@ module CPU_Sim ();
         .cpuclk,
         .memclk,
         .rst_n,
-        .uart_finish,
+        .uart_done,
         .switches1,
         .switches2,
         .switches3,
@@ -42,7 +42,7 @@ module CPU_Sim ();
         rst_n = 1;
         cpuclk = 0;
         memclk = 1;
-        uart_finish = 1;
+        uart_done = 1;
         switches1 = 0;
         bt1 = 0;
         forever begin
