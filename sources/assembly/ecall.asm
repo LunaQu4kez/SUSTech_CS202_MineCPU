@@ -20,12 +20,20 @@ ecall_getint:
     lw a0, 0(gp)
     j exit
 
-# ecall_printint: print a word to seg7tube
-ecall_printint:
-    # TODO
-
 # ecall_getbutton: return a value indicates the button pressed
 ecall_getbutton:
+    # TODO
+
+# ecall_getkeyb: return a value indicates the key pressed
+ecall_getkeyb:
+    # TODO
+
+# ecall_printseg: print a word to seg7tube
+ecall_printseg:
+    # TODO
+
+# ecall_print: print to screen
+ecall_print:
     # TODO
 
 # restore context and return
