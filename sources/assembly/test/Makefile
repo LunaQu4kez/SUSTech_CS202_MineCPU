@@ -3,7 +3,7 @@ LD := riscv64-unknown-elf-ld
 AS := riscv64-unknown-elf-as
 OBJCOPY := riscv64-unknown-elf-objcopy
 
-TARGET = fib
+TARGET = bubble
 
 .PHONY: all
 all: $(TARGET).bin
@@ -17,14 +17,12 @@ all: $(TARGET).bin
 $(TARGET).bin: %.bin: %.hex
 	$(OBJCOPY) -O binary $< $@
 
-.PHONY: asm
-asm: $(TARGET).bin
-
-$(TARGET).bin: $(TARGET).o
-	$(OBJCOPY) -O binary $< $@	
-
-$(TARGET).o: $(TARGET).asm
-	$(AS) -march=rv32i -mabi=ilp32 -o $@ $<
+# .PHONY: asm
+# asm: $(TARGET).bin
+# $(TARGET).bin: $(TARGET).o
+# 	$(OBJCOPY) -O binary $< $@	
+# $(TARGET).o: $(TARGET).asm
+# 	$(AS) -march=rv32i -mabi=ilp32 -o $@ $<
 
 .PHONY: clean
 clean:
