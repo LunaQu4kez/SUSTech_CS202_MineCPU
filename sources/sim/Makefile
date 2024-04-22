@@ -1,8 +1,8 @@
 LDFLAGS := -lunicorn -lSDL2
 export LDFLAGS
 
-SOURCE_DIR := ../io
-TARGET := UART
+SOURCE_DIR := ../core
+TARGET := CPU
 VERILATOR_FLAGS :=  --cc --vpi --build -j 0 -Wall -Wno-ALWCOMBORDER -Wno-UNUSEDSIGNAL --unroll-count 2048 --trace
 # modify this to the name of the module you want to simulate
 

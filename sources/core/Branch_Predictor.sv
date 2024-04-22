@@ -22,7 +22,7 @@ module Branch_Predictor (
 
     reg [`BHT_WID ] History_Table [0: (1 << 10) - 1]; // BHT/PHT
     reg [`DATA_WID] Return_Addr   [0: (1 <<  7) - 1]; // RAS
-    reg [`RAS_WID ] RAS_top = -1; // RAS top pointer
+    reg [`RAS_WID ] RAS_top = 0; // RAS top pointer
     reg start_flag = 0; // 0: first cycle does nothing, 1: enable pc update
 
     logic [`DATA_WID] target_pc0;
@@ -108,8 +108,8 @@ module Branch_Predictor (
     end
 
     always_ff @(negedge clk) begin : Update_RAS
-        if (rst) begin
-            RAS_top <= -1;
+        if (rst || ~start_flag) begin
+            RAS_top <= 0;
         end else if ({branch, predict} == 2'b10) begin
             if (rd == 1) begin // push return address
                 Return_Addr[RAS_top + 1] <= pc_plus_4;
