@@ -76,8 +76,9 @@ MineCPU
     - [ ] Cache *
   - [x] 异常控制 *
 - [ ] IO
-  - [ ] 拨码开关 & 按钮
-  - [ ] Led & 7 段数码管
+  - [x] 拨码开关 & 按钮
+  - [x] 4*4 小键盘 *
+  - [x] Led & 7 段数码管
   - [ ] VGA *
 - [ ] 软件
   - [ ] 测试场景1
@@ -183,6 +184,8 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | 0xFFFFFF28 | R     | 异常中断后跳转的 PC     | 0x00000000 - 0xFFFFFFFF |
 | 0xFFFFFF2C | W     | 七段数码管 1           | 0x00000000 - 0xFFFFFFFF |
 | 0xFFFFFF30 | W     | 七段数码管 2           | 0x00000000 - 0xFFFFFFFF |
+| 0xFFFFFF34 | R | 4*4 小键盘是否被按下 | 0x00 - 0x01 |
+| 0xFFFFFF38 | R | 4*4 小键盘按下位置 | 0x00 - 0x0F |
 | 0xFFFFE___ (000-BFF) | W | VGA 字符 | 0x00 - 0xFF |
 | 0xFFFFD___ (000-BFF) | W | VGA 颜色 | 0x00 - 0xFF |
 

@@ -8,6 +8,7 @@ module Top (
     // interact with devices
     input  logic [`SWCH_WID ] switches1, switches2, switches3,
     input  logic              bt1, bt2, bt3, bt4, bt5,
+    input  logic [`KBPIN_WID] kp,
     output logic [`LED_WID  ] led1_out, led2_out, led3_out,
     output logic [`LED_WID  ] seg_en, seg_out0, seg_out1,
     // vga interface
@@ -23,6 +24,7 @@ module Top (
     wire [`VGA_ADDR] vga_addr;
     wire [`INFO_WID] char_out, color_out;
     wire [`DATA_WID] seg1_out, seg2_out;
+    wire [4:0] kb_idx;
 
     CPU cpu_inst(
         .cpuclk,
@@ -39,6 +41,7 @@ module Top (
         .bt3,
         .bt4,
         .bt5,
+        .kb_idx,
         .led1_out,
         .led2_out,
         .led3_out,
@@ -78,6 +81,11 @@ module Top (
         .red,
         .green,
         .blue
+    );
+
+    Keyboard keyboard_inst (
+        .kp,
+        .kb_idx
     );
     
 endmodule

@@ -1,22 +1,23 @@
 `include "Const.svh"
 
 module Memory (
-    input                    clka, clkb,
-    input  logic [`LDST_WID] ldst,
-    input  logic [`DATA_WID] addra, addrb,
-    input  logic [`DATA_WID] write_datab,
-    input  logic             web, // port b write enable
-    input  logic [`DATA_WID] sepc,
-    output logic [`DATA_WID] dataa, datab,
+    input                      clka, clkb,
+    input  logic [`LDST_WID  ] ldst,
+    input  logic [`DATA_WID  ] addra, addrb,
+    input  logic [`DATA_WID  ] write_datab,
+    input  logic               web, // port b write enable
+    input  logic [`DATA_WID  ] sepc,
+    output logic [`DATA_WID  ] dataa, datab,
     // IO related
-    input  logic [`SWCH_WID] switches1, switches2, switches3,
-    input                    bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
-    output logic [`DATA_WID] seg1_out, seg2_out,
-    output logic [`LED_WID ] led1_out, led2_out,
+    input  logic [`SWCH_WID  ] switches1, switches2, switches3,
+    input                      bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
+    input  logic [`KBCODE_WID] kb_idx,                    // keyboard index: 0 1 2 3 4 5 6 7 8 9 A B C D * #
+    output logic [`DATA_WID  ] seg1_out, seg2_out,
+    output logic [`LED_WID   ] led1_out, led2_out,
     // vga related
-    input  logic [`VGA_ADDR] vga_addr,
-    output logic [`INFO_WID] char_out,
-    output logic [`INFO_WID] color_out
+    input  logic [`VGA_ADDR  ] vga_addr,
+    output logic [`INFO_WID  ] char_out,
+    output logic [`INFO_WID  ] color_out
 );
 
     reg [1:0] cnt = 2'b00;
@@ -233,6 +234,20 @@ module Memory (
                 led2 = led2;
                 seg1 = seg1;
                 seg2 = write_datab;
+            end
+            32'hffff_ff34: begin     // keyboard enable
+                datab_io = kb_idx[4] ? 32'h00000001 : 32'h00000000;
+                led1 = led1;
+                led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
+            end
+            32'hffff_ff38: begin     // 4*4 keyboard
+                datab_io = {28'h0000000, kb_idx[3:0]};
+                led1 = led1;
+                led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             default: begin
                 datab_io = 0;

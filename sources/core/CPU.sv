@@ -3,18 +3,19 @@
 module CPU (
     input  logic             cpuclk, memclk, rst_n,
     // uart related
-    input  logic [`DATA_WID] uart_data,
-    input  logic [`DATA_WID] uart_addr,
-    input  logic             uart_done,
+    input  logic [`DATA_WID  ] uart_data,
+    input  logic [`DATA_WID  ] uart_addr,
+    input  logic               uart_done,
     // interact with devices
-    input  logic [`LED_WID ] switches1, switches2, switches3,
-    input  logic             bt1, bt2, bt3, bt4, bt5,
-    output logic [`LED_WID ] led1_out, led2_out, led3_out,
-    output logic [`DATA_WID] seg1_out, seg2_out,
+    input  logic [`LED_WID   ] switches1, switches2, switches3,
+    input  logic               bt1, bt2, bt3, bt4, bt5,
+    input  logic [`KBCODE_WID] kb_idx,
+    output logic [`LED_WID   ] led1_out, led2_out, led3_out,
+    output logic [`DATA_WID  ] seg1_out, seg2_out,
     // vga interface
-    input  logic [`VGA_ADDR] vga_addr,
-    output logic [`INFO_WID] char_out,
-    output logic [`INFO_WID] color_out,
+    input  logic [`VGA_ADDR  ] vga_addr,
+    output logic [`INFO_WID  ] char_out,
+    output logic [`INFO_WID  ] color_out,
     // debug port
     output logic [31:0]      pc_t,
     output logic [31:0]      inst_t,
@@ -282,6 +283,7 @@ module CPU (
         .bt3,
         .bt4,
         .bt5,
+        .kb_idx,
         .led1_out,
         .led2_out,
         .seg1_out,
