@@ -1,17 +1,26 @@
-`include "Seg7Lib.svh"
+`include "Seg7Const.svh"
 
 module Seg7Tube(
-    input        clk, rst_n,                      // clock, reset
-    input  [7:0] p0, p1, p2, p3, p4, p5, p6, p7,  // data input
-    output logic [7:0] seg_en,                    // scan signal
-    output logic [7:0] seg_out0, seg_out1         // 7-segment display
-    );
+    input               clk, rst_n,                // clock, reset
+    input        [31:0] seg1_in, seg2_in,          // 7-segment display data
+    output logic [7:0]  seg_en,                    // scan signal
+    output logic [7:0]  seg_out0, seg_out1         // 7-segment display
+);
 
+    logic [7:0]  p0, p1, p2, p3, p4, p5, p6, p7,  // data input
     logic        clk_500hz;                       // 500Hz clock
     logic [31:0] cnt;                             // Counter for the 500Hz clock
     logic [3:0]  scan_cnt;                        // Scan signal for the 7-segment display
     logic [7:0]  seg_in0, seg_in1;                // Data for the 7-segment display
     parameter  period = `SEG_FREQ;                // Period of the 500Hz clock
+    assign p0 = seg1_in[ 7: 0];
+    assign p1 = seg1_in[15: 8];
+    assign p2 = seg1_in[23:16];
+    assign p3 = seg1_in[31:24];
+    assign p4 = seg2_in[ 7: 0];
+    assign p5 = seg2_in[15: 8];
+    assign p6 = seg2_in[23:16];
+    assign p7 = seg2_in[31:24];
 
     always_comb begin
         case(seg_in0)

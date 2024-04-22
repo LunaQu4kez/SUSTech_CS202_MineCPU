@@ -1,14 +1,17 @@
 `include "VGAConst.svh"
 
 module VGA (  // 800×600 60Hz
-    input  logic                clk,                // clk: 40MHz
-    input  logic [`INFO_WID]    chars [`INFO_NUM],
-    input  logic [`INFO_WID]    color [`INFO_NUM],
-    output logic                hsync,              // line synchronization signal
-    output logic                vsync,              // vertical synchronization signal
-    output logic [`COLOR_WID]   red,
-    output logic [`COLOR_WID]   green,
-    output logic [`COLOR_WID]   blue
+    input  logic              clk,      // clk: 40MHz
+    // get char and color from memory
+    output logic [`VGA_ADDR]  vga_addr,
+    input  logic [`INFO_WID ] char,
+    input  logic [`INFO_WID ] color,
+    // output to VGA
+    output logic              hsync,    // line synchronization signal
+    output logic              vsync,    // vertical synchronization signal
+    output logic [`COLOR_WID] red,
+    output logic [`COLOR_WID] green,
+    output logic [`COLOR_WID] blue
 );
     
 

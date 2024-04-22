@@ -1,27 +1,32 @@
 `include "Const.svh"
 
 module CPU (
-    input  logic        cpuclk, memclk, rst_n,
+    input  logic             cpuclk, memclk, rst_n,
     // uart related
-    input  logic [31:0] uart_data,
-    input  logic [31:0] uart_addr,
-    input  logic        uart_done,
+    input  logic [`DATA_WID] uart_data,
+    input  logic [`DATA_WID] uart_addr,
+    input  logic             uart_done,
     // interact with devices
-    input  logic [7:0 ] switches1, switches2, switches3,
-    input  logic        bt1, bt2, bt3, bt4, bt5,
-    output logic [7:0 ] led1_out, led2_out, led3_out,
-    // debug use
-    output logic [31:0]         pc_t,
-    output logic [31:0]         inst_t,
-    output logic [31:0]         EX_data1_t,
-    output logic [31:0]         EX_data2_t,
-    output logic [31:0]         EX_imm_t,
-    output logic [31:0]         MEM_addr_t,
-    output logic [31:0]         MEM_data_t,
-    output logic [31:0]         WB_data_t,
-    output logic [31:0]         WB_mem_t,
-    output logic [31:0]         WB_data_ot,
-    output logic [31:0]         sepc_t
+    input  logic [`LED_WID ] switches1, switches2, switches3,
+    input  logic             bt1, bt2, bt3, bt4, bt5,
+    output logic [`LED_WID ] led1_out, led2_out, led3_out,
+    output logic [`DATA_WID] seg1_out, seg2_out,
+    // vga interface
+    input  logic [`VGA_ADDR] vga_addr,
+    output logic [`INFO_WID] char_out,
+    output logic [`INFO_WID] color_out,
+    // debug port
+    output logic [31:0]      pc_t,
+    output logic [31:0]      inst_t,
+    output logic [31:0]      EX_data1_t,
+    output logic [31:0]      EX_data2_t,
+    output logic [31:0]      EX_imm_t,
+    output logic [31:0]      MEM_addr_t,
+    output logic [31:0]      MEM_data_t,
+    output logic [31:0]      WB_data_t,
+    output logic [31:0]      WB_mem_t,
+    output logic [31:0]      WB_data_ot,
+    output logic [31:0]      sepc_t
 );
 
     logic PC_Write, rst;
@@ -278,10 +283,15 @@ module CPU (
         .bt4,
         .bt5,
         .led1_out,
-        .led2_out
+        .led2_out,
+        .seg1_out,
+        .seg2_out,
+        .vga_addr,
+        .char_out,
+        .color_out
     );
 
-    // debug use
+    // debug port
     assign pc_t = IF_pc_in;
     assign inst_t = ID_inst_in;
     assign EX_data1_t = EX_data1_in;

@@ -1,22 +1,22 @@
 `include "Const.svh"
 
 module Memory (
-    input                     clka, clkb, clkvga, // rst,
-    input  logic [`LDST_WID]  ldst,
-    input  logic [`DATA_WID]  addra, addrb,
-    input  logic [`DATA_WID]  write_datab,
-    input  logic              web, // port b write enable
-    input  logic [`DATA_WID]  sepc,
-    output logic [`DATA_WID]  dataa, datab,
+    input                    clka, clkb,
+    input  logic [`LDST_WID] ldst,
+    input  logic [`DATA_WID] addra, addrb,
+    input  logic [`DATA_WID] write_datab,
+    input  logic             web, // port b write enable
+    input  logic [`DATA_WID] sepc,
+    output logic [`DATA_WID] dataa, datab,
     // IO related
-    input  logic [7:0      ]  switches1, switches2, switches3,
-    input                     bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
-    output logic [7:0      ]  led1_out, led2_out,
-    output logic              hsync,              // line synchronization signal
-    output logic              vsync,              // vertical synchronization signal
-    output logic [`COLOR_WID] red,
-    output logic [`COLOR_WID] green,
-    output logic [`COLOR_WID] blue 
+    input  logic [`SWCH_WID] switches1, switches2, switches3,
+    input                    bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
+    output logic [`DATA_WID] seg1_out, seg2_out,
+    output logic [`LED_WID ] led1_out, led2_out,
+    // vga related
+    input  logic [`VGA_ADDR] vga_addr,
+    output logic [`INFO_WID] char_out,
+    output logic [`INFO_WID] color_out
 );
 
     reg [1:0] cnt = 2'b00;
@@ -130,14 +130,16 @@ module Memory (
 
 
     // MMIO related
-    // output
-    logic [7:0] led1, led2;
+    logic [`LED_WID ] led1, led2;
+    logic [`DATA_WID] seg1, seg2;
+    logic [`INFO_WID] chars [`INFO_NUM];
+    logic [`INFO_WID] color [`INFO_NUM]; 
     assign led1_out = led1;
     assign led2_out = led2;
-
-    logic [`INFO_WID] chars [`INFO_NUM];
-    logic [`INFO_WID] color [`INFO_NUM];
-
+    assign seg1_out = seg1;
+    assign seg2_out = seg2;
+    assign char_out = chars[vga_addr];
+    assign color_out = color[vga_addr];
 
     always_comb begin
         unique case (addrb)
@@ -145,66 +147,104 @@ module Memory (
                 datab_io = {24'h000000, switches1};
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff04: begin     // switches2
                 datab_io = {24'h000000, switches2};
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff08: begin     // switches3
                 datab_io = {24'h000000, switches3};
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff0c: begin     // led1
                 datab_io = 0;
                 led1 = write_datab[7:0];
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff10: begin     // led2
                 datab_io = 0;
                 led1 = led1;
                 led2 = write_datab[7:0];
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff14: begin     // button1 middle
                 datab_io = bt1 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff18: begin     // button2 up
                 datab_io = bt2 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff1c: begin     // button3 down
                 datab_io = bt3 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff20: begin     // button4 left
                 datab_io = bt4 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
             32'hffff_ff24: begin     // button5 right
                 datab_io = bt5 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
-            32'hffff_ff28: begin     // sepc
+            32'hffff_ff28: begin     // sepc: read
                 datab_io = sepc;
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
+            end
+            32'hffff_ff2c: begin     // seg1: write
+                datab_io = data_io;
+                led1 = led1;
+                led2 = led2;
+                seg1 = write_datab;
+                seg2 = seg2;
+            end
+            32'hffff_ff30: begin     // seg2: write
+                datab_io = data_io;
+                led1 = led1;
+                led2 = led2;
+                seg1 = seg1;
+                seg2 = write_datab;
             end
             default: begin
                 datab_io = 0;
                 led1 = led1;
                 led2 = led2;
+                seg1 = seg1;
+                seg2 = seg2;
             end
         endcase
     end
 
-    
+    // vga write
     always_comb begin
         unique case (addrb[31:12])
             20'hffffe: begin
@@ -221,16 +261,5 @@ module Memory (
             end
         endcase
     end
-    
-    VGA vga_inst (
-        .clk(clkvga),
-        .chars,
-        .color,
-        .hsync,
-        .vsync,
-        .red,
-        .green,
-        .blue
-    );
 
 endmodule
