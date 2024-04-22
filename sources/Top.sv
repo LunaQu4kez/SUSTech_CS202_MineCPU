@@ -43,7 +43,7 @@ module Top (
         .led2_out,
         .led3_out,
         .seg1_out,
-        .seg2_out,
+        .seg2_out
     );
 
     UART uart_inst(

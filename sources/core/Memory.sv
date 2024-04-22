@@ -221,14 +221,14 @@ module Memory (
                 seg2 = seg2;
             end
             32'hffff_ff2c: begin     // seg1: write
-                datab_io = data_io;
+                datab_io = datab_io;
                 led1 = led1;
                 led2 = led2;
                 seg1 = write_datab;
                 seg2 = seg2;
             end
             32'hffff_ff30: begin     // seg2: write
-                datab_io = data_io;
+                datab_io = datab_io;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;

@@ -7,10 +7,10 @@ module Seg7Tube(
     output logic [7:0]  seg_out0, seg_out1         // 7-segment display
 );
 
-    logic [7:0]  p0, p1, p2, p3, p4, p5, p6, p7,  // data input
+    logic [7:0]  p0, p1, p2, p3, p4, p5, p6, p7;  // data input
     logic        clk_500hz;                       // 500Hz clock
     logic [31:0] cnt;                             // Counter for the 500Hz clock
-    logic [3:0]  scan_cnt;                        // Scan signal for the 7-segment display
+    logic [2:0]  scan_cnt;                        // Scan signal for the 7-segment display
     logic [7:0]  seg_in0, seg_in1;                // Data for the 7-segment display
     parameter  period = `SEG_FREQ;                // Period of the 500Hz clock
     assign p0 = seg1_in[ 7: 0];
