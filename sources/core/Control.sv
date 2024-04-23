@@ -34,23 +34,30 @@ module Control (
     always_comb begin : Ctrl_Signal_Gen
         unique case (inst[`OP_WID])
             `ART_LOG_OP: begin
-                unique case (inst[`FUNC3_WID])
-                    `ADD_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SUB : `ALU_ADD;
-                    `SLL_FUNC3: ALUOp = `ALU_SLL;
-                    `SLT_FUNC3: ALUOp = `ALU_SLT;
-                   `SLTU_FUNC3: ALUOp = `ALU_SLTU;
-                    `XOR_FUNC3: ALUOp = `ALU_XOR;
-                    `SRL_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SRA : `ALU_SRL;
-                     `OR_FUNC3: ALUOp = `ALU_OR;
-                    `AND_FUNC3: ALUOp = `ALU_AND;
-                    `MUL_FUNC3: ALUOp = `ALU_MUL;
-                   `MULH_FUNC3: ALUOp = `ALU_MULH;
-                 `MULHSU_FUNC3: ALUOp = `ALU_MULHSU;
-                  `MULHU_FUNC3: ALUOp = `ALU_MULHU;
-                    `DIV_FUNC3: ALUOp = `ALU_DIV;
-                    `REM_FUNC3: ALUOp = `ALU_REM;
-                       default: ALUOp = 0;
-                endcase
+                if (inst[`FUNC7_WID] == 7'h10) begin
+                    unique case (inst[`FUNC3_WID])
+                        `MUL_FUNC3: ALUOp = `ALU_MUL;
+                       `MULH_FUNC3: ALUOp = `ALU_MULH;
+                     `MULHSU_FUNC3: ALUOp = `ALU_MULHSU;
+                      `MULHU_FUNC3: ALUOp = `ALU_MULHU;
+                        `DIV_FUNC3: ALUOp = `ALU_DIV;
+                        `REM_FUNC3: ALUOp = `ALU_REM;
+                           default: ALUOp = 0;
+                    endcase
+                end
+                else begin
+                    unique case (inst[`FUNC3_WID])
+                        `ADD_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SUB : `ALU_ADD;
+                        `SLL_FUNC3: ALUOp = `ALU_SLL;
+                        `SLT_FUNC3: ALUOp = `ALU_SLT;
+                       `SLTU_FUNC3: ALUOp = `ALU_SLTU;
+                        `XOR_FUNC3: ALUOp = `ALU_XOR;
+                        `SRL_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SRA : `ALU_SRL;
+                         `OR_FUNC3: ALUOp = `ALU_OR;
+                        `AND_FUNC3: ALUOp = `ALU_AND;
+                           default: ALUOp = 0;
+                    endcase
+                end
                 BRUOp    = `BRU_NOP;
                 ALUSrc   = 0;
                 MemWrite = 0;
