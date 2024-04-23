@@ -36,12 +36,12 @@
 `define CHAR_157 128'h003c7e7e7e7e3c00ffffffffffffffff  // up: circle-pacman down: color block
 `define CHAR_158 128'h003c7e7e7e7e3c00003c7e5a7e7e5a00  // up: circle-pacman down: ghost
 
-`define CHAR_136 128'h003c7e5a7e7e5a000000001818000000  // up: ghost         down: a point
-`define CHAR_137 128'h003c7e5a7e7e5a00ffffffffffffffff  // up: ghost         down: color block
-`define CHAR_138 128'h003c7e5a7e7e5a00003c787070783c00  // up: ghost         down: right-pacman
-`define CHAR_139 128'h003c7e5a7e7e5a00000042667e7e3c00  // up: ghost         down: up-pacman
-`define CHAR_140 128'h003c7e5a7e7e5a00003c1e0e0e1e3c00  // up: ghost         down: left-pacman
-`define CHAR_141 128'h003c7e5a7e7e5a00003c7e7e66420000  // up: ghost         down: down-pacman
-`define CHAR_142 128'h003c7e5a7e7e5a00003c7e7e7e7e3c00  // up: ghost         down: circle-pacman
-`define CHAR_143 128'h003c7e5a7e7e5a00003c7e5a7e7e5a00  // up: ghost         down: ghost
+`define CHAR_159 128'h003c7e5a7e7e5a000000001818000000  // up: ghost         down: a point
+`define CHAR_160 128'h003c7e5a7e7e5a00ffffffffffffffff  // up: ghost         down: color block
+`define CHAR_161 128'h003c7e5a7e7e5a00003c787070783c00  // up: ghost         down: right-pacman
+`define CHAR_162 128'h003c7e5a7e7e5a00000042667e7e3c00  // up: ghost         down: up-pacman
+`define CHAR_163 128'h003c7e5a7e7e5a00003c1e0e0e1e3c00  // up: ghost         down: left-pacman
+`define CHAR_164 128'h003c7e5a7e7e5a00003c7e7e66420000  // up: ghost         down: down-pacman
+`define CHAR_165 128'h003c7e5a7e7e5a00003c7e7e7e7e3c00  // up: ghost         down: circle-pacman
+`define CHAR_166 128'h003c7e5a7e7e5a00003c7e5a7e7e5a00  // up: ghost         down: ghost
 
