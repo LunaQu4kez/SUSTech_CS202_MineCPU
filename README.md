@@ -216,8 +216,9 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 - **[Memory]** 内存读取数据时传入地址会延迟一个周期读取到数据，且 `sh` 和 `sb` 无法直接对内存进行操作.
   - **原因**: 使用 ip RAM 生成的内存以 32 bit 为单位进行存或读取，而 `sh` 和 `sb` 只修改其中的 16 bit 或 8 bit
   - **解决方案**:
-    1. 使用 Cache 进行管理
-    2. 加快内存时钟频率，先读取再修改最后存入
+    1. :negative_squared_cross_mark: 使用 Cache 进行管理
+    2. :white_check_mark: 加快内存时钟频率，先读取再修改最后存入
 - **[Instruction auipc/Solved]** 指令 `auipc` 的实现.
   - **原因**: 指令 `auipc` 需要进行 pc 相关的计算，而 ALU 没有相关数据的输入
-  - **解决方案**: :white_check_mark: 在 ALU 输入 rs1 的端口前添加选择器，对 pc 和 rs1_data 进行选择，同时拓宽控制信号 ALUSrc. 
+  - **解决方案**: 
+    1. :white_check_mark: 在 ALU 输入 rs1 的端口前添加选择器，对 pc 和 rs1_data 进行选择，同时拓宽控制信号 ALUSrc. 
