@@ -43,6 +43,12 @@ module Control (
                     `SRL_FUNC3: ALUOp = inst[`FUNC7_WID] == 7'h20 ? `ALU_SRA : `ALU_SRL;
                      `OR_FUNC3: ALUOp = `ALU_OR;
                     `AND_FUNC3: ALUOp = `ALU_AND;
+                    `MUL_FUNC3: ALUOp = `ALU_MUL;
+                   `MULH_FUNC3: ALUOp = `ALU_MULH;
+                 `MULHSU_FUNC3: ALUOp = `ALU_MULHSU;
+                  `MULHU_FUNC3: ALUOp = `ALU_MULHU;
+                    `DIV_FUNC3: ALUOp = `ALU_DIV;
+                    `REM_FUNC3: ALUOp = `ALU_REM;
                        default: ALUOp = 0;
                 endcase
                 BRUOp    = `BRU_NOP;

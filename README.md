@@ -65,7 +65,7 @@ MineCPU
   - [x] EX Stage
     - [x] 算术逻辑 (ALU)
       - [x] RV32I
-      - [ ] RV32M *
+      - [x] RV32M *
     - [x] 分支判断 (BRU)
     - [x] 前递模块 (Forward Unit) *
   - [x] MEM Stage
