@@ -100,14 +100,14 @@ void print_map() {
 void init() {
     ox = 23;
     oy = 13;
-    ax = 11;
-    ay = 14;
+    ax = 14;
+    ay = 13;
     bx = 14;
     by = 14;
     cx = 14;
     cy = 12;
     dx = 14;
-    dy = 16;
+    dy = 15;
 
     od = 0;
     ad = 0;
@@ -458,7 +458,7 @@ void init() {
     game[11][11] = 0;
     game[11][12] = 0;
     game[11][13] = 0;
-    game[11][14] = 3;
+    game[11][14] = 0;
     game[11][15] = 0;
     game[11][16] = 0;
     game[11][17] = 0;
@@ -543,11 +543,11 @@ void init() {
     game[14][9] = 0;
     game[14][10] = -1;
     game[14][11] = 0;
-    game[14][12] = 5;
+    game[14][12] = 0;
     game[14][13] = 0;
-    game[14][14] = 4;
+    game[14][14] = 0;
     game[14][15] = 0;
-    game[14][16] = 6;
+    game[14][16] = 0;
     game[14][17] = -1;
     game[14][18] = 0;
     game[14][19] = 0;
@@ -805,7 +805,7 @@ void init() {
     game[23][10] = 1;
     game[23][11] = 1;
     game[23][12] = 1;
-    game[23][13] = 2;
+    game[23][13] = 0;
     game[23][14] = 0;
     game[23][15] = 1;
     game[23][16] = 1;
@@ -1023,4 +1023,10 @@ void init() {
     game[30][25] = -1;
     game[30][26] = -1;
     game[30][27] = -1;
+
+    game[ox][oy] = 2;
+    game[ax][ay] = 3;
+    game[bx][by] = 4;
+    game[cx][cy] = 5;
+    game[dx][dy] = 6;
 }
