@@ -3,18 +3,21 @@ using namespace std;
 
 void init();
 void print_map();
+void time_delay();
 void stepO();
 void stepA();
 void stepB();
 void stepC();
 void stepD();
 bool checkover();
-void time_delay();
+
 
 
 int game[31][28]; // -1 wall, 0 road, 1 point, 2 pacman, 3 red ghost, 4 pink ghost, 5 blue ghost, 6 orange ghost
 int ox, oy, ax, ay, bx, by, cx, cy, dx, dy; // pacman, red, pink, blue, orange
-int step, score, dir;
+int od, ad, bd, cd, dd;  // direction: 0 right, 1 up, 2 left, 3 down
+int os, as, bs, cs, ds;  // step now
+int step, score;  
 int cnt;  // for time delay
 
 int main() {
@@ -44,6 +47,40 @@ int main() {
     //}
 }
 
+void stepO() {
+
+}
+
+void stepA() {
+    
+}
+
+void stepB() {
+    
+}
+
+void stepC() {
+    
+}
+
+void stepD() {
+    
+}
+
+bool checkover() {
+    if (score == 244) return true;
+    if (ox == ax && oy == ay) return true;
+    if (ox == bx && oy == by) return true;
+    if (ox == cx && oy == cy) return true;
+    if (ox == dx && oy == dy) return true;
+    return false;
+}
+
+void time_delay() {
+    while (cnt < 40000000) cnt++;
+    cnt = 0;
+}
+
 void print_map() {
     for (int i = 0; i < 31; i++) {
         for (int j = 0; j < 28; j++) {
@@ -71,6 +108,19 @@ void init() {
     cy = 12;
     dx = 14;
     dy = 16;
+
+    od = 0;
+    ad = 0;
+    bd = 1;
+    cd = 0;
+    dd = 2;
+
+    os = 0;
+    as = 0;
+    bs = 0;
+    cs = 0;
+    ds = 0;
+
     step = 0;
     score = 0;
     cnt = 0;
