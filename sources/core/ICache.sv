@@ -20,8 +20,9 @@ module ICache (
     assign mem_pc = addr;
     assign offset = addr[11:0];
     assign tag = addr[31:12];
-    assign icache_stall = !cache[offset][53] || cache[offset][51:32] != tag;
-    assign inst = cache[offset][31:0];
+
+    assign inst = read_state == 2 ? mem_inst : cache[offset][31:0];
+    assign icache_stall = (!cache[offset][53] || cache[offset][51:32] != tag) && (read_state != 2);
 
     initial begin
         read_state = 0;
@@ -40,13 +41,13 @@ module ICache (
     end
 
     // write to cache
-    always_comb begin
+    always_ff @(posedge clk) begin
         if (rst) begin
-            for (int i = 0; i < (1 << 12); i++) begin
-                cache[i][53] = 0;
+            for (int i = 0; i < (1 << 10); i++) begin
+                cache[i] <= 0;
             end
         end else begin
-            cache[offset] = (read_state == 2) ? {2'b10, tag, mem_inst} : cache[offset];
+            cache[offset] <= (read_state == 2) ? {2'b10, tag, mem_inst} : cache[offset];
         end
     end
     
