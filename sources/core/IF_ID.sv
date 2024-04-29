@@ -2,6 +2,7 @@
 
 module IF_ID (
     input              clk, rst,
+    input              icache_stall,
     input  [`DATA_WID] inst_in, pc_in,
     output [`DATA_WID] inst_out, pc_out
 );
@@ -11,8 +12,8 @@ module IF_ID (
     assign inst_out = inst;
     assign pc_out = pc;
 
-    always @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge clk) begin
+        if (rst | icache_stall) begin
             inst <= 0;
             pc <= 0;
         end else begin

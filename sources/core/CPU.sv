@@ -15,29 +15,19 @@ module CPU (
     // vga interface
     input  logic [`VGA_ADDR  ] vga_addr,
     output logic [`INFO_WID  ] char_out,
-    output logic [`INFO_WID  ] color_out,
-    // debug port
-    output logic [31:0]      pc_t,
-    output logic [31:0]      inst_t,
-    output logic [31:0]      EX_data1_t,
-    output logic [31:0]      EX_data2_t,
-    output logic [31:0]      EX_imm_t,
-    output logic [31:0]      MEM_addr_t,
-    output logic [31:0]      MEM_data_t,
-    output logic [31:0]      WB_data_t,
-    output logic [31:0]      WB_mem_t,
-    output logic [31:0]      WB_data_ot,
-    output logic [31:0]      sepc_t
+    output logic [`INFO_WID  ] color_out
 );
 
-    logic PC_Write, rst;
+    logic PC_Write, rst, icache_stall;
     logic [`DATA_WID] new_pc, IF_pc_in;
     assign rst = ~rst_n | ~uart_done;
+    assign led3_out = 0;
 
     PC pc_inst (
         .clk(cpuclk),
         .rst,
         .PC_Write,
+        .icache_stall,
         .new_pc,
         .pc_out(IF_pc_in)
     );
@@ -45,9 +35,12 @@ module CPU (
     logic [`DATA_WID] IF_pc_out, IF_inst_out, mem_pc, mem_inst;
 
     Stage_IF if_inst (
+        .clk(cpuclk),
+        .rst,
         .new_pc(IF_pc_in),
         .pc_out(IF_pc_out),
         .inst(IF_inst_out),
+        .icache_stall,
         .mem_inst,
         .mem_pc
     );
@@ -59,6 +52,7 @@ module CPU (
     IF_ID if_id_inst (
         .clk(cpuclk),
         .rst,
+        .icache_stall,
         .inst_in(IF_inst_out),
         .pc_in(IF_pc_out),
         .inst_out(ID_inst_in),
@@ -292,18 +286,5 @@ module CPU (
         .char_out,
         .color_out
     );
-
-    // debug port
-    assign pc_t = IF_pc_in;
-    assign inst_t = ID_inst_in;
-    assign EX_data1_t = EX_data1_in;
-    assign EX_data2_t = EX_data2_in;
-    assign EX_imm_t = EX_imm_in;
-    assign MEM_addr_t = MEM_data1_in;
-    assign MEM_data_t = MEM_data2_in;
-    assign WB_data_t = WB_data1_in;
-    assign WB_mem_t = WB_data2_in;
-    assign WB_data_ot = WB_data_out;
-    assign sepc_t = sepc;
 
 endmodule

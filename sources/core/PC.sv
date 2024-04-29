@@ -3,6 +3,7 @@
 module PC (
     input                    clk, rst,
     input  logic             PC_Write,   // hazard stall 1: yes, 0: no
+    input  logic             icache_stall,
     input  logic [`DATA_WID] new_pc,     // next pc
     output logic [`DATA_WID] pc_out
 );
@@ -12,7 +13,7 @@ module PC (
 
     always_ff @(negedge clk) begin
         if (rst) pc <= 0;
-        else pc <= (PC_Write == 1'b0) ? new_pc : pc;
+        else pc <= (PC_Write | icache_stall == 1'b0) ? new_pc : pc;
     end
     
 endmodule
