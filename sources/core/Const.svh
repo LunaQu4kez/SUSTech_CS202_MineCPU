@@ -105,3 +105,7 @@
 // Keyboard related
 `define KBPIN_WID  7:0
 `define KBCODE_WID 4:0 
+// UART related
+`define BPS_CNT 868
+`define MAX_DATA 32'h7fff
+`define MAX_IDLE 16'hf

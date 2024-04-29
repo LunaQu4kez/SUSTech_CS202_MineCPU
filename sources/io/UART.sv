@@ -1,13 +1,11 @@
-`define BPS_CNT 868
-`define MAX_DATA 32'h7fff
-`define MAX_IDLE 16'hf
+`include "Const.svh"
 
 module UART (
-    input               clk, rst, rx,
+    input                    clk, rst, rx,
     // ports to memory
-    output logic [31:0] data_out,
-    output logic [31:0] addr_out,
-    output logic        done
+    output logic [`DATA_WID] data_out,
+    output logic [`DATA_WID] addr_out,
+    output logic             done
 );
 
     reg       rx_done;
@@ -26,6 +24,15 @@ module UART (
     reg [15:0] idle_cnt;
     reg [9:0]  idle_cnt0;
     reg        received;
+
+    // filter unexpected noise
+    reg rxd_t0, rxd_t1, rxd_t2;
+
+    // detect start bit
+    reg  en_state;
+    wire nedge;
+    assign nedge = !rxd_t1 & rxd_t2;
+
     assign done = (addr_out >= `MAX_DATA) || (received && idle_cnt == `MAX_IDLE);
     always_ff @(posedge clk) begin
         if (rst | en_state) begin
@@ -45,8 +52,7 @@ module UART (
         end
     end
     
-    // filter unexpected noise
-    reg rxd_t0, rxd_t1, rxd_t2;
+    
     always_ff @(posedge clk) begin
         if (rst) begin
             rxd_t0 <= 1'b1;
@@ -59,10 +65,6 @@ module UART (
         end
     end
 
-    // detect start bit
-    reg  en_state;
-    wire nedge;
-    assign nedge = !rxd_t1 & rxd_t2;
     
     always_ff @(posedge clk) begin
         if (rst) en_state <= 1'b0;
