@@ -5,3 +5,4 @@
 vivado_project
 **/*.vcd
 **/obj_dir_*
+program/my_pacman/output
