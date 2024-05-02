@@ -1,7 +1,7 @@
 `include "Const.svh"
 
 module CPU (
-    input  logic             cpuclk, memclk, rst_n,
+    input  logic               cpuclk, memclk, rst_n,
     // uart related
     input  logic [`DATA_WID  ] uart_data,
     input  logic [`DATA_WID  ] uart_addr,
@@ -18,7 +18,7 @@ module CPU (
     output logic [`INFO_WID  ] color_out
 );
 
-    logic PC_Write, rst, icache_stall;
+    logic PC_Write, rst, icache_stall, dcache_stall;
     logic [`DATA_WID] new_pc, IF_pc_in;
     assign rst = ~rst_n | ~uart_done;
     assign led3_out = 0;
@@ -53,6 +53,7 @@ module CPU (
         .clk(cpuclk),
         .rst,
         .icache_stall,
+        .dcache_stall,
         .inst_in(IF_inst_out),
         .pc_in(IF_pc_out),
         .inst_out(ID_inst_in),
@@ -126,6 +127,7 @@ module CPU (
         .rs1_in(ID_rs1_out),
         .rs2_in(ID_rs2_out),
         .flush,
+        .dcache_stall,
         .predict_result_in(ID_predict_result_out),
         .pc_out(EX_pc_in),
         .data1_out(EX_data1_in),
@@ -189,6 +191,7 @@ module CPU (
     EX_MEM ex_mem_inst (
         .clk(cpuclk),
         .rst,
+        .dcache_stall,
         .ALUres_in(EX_ALU_res_out), 
         .data2_in(EX_data_out),
         .rd_in(EX_rd_out),
@@ -205,12 +208,12 @@ module CPU (
     logic [`DATA_WID] MEM_data1_out, MEM_data2_out;
     logic [`WB_CTRL_WID] MEM_WB_ctrl_out;
     logic [`DATA_WID] mem_addr, mem_write_data, mem_data;
-    logic MemWrite, web;
-    logic [`LDST_WID] ldst;
-
+    logic mem_web, web;
     assign MEMtoEX_data = mem_addr;
 
     Stage_MEM mem_instance (
+        .clk(cpuclk),
+        .rst,
         .MEM_ctrl_in(MEM_MEM_ctrl_in),
         .WB_ctrl_in(MEM_WB_ctrl_in),
         .write_addr(MEM_data1_in),
@@ -220,27 +223,26 @@ module CPU (
         .addr_out(MEM_data1_out),
         .data_out(MEM_data2_out),
         .WB_ctrl_out(MEM_WB_ctrl_out),
+        .dcache_stall,
         .mem_addr,
         .mem_write_data,
-        .MemWrite,
-        .ldst,
+        .mem_web,
         .mem_data
     );
 
     logic [`DATA_WID] WB_data1_in, WB_data2_in;
     logic [`WB_CTRL_WID] WB_WB_ctrl_in;
     logic [`DATA_WID] uart_mem_data, uart_mem_addr;
-    logic [`LDST_WID] uart_LDST;
     assign MEM_WB_RegWrite = WB_WB_ctrl_in[1];
     // select uart or internal access
     assign uart_mem_addr = uart_done ? mem_addr : uart_addr;
     assign uart_mem_data = uart_done ? mem_write_data : uart_data;
-    assign uart_LDST = uart_done ? ldst : 7;
-    assign web = uart_done ? MemWrite : 1;
+    assign web = uart_done || mem_web;
 
     MEM_WB mem_wb_inst (
         .clk(cpuclk),
         .rst,
+        .dcache_stall,
         .addr_in(MEM_data1_out),
         .data_in(MEM_data2_out),
         .rd_in(MEM_rd_out),
@@ -261,7 +263,6 @@ module CPU (
     Memory memory_inst (
         .clka(memclk),
         .clkb(memclk),
-        .ldst(uart_LDST),
         .addra(mem_pc),
         .addrb(uart_mem_addr),
         .write_datab(uart_mem_data),

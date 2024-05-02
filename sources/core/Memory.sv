@@ -20,16 +20,14 @@ module Memory (
 );
 
     logic [`DATA_WID] wdatab, rdatab, datab_io;
-    logic bool_io;
-    assign bool_io = (addrb[31:16] == 16'hffff);  // 1: io, 0: mem
-    assign datab = bool_io ? datab_io : rdatab;
-
+    logic bool_io;   // mmio or mem
     logic [`DATA_WID] rdataa, edataa = 0;
     logic bool_exc;  // exception or not
-    assign bool_exc = (addra[31:16] == 16'h1c09);
+    assign bool_io = (addrb[31:16] == 16'hffff);  // 1: io, 0: mem
+    assign datab = bool_io ? datab_io : rdatab;
+    assign bool_exc = (addra[31:16] == 16'h1c09); // 1: exc, 0: mem
     assign dataa = bool_exc ? edataa : rdataa;
 
-    
     // IP RAM Simulation
     MemoryAnalog test_inst (
         .clka(~clka),
