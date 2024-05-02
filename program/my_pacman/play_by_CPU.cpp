@@ -28,13 +28,14 @@ int wx, wy;
 
 
 int main() {
-    //while (true) {
+    while (true) {
         init();
         print_map();
+
         // if bt1 is pushed, start game
-        // while (true) {
-        //     if (bt1 is pushed) break;
-        // }
+        while (true) {
+            if (bt1 is pushed) break;
+        }
 
         while (true) {
             ///******  for test  ******
@@ -53,18 +54,15 @@ int main() {
             stepD();
             print_map();
             if (checkover()) {
-                printf("*******************\n");
-                printf("*******CAUGHT******\n");
-                printf("*******************\n");
                 break;
             }
         }
 
         // if bt1 is pushed, end and start a new game
-        // while (true) {
-        //     if (bt1 is pushed) break;
-        // }
-    //}
+        while (true) {
+            if (bt1 is pushed) break;
+        }
+    }
 }
 
 void stepO() {
@@ -438,37 +436,16 @@ bool checkover() {
 void time_delay() {
     while (cnt < 10000000) {
         cnt++;
-        // if (bt2 is pushed && dir != 1) dir = 0;
-        // if (bt3 is pushed && dir != 0) dir = 1;
-        // if (bt4 is pushed && dir != 3) dir = 2;
-        // if (bt5 is pushed && dir != 2) dir = 3;
+        if (bt2 is pushed && dir != 1) dir = 0;
+        if (bt3 is pushed && dir != 0) dir = 1;
+        if (bt4 is pushed && dir != 3) dir = 2;
+        if (bt5 is pushed && dir != 2) dir = 3;
     }
     cnt = 0;
 }
 
 void print_map() {
-    printf("   ");
-    for (int j = 0; j < 28; j++) {
-        if (j < 10) printf("%d ", j);
-        else printf("%d", j);
-    }
-    printf("\n");
-    for (int i = 0; i < 31; i++) {
-        if (i < 10) printf("%d  ", i);
-        else printf("%d ", i);
-        for (int j = 0; j < 28; j++) {
-            if (game[i][j] == -1) printf("X ");
-            else if (game[i][j] == 0) printf("  ");
-            else if (game[i][j] == 1) printf(". ");
-            else if (game[i][j] == 2) printf("O ");
-            else if (game[i][j] == 3) printf("A ");
-            else if (game[i][j] == 4) printf("B ");
-            else if (game[i][j] == 5) printf("C ");
-            else if (game[i][j] == 6) printf("D ");
-        }
-        printf("\n");
-    }
-    printf("**********************************************************************************\n");
+    // toDo
 }
 
 void init() {
