@@ -54,22 +54,16 @@ int get_value(vpiHandle vh) {
 }
 
 void run_one_cycle() {
-    top->cpuclk = 0;
+    top->cpuclk = 1;
+    top->memclk = 1;
     top->eval();
-    for(int i = 0; i < 4; i++) {
-        top->memclk = 1;
-        top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
-        top->memclk = 0;
-        top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
-        if (i % 2 == 0) {
-            top->cpuclk = !top->cpuclk;
-            top->eval();
-        }
-    }
+    contextp->timeInc(1);
+    tfp->dump(contextp->time());
+    top->cpuclk = 0;
+    top->memclk = 0;
+    top->eval();
+    contextp->timeInc(1);
+    tfp->dump(contextp->time());
 }
 
 vector<uint32_t> load_program() {
@@ -88,6 +82,7 @@ vector<uint32_t> load_program() {
         top->uart_addr = i * 4;
         top->uart_data = concat_data;
         inst.push_back(concat_data);
+        run_one_cycle();
         run_one_cycle();
     }
 
@@ -142,21 +137,20 @@ int main(int argc, char** argv) {
 
     // run four cycles to get warm up
     for(int i = 0; i < 3; i++) run_one_cycle();
-
-    while (uc_pc != 0x60) {
-        run_one_cycle();
-        if(get_value(flush)) run_one_cycle(); // penalty one cycle
-    	VerilatedVpi::callValueCbs();
-        // run one instruction on unicorn
-        if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
-            printf("pc: 0x%llx\n", uc_pc);
-            printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
-            break;
-        }
-        
-        uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
-        time++;
-    }
+    for(int i = 0; i < 3; i++) run_one_cycle();
+    // while (uc_pc != 0x60) {
+    //     run_one_cycle();
+    //     if(get_value(flush)) run_one_cycle(); // penalty one cycle
+    // 	VerilatedVpi::callValueCbs();
+    //     // run one instruction on unicorn
+    //     if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
+    //         printf("pc: 0x%llx\n", uc_pc);
+    //         printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
+    //         break;
+    //     }
+    //     uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
+    //     time++;
+    // }
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));
