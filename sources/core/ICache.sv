@@ -13,12 +13,12 @@ module ICache (
 
     // format: valid[53] | dirty[52] | tag[51:32] | data[31:0]
     // here dirty is regarded as use bit
-    reg  [`CACHE_WID] cache [0: (1 << 12) - 1];
-    reg  [1:0 ] read_state;
-    wire [11:0] offset;
+    reg  [`CACHE_WID] cache [0: (1 << 10) - 1];
+    reg  [1:0]  read_state;
+    wire [9:0]  offset;
     wire [19:0] tag;
     assign mem_pc = addr;
-    assign offset = addr[11:0];
+    assign offset = addr[11:2];
     assign tag = addr[31:12];
 
     assign inst = read_state == 2 ? mem_inst : cache[offset][31:0];
@@ -26,7 +26,7 @@ module ICache (
 
     initial begin
         read_state = 0;
-        for (int i = 0; i < (1 << 12); i++) begin
+        for (int i = 0; i < (1 << 10); i++) begin
             cache[i] = 0;
         end        
     end
