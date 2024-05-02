@@ -2,6 +2,7 @@
 
 module Branch_Predictor (
     input  logic             clk, rst,
+    input  logic             dcache_stall,
     // whether to branch and predict, from Control
     input  logic             branch, predict,
     // process jalr, ujtype indicates jal
@@ -89,7 +90,7 @@ module Branch_Predictor (
             for (int i = 0; i < (1 << 10); i = i + 1) begin
                 History_Table[i] <= 2'b01;
             end
-        end else if (old_branch) begin // update table
+        end else if (old_branch && ~dcache_stall) begin // update table
             if (old_actual) begin
                 if (History_Table[update_addr] != 2'b11) begin
                     History_Table[update_addr] <= History_Table[update_addr] + 1;
@@ -110,7 +111,7 @@ module Branch_Predictor (
     always_ff @(negedge clk) begin : Update_RAS
         if (rst || ~start_flag) begin
             RAS_top <= 0;
-        end else if ({branch, predict} == 2'b10) begin
+        end else if ({branch, predict} == 2'b10 && !dcache_stall) begin
             if (rd == 1) begin // push return address
                 Return_Addr[RAS_top + 1] <= pc_plus_4;
                 RAS_top <= RAS_top + 1;

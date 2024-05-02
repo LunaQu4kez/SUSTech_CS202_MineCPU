@@ -2,6 +2,7 @@
 
 module Stage_ID (
     input                        clk, rst,
+    input                        dcache_stall,
     // signal from IF stage
     input  logic [`DATA_WID    ] pc_in,
     input  logic [`DATA_WID    ] inst,
@@ -87,6 +88,7 @@ module Stage_ID (
     Branch_Predictor bp_inst (
         .clk,
         .rst,
+        .dcache_stall,
         .branch,
         .predict,
         .rs1_data,

@@ -76,6 +76,7 @@ module CPU (
     Stage_ID id_inst (
         .clk(cpuclk),
         .rst,
+        .dcache_stall,
         .pc_in(ID_pc_in),
         .inst(ID_inst_in),
         .ID_EX_rd,
