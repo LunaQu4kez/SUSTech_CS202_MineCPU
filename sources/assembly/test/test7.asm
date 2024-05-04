@@ -35,6 +35,6 @@ addi sp, sp, 16
 jr ra
 
 exit:
-sw a0, 4(gp)
+sw a0, 12(gp)
 
  
