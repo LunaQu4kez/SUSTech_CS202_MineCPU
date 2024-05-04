@@ -19,9 +19,8 @@ module Memory (
     output logic [`INFO_WID  ] color_out
 );
 
-    logic [`DATA_WID] wdatab, rdatab, datab_io;
+    logic [`DATA_WID] rdataa, rdatab, datab_io, edataa = 0;
     logic bool_io;   // mmio or mem
-    logic [`DATA_WID] rdataa, edataa = 0;
     logic bool_exc;  // exception or not
     assign bool_io = (addrb[31:16] == 16'hffff);  // 1: io, 0: mem
     assign datab = bool_io ? datab_io : rdatab;
@@ -34,7 +33,7 @@ module Memory (
         .clkb(~clkb),
         .addra(addra[15:2]),
         .addrb(addrb[15:2]),
-        .write_datab(bool_io ? 0 : wdatab),
+        .write_datab(bool_io ? 0 : write_datab),
         .web(web & ~bool_io),
         .dataa(rdataa),
         .datab(rdatab)

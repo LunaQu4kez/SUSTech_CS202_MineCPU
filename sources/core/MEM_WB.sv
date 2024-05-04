@@ -2,7 +2,7 @@
 
 module MEM_WB (
     input                       clk, rst,
-    input                       dcache_stall,
+    input                       dcache_stall, icache_stall,
     input  logic [`DATA_WID   ] addr_in, data_in,
     input  logic [`REGS_WID   ] rd_in,
     output logic [`DATA_WID   ] addr_out, data_out,
@@ -22,7 +22,7 @@ module MEM_WB (
     assign WB_ctrl_out = WB_ctrl;
 
     always @(posedge clk) begin
-        if (rst || dcache_stall) begin
+        if (rst | dcache_stall | icache_stall) begin
             addr <= 0;
             data <= 0;
             rd <= 0;

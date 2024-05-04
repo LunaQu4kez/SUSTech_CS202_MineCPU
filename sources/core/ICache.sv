@@ -11,18 +11,17 @@ module ICache (
     output logic [`DATA_WID] mem_pc
 );
 
-    // format: valid[53] | dirty[52] | tag[51:32] | data[31:0]
+    // format: valid[41] | dirty[40] | tag[39:32] | data[31:0]
     // here dirty is regarded as use bit
     reg  [`CACHE_WID] cache [0: (1 << 10) - 1];
-    reg  [1:0]  read_state;
-    wire [9:0]  offset;
-    wire [19:0] tag;
+    reg  [1:0] read_state;
+    wire [9:0] offset;
+    wire [7:0] tag;
     assign mem_pc = addr;
     assign offset = addr[11:2];
-    assign tag = addr[31:12];
-
+    assign tag = addr[19:12];
     assign inst = read_state == 2 ? mem_inst : cache[offset][31:0];
-    assign icache_stall = (!cache[offset][53] || cache[offset][51:32] != tag) && (read_state != 2);
+    assign icache_stall = (!cache[offset][41] || cache[offset][39:32] != tag) && (read_state != 2);
 
     initial begin
         read_state = 0;

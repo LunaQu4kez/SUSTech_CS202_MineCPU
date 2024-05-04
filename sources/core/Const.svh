@@ -18,7 +18,7 @@
 `define BHT_WID      1:0
 `define RAS_WID      6:0
 `define MUL_WID     63:0
-`define CACHE_WID   53:0
+`define CACHE_WID   41:0
 // Opcode
 `define ART_LOG_OP 7'b0110011  // R type
 `define ART_IMM_OP 7'b0010011  // I type

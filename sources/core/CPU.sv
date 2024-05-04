@@ -18,7 +18,7 @@ module CPU (
     output logic [`INFO_WID  ] color_out
 );
 
-    logic PC_Write, rst, icache_stall, dcache_stall;
+    logic PC_Write, rst, icache_stall /*verilator public*/, dcache_stall;
     logic [`DATA_WID] new_pc, IF_pc_in;
     assign rst = ~rst_n | ~uart_done;
     assign led3_out = 0;
@@ -128,6 +128,7 @@ module CPU (
         .rs1_in(ID_rs1_out),
         .rs2_in(ID_rs2_out),
         .flush,
+        .icache_stall,
         .dcache_stall,
         .predict_result_in(ID_predict_result_out),
         .pc_out(EX_pc_in),
@@ -192,6 +193,7 @@ module CPU (
     EX_MEM ex_mem_inst (
         .clk(cpuclk),
         .rst,
+        .icache_stall,
         .dcache_stall,
         .ALUres_in(EX_ALU_res_out), 
         .data2_in(EX_data_out),
@@ -238,11 +240,12 @@ module CPU (
     // select uart or internal access
     assign uart_mem_addr = uart_done ? mem_addr : uart_addr;
     assign uart_mem_data = uart_done ? mem_write_data : uart_data;
-    assign web = uart_done || mem_web;
+    assign web = ~uart_done || mem_web;
 
     MEM_WB mem_wb_inst (
         .clk(cpuclk),
         .rst,
+        .icache_stall,
         .dcache_stall,
         .addr_in(MEM_data1_out),
         .data_in(MEM_data2_out),
