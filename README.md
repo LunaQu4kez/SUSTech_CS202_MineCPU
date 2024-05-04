@@ -21,30 +21,33 @@
 ```
 MineCPU
 ├── docs
-│   ├── CPU.*                  # design draft
-│   ├── report.md              # report of this project
-│   ├── cpu_design.pdf         # CPU design from textbook
-│   └── riscv-card.pdf         # ISA reference
+│   ├── CPU.*                   # design draft
+│   ├── project_desciption.pdf  # project description
+│   ├── Report.md               # report of this project
+│   └── riscv-card.pdf          # ISA reference
 ├── program
-│   ├── lib                    # library of some API
-│   ├── pacman                 # game adapted to CPU
-│   └── list.md                # maybe useful
+│   ├── lib                     # library of some API
+│   ├── my_pacman               # game by C++ (easier cross-compiling to RV)
+│   └── pacman                  # game by C
 ├── sources                                              
-│   ├── assembly               # assembly program for test and fun
+│   ├── assembly                # assembly code for test and fun
 │   │   ├── *.asm              
 │   │   └── *.coe             
 │   ├── constrain
-│   │   └── constr.xdc         # constrain file
+│   │   └── constr.xdc          # constrain file
 │   ├── core
-│   │   └── *.sv               # code of CPU core
+│   │   ├── *.sv                # code of CPU core
+│   │   └── *.svh               # head file for constant
 │   ├── io
-│   │   └── *.sv               # code related to IO
+│   │   ├── *.sv                # code related to IO
+│   │   └── *.svh               # head file for constant
 │   ├── sim
-│   │   ├── *.cpp              # verilator simulation
-│   │   └── *.sv               # vivado simulation
-│   └── Top.sv                 # top module of MineCPU
+│   │   ├── *.cpp               # verilator simulation
+│   │   └── *.sv                # vivado simulation
+│   └── Top.sv                  # top module of MineCPU
 ├── test
-│   └── DiffTest.cpp           # differential test of CPU
+│   ├── DiffTest.cpp            # differential test of CPU
+│   └── Makefile       
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -93,9 +96,9 @@ MineCPU
 
 - **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU
 - 时钟频率:
-  + CPU: 100MHz (未测试)
-  + MEM: 400MHz (搓完Cache之前先这样吧)
-  + VGA: 40MHz  (还没开始写)
+  + CPU: 100MHz
+  + MEM: 100MHz (使用 Cache 进行读取写入管理)
+  + VGA: 40MHz
 
 ### ISA
 
@@ -213,7 +216,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
     2. :negative_squared_cross_mark: 进行停顿 / 改进转发单元。前者过于简单，后者工作量太大，且 `ld` 指令的冒险难以解决。~~考虑后续增加记分板~~
     3. :white_check_mark: 折中方案，在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。~~那要 ld/sd ra, 4(sp) 有何用~~  但这个方案仅解决了遵守 Convention 时 ra 寄存器的数据冒险。若程序不遵守，用其他寄存器作为跳转 base，该冒险仍存在。
 
-- **[Memory]** 内存读取数据时传入地址会延迟一个周期读取到数据，且 `sh` 和 `sb` 无法直接对内存进行操作.
+- **[Memory/Solved]** 内存读取数据时传入地址会延迟一个周期读取到数据，且 `sh` 和 `sb` 无法直接对内存进行操作.
   - **原因**: 使用 ip RAM 生成的内存以 32 bit 为单位进行存或读取，而 `sh` 和 `sb` 只修改其中的 16 bit 或 8 bit
   - **解决方案**:
     1. :negative_squared_cross_mark: 加快内存时钟频率，先读取再修改最后存入
