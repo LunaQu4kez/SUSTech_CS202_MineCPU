@@ -67,7 +67,7 @@ module DCache (
         unique case (cache_state)
             0: begin
                 mem_addr = addr;
-                mem_write_data = 0;
+                mem_write_data = uncached ? write_data : 0;
                 mem_web = 0;
             end
             1: begin
