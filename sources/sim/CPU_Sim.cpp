@@ -8,7 +8,7 @@
 
 using std::vector;
 const char *REG_NAMES[32] = {"x0", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
-const int SIM_TIME = 20;
+const int SIM_TIME = 200;
 
 // verilator
 const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
@@ -66,7 +66,7 @@ void run_one_cycle() {
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/test/test1.bin"); // modify the path to the binary file
+    vector<char> data = read_binary("../assembly/test/test7.bin"); // modify the path to the binary file
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -127,9 +127,6 @@ int main(int argc, char** argv) {
 
     // initialize vpi handles
     pc = get_handle("TOP.CPU.pc_inst.pc");
-    flush = get_handle("TOP.CPU.flush");
-    icache_stall = get_handle("TOP.CPU.icache_stall");
-    dcache_stall = get_handle("TOP.CPU.dcache_stall");
     for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.CPU.id_inst.reg_inst.regs"), i);
     for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.CPU.memory_inst.test_inst.mem"), i);
 
@@ -155,7 +152,7 @@ int main(int argc, char** argv) {
         uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
     }
     
-    // while(get_value(pc) <= inst.size() * 4 + 10) run_one_cycle();
+    while(get_value(pc) <= inst.size() * 4 + 10) run_one_cycle();
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));
