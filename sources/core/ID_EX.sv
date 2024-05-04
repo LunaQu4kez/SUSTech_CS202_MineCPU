@@ -44,7 +44,7 @@ module ID_EX (
     assign WB_ctrl_out = WB_ctrl;
     assign predict_result_out = predict_result;
 
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if (rst | flush) begin
             pc <= 0;
             data1 <= 0;

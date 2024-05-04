@@ -19,12 +19,13 @@ module Stage_MEM (
     output logic                 mem_web
 );
 
-    wire MemWrite;
+    wire MemWrite, MemRead;
     wire [`LDST_WID] ldst;
     assign WB_ctrl_out = WB_ctrl_in;
     assign MEM_rd_out = EX_MEM_rd;
     assign addr_out = write_addr;
     assign MemWrite = MEM_ctrl_in[1];
+    assign MemRead = MEM_ctrl_in[0];
     assign ldst = MEM_ctrl_in[4:2];
 
     DCache dcache_inst (
@@ -35,6 +36,7 @@ module Stage_MEM (
         .write_data,
         .ldst,
         .MemWrite,
+        .MemRead,
         .dcache_stall,
         .mem_data,
         .mem_addr,

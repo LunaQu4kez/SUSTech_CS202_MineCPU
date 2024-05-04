@@ -22,11 +22,16 @@ module MEM_WB (
     assign WB_ctrl_out = WB_ctrl;
 
     always @(posedge clk) begin
-        if (rst | dcache_stall | icache_stall) begin
+        if (rst) begin
             addr <= 0;
             data <= 0;
             rd <= 0;
             WB_ctrl <= 0;
+        end else if (dcache_stall | icache_stall) begin
+            addr <= addr;
+            data <= data;
+            rd <= rd;
+            WB_ctrl <= WB_ctrl;
         end else begin
             addr <= addr_in;
             data <= data_in;

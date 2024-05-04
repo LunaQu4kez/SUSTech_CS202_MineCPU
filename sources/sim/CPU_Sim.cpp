@@ -23,6 +23,8 @@ vpiHandle pc;
 vpiHandle regs[32];
 vpiHandle mem[16383];
 vpiHandle flush;
+vpiHandle icache_stall;
+vpiHandle dcache_stall;
 
 // from Monad's code
 vector<char> read_binary(const char *name) {
@@ -67,7 +69,7 @@ void run_one_cycle() {
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/test/fib.bin");
+    vector<char> data = read_binary("../assembly/test/test9.bin");
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -124,6 +126,8 @@ int main(int argc, char** argv) {
     // initialize vpi handles
     pc = get_handle("TOP.CPU.pc_inst.pc");
     flush = get_handle("TOP.CPU.flush");
+    icache_stall = get_handle("TOP.CPU.icache_stall");
+    dcache_stall = get_handle("TOP.CPU.dcache_stall");
     for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.CPU.id_inst.reg_inst.regs"), i);
     for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.CPU.memory_inst.test_inst.mem"), i);
 
@@ -135,22 +139,20 @@ int main(int argc, char** argv) {
     vector<uint32_t> inst = load_program();
     top->uart_done = 1;
 
-    // run four cycles to get warm up
-    for(int i = 0; i < 3; i++) run_one_cycle();
-    for(int i = 0; i < 3; i++) run_one_cycle();
-    // while (uc_pc != 0x60) {
-    //     run_one_cycle();
-    //     if(get_value(flush)) run_one_cycle(); // penalty one cycle
-    // 	VerilatedVpi::callValueCbs();
-    //     // run one instruction on unicorn
-    //     if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
-    //         printf("pc: 0x%llx\n", uc_pc);
-    //         printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
-    //         break;
-    //     }
-    //     uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
-    //     time++;
-    // }
+    while (uc_pc != 0x1c) {
+        run_one_cycle();
+        while(get_value(flush) || get_value(icache_stall) || get_value(dcache_stall)) run_one_cycle(); // penalty one cycle
+    	VerilatedVpi::callValueCbs();
+        // run one instruction on unicorn
+        if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
+            printf("pc: 0x%llx\n", uc_pc);
+            printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
+            break;
+        }
+        uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
+        time++;
+    }
+    for(int i = 0; i < 15; i++) run_one_cycle();
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));

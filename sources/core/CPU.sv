@@ -18,7 +18,7 @@ module CPU (
     output logic [`INFO_WID  ] color_out
 );
 
-    logic PC_Write, rst, icache_stall /*verilator public*/, dcache_stall;
+    logic PC_Write, rst, icache_stall /*verilator public*/, dcache_stall /*verilator public*/;
     logic [`DATA_WID] new_pc, IF_pc_in;
     assign rst = ~rst_n | ~uart_done;
     assign led3_out = 0;

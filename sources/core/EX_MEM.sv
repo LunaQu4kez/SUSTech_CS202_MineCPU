@@ -25,7 +25,7 @@ module EX_MEM (
     assign MEM_ctrl_out = MEM_ctrl;
     assign WB_ctrl_out = WB_ctrl;
 
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if (rst) begin
             ALUres <= 0;
             data2 <= 0;
