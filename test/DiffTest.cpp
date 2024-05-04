@@ -1,7 +1,6 @@
 #include <unicorn/unicorn.h>
 #include <verilated.h>
 #include <verilated_vpi.h>
-#include "verilated_vcd_c.h"
 #include <vector>
 #include <fstream>
 #include "VTop.h"
@@ -13,7 +12,6 @@ const int SIM_TIME = 7;
 // verilator
 const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
 VTop *top = new VTop(contextp.get());
-VerilatedVcdC* tfp = new VerilatedVcdC;
 
 // unicorn simulator
 uc_engine *uc;
@@ -59,12 +57,8 @@ void run_one_cycle() {
     for(int i = 0; i < 4; i++) {
         top->memclk = 1;
         top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
         top->memclk = 0;
         top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
         if (i % 2 == 0) {
             top->cpuclk = !top->cpuclk;
             top->eval();
@@ -126,9 +120,6 @@ vector<uint32_t> load_program() {
 
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
-    Verilated::traceEverOn(true);
-    top->trace(tfp, 1);
-    tfp->open("difftest.vcd");
 
     // initialize unicorn
     uc_err err;
@@ -177,7 +168,7 @@ int main(int argc, char** argv) {
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));
 
-	top->final(), tfp->close();
+	top->final();
     delete top;
 
 	return 0;

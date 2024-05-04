@@ -23,6 +23,8 @@ vpiHandle pc;
 vpiHandle regs[32];
 vpiHandle mem[16383];
 vpiHandle flush;
+vpiHandle icache_stall;
+vpiHandle dcache_stall;
 
 // from Monad's code
 vector<char> read_binary(const char *name) {
@@ -54,26 +56,20 @@ int get_value(vpiHandle vh) {
 }
 
 void run_one_cycle() {
-    top->cpuclk = 0;
+    top->cpuclk = 1;
+    top->memclk = 1;
     top->eval();
-    for(int i = 0; i < 4; i++) {
-        top->memclk = 1;
-        top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
-        top->memclk = 0;
-        top->eval();
-        contextp->timeInc(1);
-        tfp->dump(contextp->time());
-        if (i % 2 == 0) {
-            top->cpuclk = !top->cpuclk;
-            top->eval();
-        }
-    }
+    contextp->timeInc(1);
+    tfp->dump(contextp->time());
+    top->cpuclk = 0;
+    top->memclk = 0;
+    top->eval();
+    contextp->timeInc(1);
+    tfp->dump(contextp->time());
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/test/fib.bin");
+    vector<char> data = read_binary("../assembly/test/fib.bin"); // modify the path to the binary file
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -88,6 +84,7 @@ vector<uint32_t> load_program() {
         top->uart_addr = i * 4;
         top->uart_data = concat_data;
         inst.push_back(concat_data);
+        run_one_cycle();
         run_one_cycle();
     }
 
@@ -121,7 +118,7 @@ int main(int argc, char** argv) {
         return -1;
     }
     uc_mem_map(uc, 0x0, 1024 * 1024 * 4, UC_PROT_ALL);
-    uc_mem_map(uc, 0xffffff00, 1024 * 4, UC_PROT_ALL);
+    uc_mem_map(uc, 0xffff0000, 1 << 16, UC_PROT_ALL);
     int uc_sp = 0x7ffc, uc_gp = 0xffffff00;
     uc_reg_write(uc, UC_RISCV_REG_SP, &uc_sp);
     uc_reg_write(uc, UC_RISCV_REG_GP, &uc_gp);
@@ -129,6 +126,8 @@ int main(int argc, char** argv) {
     // initialize vpi handles
     pc = get_handle("TOP.CPU.pc_inst.pc");
     flush = get_handle("TOP.CPU.flush");
+    icache_stall = get_handle("TOP.CPU.icache_stall");
+    dcache_stall = get_handle("TOP.CPU.dcache_stall");
     for(int i = 0; i < 32; i++) regs[i] = vpi_handle_by_index(get_handle("TOP.CPU.id_inst.reg_inst.regs"), i);
     for(int i = 0; i < 16383; i++) mem[i] = vpi_handle_by_index(get_handle("TOP.CPU.memory_inst.test_inst.mem"), i);
 
@@ -140,12 +139,9 @@ int main(int argc, char** argv) {
     vector<uint32_t> inst = load_program();
     top->uart_done = 1;
 
-    // run four cycles to get warm up
-    for(int i = 0; i < 3; i++) run_one_cycle();
-
-    while (uc_pc != 0x60) {
+    while (uc_pc != inst.size() * 4){
         run_one_cycle();
-        if(get_value(flush)) run_one_cycle(); // penalty one cycle
+        while(get_value(flush) || get_value(icache_stall) || get_value(dcache_stall)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
         // run one instruction on unicorn
         if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
@@ -153,10 +149,11 @@ int main(int argc, char** argv) {
             printf("Failed on uc_emu_start() with error returned %u: %s\n", err, uc_strerror(err));
             break;
         }
-        
         uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
         time++;
     }
+    
+    while(get_value(pc) <= inst.size() * 4 + 10) run_one_cycle();
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));

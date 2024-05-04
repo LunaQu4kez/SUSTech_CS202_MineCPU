@@ -29,8 +29,7 @@ module Control (
     // total control
     assign total_ctrl = {EX_ctrl, MEM_ctrl, WB_ctrl};
 
-    
-
+    // control signal generate
     always_comb begin : Ctrl_Signal_Gen
         unique case (inst[`OP_WID])
             `ART_LOG_OP: begin
