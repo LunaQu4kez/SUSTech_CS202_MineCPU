@@ -4,6 +4,7 @@ module ICache (
     input  logic             clk, rst,
     // cpu interface
     input  logic [`DATA_WID] addr,
+    input  logic             predict_fail,
     output logic [`DATA_WID] inst,
     output logic             icache_stall,
     // mem interface
@@ -21,7 +22,7 @@ module ICache (
     assign offset = addr[11:2];
     assign tag = addr[19:12];
     assign inst = read_state == 2 ? mem_inst : cache[offset][31:0];
-    assign icache_stall = (!cache[offset][41] || cache[offset][39:32] != tag) && (read_state != 2);
+    assign icache_stall = !predict_fail && (!cache[offset][41] || cache[offset][39:32] != tag) && (read_state != 2);
 
     initial begin
         read_state = 0;

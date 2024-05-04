@@ -14,10 +14,10 @@ module IF_ID (
     assign pc_out = pc;
 
     always_ff @(posedge clk) begin
-        if (rst) begin
+        if (rst | icache_stall) begin
             inst <= 0;
             pc <= 0;
-        end else if (dcache_stall | icache_stall) begin
+        end else if (dcache_stall) begin
             inst <= inst;
             pc <= pc;
         end else begin

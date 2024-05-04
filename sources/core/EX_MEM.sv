@@ -2,7 +2,7 @@
 
 module EX_MEM (
     input                  clk, rst,
-    input                  dcache_stall, icache_stall,
+    input                  dcache_stall,
     input  [`DATA_WID    ] ALUres_in, data2_in,
     input  [`REGS_WID    ] rd_in,
     output [`DATA_WID    ] ALUres_out, data2_out,
@@ -32,7 +32,7 @@ module EX_MEM (
             rd <= 0;
             MEM_ctrl <= 0;
             WB_ctrl <= 0;
-        end else if (dcache_stall | icache_stall) begin
+        end else if (dcache_stall) begin
             ALUres <= ALUres;
             data2 <= data2;
             rd <= rd;

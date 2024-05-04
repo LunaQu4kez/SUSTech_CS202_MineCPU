@@ -28,15 +28,20 @@ module CPU (
         .rst,
         .PC_Write,
         .icache_stall,
+        .dcache_stall,
         .new_pc,
         .pc_out(IF_pc_in)
     );
 
     logic [`DATA_WID] IF_pc_out, IF_inst_out, mem_pc, mem_inst;
+    logic IF_ID_Write, predict_fail;
+    logic flush /*verilator public*/;
+    logic [`DATA_WID] ID_inst_in, ID_pc_in;
 
     Stage_IF if_inst (
         .clk(cpuclk),
         .rst,
+        .predict_fail,
         .new_pc(IF_pc_in),
         .pc_out(IF_pc_out),
         .inst(IF_inst_out),
@@ -44,10 +49,6 @@ module CPU (
         .mem_inst,
         .mem_pc
     );
-
-    logic IF_ID_Write, predict_fail;
-    logic flush /*verilator public*/;
-    logic [`DATA_WID] ID_inst_in, ID_pc_in;
 
     IF_ID if_id_inst (
         .clk(cpuclk),
@@ -76,6 +77,7 @@ module CPU (
     Stage_ID id_inst (
         .clk(cpuclk),
         .rst,
+        .icache_stall,
         .dcache_stall,
         .pc_in(ID_pc_in),
         .inst(ID_inst_in),
@@ -128,7 +130,6 @@ module CPU (
         .rs1_in(ID_rs1_out),
         .rs2_in(ID_rs2_out),
         .flush,
-        .icache_stall,
         .dcache_stall,
         .predict_result_in(ID_predict_result_out),
         .pc_out(EX_pc_in),
@@ -193,7 +194,6 @@ module CPU (
     EX_MEM ex_mem_inst (
         .clk(cpuclk),
         .rst,
-        .icache_stall,
         .dcache_stall,
         .ALUres_in(EX_ALU_res_out), 
         .data2_in(EX_data_out),
@@ -245,7 +245,6 @@ module CPU (
     MEM_WB mem_wb_inst (
         .clk(cpuclk),
         .rst,
-        .icache_stall,
         .dcache_stall,
         .addr_in(MEM_data1_out),
         .data_in(MEM_data2_out),

@@ -69,7 +69,7 @@ void run_one_cycle() {
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/test/test9.bin");
+    vector<char> data = read_binary("../assembly/test/fib.bin");
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
     vector<uint32_t> inst = load_program();
     top->uart_done = 1;
 
-    while (uc_pc != 0x1c) {
+    while (uc_pc != inst.size() * 4){
         run_one_cycle();
         while(get_value(flush) || get_value(icache_stall) || get_value(dcache_stall)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
@@ -152,7 +152,8 @@ int main(int argc, char** argv) {
         uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
         time++;
     }
-    for(int i = 0; i < 15; i++) run_one_cycle();
+    
+    for(int i = 0; i < 10; i++) run_one_cycle();
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));

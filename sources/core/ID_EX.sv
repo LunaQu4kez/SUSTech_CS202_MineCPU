@@ -7,7 +7,7 @@ module ID_EX (
     input  [`REGS_WID    ] rs1_in, rs2_in,     // ID_EX_rs1, ID_EX_rs2
     input                  flush,              // control hazard flush, 1 yes, 0 no
     input                  predict_result_in,
-    input                  dcache_stall, icache_stall,
+    input                  dcache_stall,
     output [`DATA_WID    ] pc_out, data1_out, data2_out, imm_out,
     output [`REGS_WID    ] rd_out,             // inst[11-7], rd_out
     output [`REGS_WID    ] rs1_out, rs2_out,   // ID_EX_rs1, ID_EX_rs2
@@ -45,7 +45,7 @@ module ID_EX (
     assign predict_result_out = predict_result;
 
     always_ff @(posedge clk) begin
-        if (rst | flush) begin
+        if (rst || (flush && !dcache_stall)) begin
             pc <= 0;
             data1 <= 0;
             data2 <= 0;
@@ -57,7 +57,7 @@ module ID_EX (
             MEM_ctrl <= 0;
             WB_ctrl <= 0;
             predict_result <= 0;
-        end else if (dcache_stall | icache_stall) begin
+        end else if (dcache_stall) begin
             pc <= pc;
             data1 <= data1;
             data2 <= data2;
