@@ -22,9 +22,6 @@ uc_engine *uc;
 vpiHandle pc;
 vpiHandle regs[32];
 vpiHandle mem[16383];
-vpiHandle flush;
-vpiHandle icache_stall;
-vpiHandle dcache_stall;
 
 // from Monad's code
 vector<char> read_binary(const char *name) {
@@ -145,11 +142,9 @@ int main(int argc, char** argv) {
     top->uart_done = 1;
 
     while (uc_pc != inst.size() * 4){
-        if(time > SIM_TIME) break;
-        time++;
+        if(time++ > SIM_TIME) break;
         set_device();
         run_one_cycle();
-        while(get_value(flush) || get_value(icache_stall) || get_value(dcache_stall)) run_one_cycle(); // penalty one cycle
     	VerilatedVpi::callValueCbs();
         // run one instruction on unicorn
         if ((err = uc_emu_start(uc, uc_pc, 0xFFFFFFFF, 0, 1))) {
@@ -158,7 +153,6 @@ int main(int argc, char** argv) {
             break;
         }
         uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
-        time++;
     }
     
     // while(get_value(pc) <= inst.size() * 4 + 10) run_one_cycle();

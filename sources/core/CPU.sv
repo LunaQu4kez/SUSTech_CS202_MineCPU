@@ -18,7 +18,7 @@ module CPU (
     output logic [`INFO_WID  ] color_out
 );
 
-    logic PC_Write, rst, icache_stall /*verilator public*/, dcache_stall /*verilator public*/;
+    logic PC_Write, rst, icache_stall, dcache_stall;
     logic [`DATA_WID] new_pc, IF_pc_in;
     assign rst = ~rst_n | ~uart_done;
     assign led3_out = 0;
@@ -34,8 +34,7 @@ module CPU (
     );
 
     logic [`DATA_WID] IF_pc_out, IF_inst_out, mem_pc, mem_inst;
-    logic IF_ID_Write, predict_fail;
-    logic flush /*verilator public*/;
+    logic IF_ID_Write, predict_fail, flush;
     logic [`DATA_WID] ID_inst_in, ID_pc_in;
 
     Stage_IF if_inst (
