@@ -69,7 +69,7 @@ void run_one_cycle() {
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/test/fib.bin");
+    vector<char> data = read_binary("../assembly/test/fib.bin"); // modify the path to the binary file
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
         return -1;
     }
     uc_mem_map(uc, 0x0, 1024 * 1024 * 4, UC_PROT_ALL);
-    uc_mem_map(uc, 0xffffff00, 1024 * 4, UC_PROT_ALL);
+    uc_mem_map(uc, 0xffff0000, 1 << 16, UC_PROT_ALL);
     int uc_sp = 0x7ffc, uc_gp = 0xffffff00;
     uc_reg_write(uc, UC_RISCV_REG_SP, &uc_sp);
     uc_reg_write(uc, UC_RISCV_REG_GP, &uc_gp);
@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
         time++;
     }
     
-    for(int i = 0; i < 10; i++) run_one_cycle();
+    while(get_value(pc) <= inst.size() * 4 + 10) run_one_cycle();
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));
