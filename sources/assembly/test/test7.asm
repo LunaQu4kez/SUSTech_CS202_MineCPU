@@ -1,40 +1,29 @@
 .text
 main:
-addi a0, zero, 3
-jal ra, func
-j exit
-
-func:
-addi sp, sp, -16
-sw a2, 12(sp)
-sw a1, 8(sp)
-sw ra, 4(sp)
-sw a0, 0(sp)
-
-addi t0, a0, -1
-bge zero, t0, retu
-addi a0, a0, -1
-jal ra, func
-mv a1, a0
-lw a0, 0(sp)
-addi a0, a0, -2
-jal ra, func
-mv a2, a0
-add t3, a1, a2
-lw a0, 0(sp)
-lw ra, 4(sp)
-lw a1, 8(sp)
-lw a2, 12(sp)
-addi sp, sp, 16
-mv a0, t3
-jr ra
-
-retu:
-li a0, 1
-addi sp, sp, 16
-jr ra
-
+	li a0, 5
+	jal fib
+	j exit
+fib:
+	addi sp, sp, -12 # adjust stack for 2 items
+	sw ra, 4(sp)     # save the return address
+	sw a0, 0(sp)     # save the argument n
+	slti t0, a0, 2   # test for n < 2
+	beq t0, zero, L1 # if n >= 2, go to L1
+	addi a0, zero, 1 # else return 1
+	addi sp, sp, 12  # pop 2 items off stack
+	jr ra            # return to caller
+L1:
+	addi a0, a0, -1  # n >= 2; argument gets(n-1)
+	jal fib          # call fib(n-1)
+	sw a0, 8(sp)     # save result for fib(n-1)
+	lw a0, 0(sp)     # load n
+	addi a0, a0, -2  # n >= 2; argument gets(n-2)
+	jal fib          # call fib(n-2)
+	lw t1, 8(sp)     # restore fib(n-1)
+	add a0, a0, t1   # ao = fib(n-1) + fib(n-2)
+	lw ra, 4(sp)     # restore the return address
+	lw t1, 8(sp)     # restore fib(n-1)
+	addi sp, sp, 12  # adjust stack pointer to pop 2 items
+	jr ra            # return to the caller
 exit:
-sw a0, 12(gp)
-
- 
+	nop
