@@ -6,16 +6,10 @@ module Queue (
     output logic [31:0] addr_out
 );
 
-    reg [31:0] data_queue;
-    reg [2:0] cnt;
-    reg [4:0] clk_cnt;
+    reg [31:0] data_queue = 0;
+    reg [2:0] cnt = 0;
+    reg [4:0] clk_cnt = 0;
     wire full;
-
-    initial begin
-        cnt = 0;
-        clk_cnt = 0;
-        data_queue = 0;
-    end
 
     assign data_out = data_queue;
     assign full = (cnt == 4);
