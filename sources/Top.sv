@@ -2,7 +2,7 @@
 
 module Top (
     // clk -> cpuclk, memclk, vgaclk
-    input                     cpuclk, memclk, vgaclk, rst_n,
+    input                     clk, rst_n,
     // uart related
     input  logic              rx,
     // interact with devices
@@ -19,12 +19,21 @@ module Top (
     output logic [`COLOR_WID] blue
 );
 
+    wire cpuclk, memclk, vgaclk;
     wire uart_done;
     wire [`DATA_WID] uart_data, uart_addr;
     wire [`VGA_ADDR] vga_addr;
     wire [`INFO_WID] char_out, color_out;
     wire [`DATA_WID] seg1_out, seg2_out;
     wire [4:0] kb_idx;
+
+    assign cpuclk = clk;  // 100MHz
+    assign memclk = clk;  // 100MHz
+
+    VGAClkGen vga_clk_gen_inst (  // 40MHz
+        .clk_in1(clk),
+        .clk_out1(vgaclk)
+    );
 
     CPU cpu_inst(
         .cpuclk,
@@ -53,7 +62,7 @@ module Top (
     );
 
     UART uart_inst(
-        .clk(cpuclk),
+        .clk,
         .rst(~rst_n),
         .rx(rx),
         .data_out(uart_data),
@@ -74,7 +83,7 @@ module Top (
     VGA vga_inst(
         .clk(vgaclk),
         .vga_addr,
-        .char(char_out),
+        .ch(char_out),
         .color(color_out),
         .hsync,
         .vsync,
