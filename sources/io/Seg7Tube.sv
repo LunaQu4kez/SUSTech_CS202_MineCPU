@@ -1,4 +1,4 @@
-`include "Seg7Const.svh"
+`include "Const.svh"
 
 module Seg7Tube(
     input               clk, rst_n,                // clock, reset

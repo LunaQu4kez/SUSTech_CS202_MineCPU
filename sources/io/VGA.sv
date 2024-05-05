@@ -1,4 +1,4 @@
-`include "VGAConst.svh"
+`include "Const.svh"
 
 module VGA (  // 800×600 60Hz
     input  logic              clk,      // clk: 40MHz
