@@ -15,7 +15,7 @@ module ICache (
     // format: valid[41] | dirty[40] | tag[39:32] | data[31:0]
     // here dirty is regarded as use bit
     reg  [`CACHE_WID] cache [0: (1 << 10) - 1];
-    reg  [1:0] read_state;
+    reg  [1:0] read_state = 0;
     wire [9:0] offset;
     wire [7:0] tag;
     assign mem_pc = addr;
@@ -25,7 +25,7 @@ module ICache (
     assign icache_stall = !predict_fail && (!cache[offset][41] || cache[offset][39:32] != tag) && (read_state != 2);
 
     initial begin
-        read_state = 0;
+        // read_state = 0;
         for (int i = 0; i < (1 << 10); i++) begin
             cache[i] = 0;
         end        

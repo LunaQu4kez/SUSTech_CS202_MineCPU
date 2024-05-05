@@ -20,7 +20,7 @@ module DCache (
     // format: valid[41] | dirty[40] | tag[39:32] | data[31:0]
     reg  [`CACHE_WID] cache [0: (1 << 10) - 1];
     // state: 0: idle, 1: reading, 2: finish [3: writing, 4: finish]
-    reg  [2:0] cache_state;
+    reg  [2:0] cache_state = 0;
     reg  [`DATA_WID] rdata_out;
     reg  [`CACHE_WID] old_cache;
     wire [9:0] offset = addr[11:2];
@@ -34,7 +34,7 @@ module DCache (
     && (!cache[offset][41] || cache[offset][39:32] != tag || (old_cache[40] && old_cache[39:32] != tag));
 
     initial begin
-        cache_state = 0;
+        // cache_state = 0;
         for (int i = 0; i < (1 << 10); i++) begin
             cache[i] = 0;
         end        

@@ -28,37 +28,37 @@ module Memory (
     assign dataa = bool_exc ? edataa : rdataa;
 
     // IP RAM Simulation
-    MemoryAnalog test_inst (
-        .clka(~clka),
-        .clkb(~clkb),
-        .addra(addra[15:2]),
-        .addrb(addrb[15:2]),
-        .write_datab(bool_io ? 0 : write_datab),
-        .web(web & ~bool_io),
-        .dataa(rdataa),
-        .datab(rdatab)
-    );
-    
-    // Mem mem_inst (
+    // MemoryAnalog test_inst (
     //     .clka(~clka),
     //     .clkb(~clkb),
     //     .addra(addra[15:2]),
     //     .addrb(addrb[15:2]),
-    //     .dina(0),
-    //     .dinb(bool_io ? 0 : wdatab),
-    //     .douta(rdataa),
-    //     .doutb(rdatab),
-    //     .ena(1'b1),
-    //     .enb(1'b1),
-    //     .wea(1'b0),
-    //     .web(web & ~bool_io)
+    //     .write_datab(bool_io ? 0 : write_datab),
+    //     .web(web & ~bool_io),
+    //     .dataa(rdataa),
+    //     .datab(rdatab)
     // );
+    
+    Mem mem_inst (
+        .clka(~clka),
+        .clkb(~clkb),
+        .addra(addra[15:2]),
+        .addrb(addrb[15:2]),
+        .dina(0),
+        .dinb(bool_io ? 0 : write_datab),
+        .douta(rdataa),
+        .doutb(rdatab),
+        .ena(1'b1),
+        .enb(1'b1),
+        .wea(1'b0),
+        .web(web & ~bool_io)
+    );
 
-    // Excp_ROM excp_rom_inst (
-    //     .addra(addra[7:2]),
-    //     .clka(~clka),
-    //     .douta(edataa)
-    // );
+    Excp_ROM excp_rom_inst (
+        .addra(addra[9:2]),
+        .clka(~clka),
+        .douta(edataa)
+    );
 
     // MMIO related
     logic [`LED_WID ] led1, led2;
