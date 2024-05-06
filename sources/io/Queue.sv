@@ -9,18 +9,21 @@ module Queue (
     reg [31:0] data_queue = 0;
     reg [2:0] cnt = 0;
     reg [4:0] clk_cnt = 0;
+    reg [31:0] addr_out_ = -4;
     wire full;
 
     assign data_out = data_queue;
     assign full = (cnt == 4);
 
+    assign addr_out = addr_out_;
+
     always_ff @(posedge clk) begin : addr
         if (rst) begin
-            addr_out <= -4;
+            addr_out_ <= -4;
         end else if (full && clk_cnt == 0) begin
-            addr_out <= addr_out + 4;
+            addr_out_ <= addr_out_ + 4;
         end else begin
-            addr_out <= addr_out;
+            addr_out_ <= addr_out_;
         end
     end
 

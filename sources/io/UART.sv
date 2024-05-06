@@ -8,8 +8,8 @@ module UART (
     output logic             done
 );
 
-    reg       rx_done;
-    reg [7:0] rx_data;
+    reg       rx_done = 0;
+    reg [7:0] rx_data = 0;
 
     Queue queue (
         .clk(clk),
@@ -21,19 +21,19 @@ module UART (
     );
 
     // timeout detection
-    reg [15:0] idle_cnt;
-    reg [9:0]  idle_cnt0;
-    reg        received;
+    reg [15:0] idle_cnt = 0;
+    reg [9:0]  idle_cnt0 = 0;
+    reg        received = 0;
 
     // filter unexpected noise
-    reg rxd_t0, rxd_t1, rxd_t2;
+    reg rxd_t0 = 1, rxd_t1 = 1, rxd_t2 = 1;
 
     // detect start bit
-    reg  en_state;
+    reg  en_state = 0;
     wire nedge;
     assign nedge = !rxd_t1 & rxd_t2;
 
-    assign done = (addr_out >= `MAX_DATA) || (received && idle_cnt == `MAX_IDLE);
+    assign done = (addr_out >= `MAX_DATA & addr_out != 32'hfffffffc) | (received & (idle_cnt == `MAX_IDLE));
     always_ff @(posedge clk) begin
         if (rst | en_state) begin
             idle_cnt0 <= 10'h0;
