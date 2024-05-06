@@ -1,6 +1,9 @@
 `include "Const.svh"
 
-module Branch_Predictor (
+module Branch_Predictor # (
+    parameter BHT_SIZE = 8,
+    parameter RAS_SIZE = 7
+) (
     input  logic             clk, rst,
     input  logic             stall,
     // whether to branch and predict, from Control
@@ -21,17 +24,18 @@ module Branch_Predictor (
     output logic [`DATA_WID] sepc
 );
 
-    reg [`BHT_WID ] History_Table [0: (1 << 10) - 1]; // BHT/PHT
-    reg [`DATA_WID] Return_Addr   [0: (1 <<  7) - 1]; // RAS
-    reg [`RAS_WID ] RAS_top = 0; // RAS top pointer
-    reg start_flag = 0; // 0: first cycle does nothing, 1: enable pc update
+    // BHT & RAS
+    reg [`BHT_WID ] History_Table [0: (1 << BHT_SIZE) - 1]; // BHT/PHT
+    reg [`DATA_WID] Return_Addr   [0: (1 << RAS_SIZE) - 1]; // RAS
 
+    reg [RAS_SIZE-1:0] RAS_top = 0; // RAS top pointer
+    reg start_flag = 0;               // 0: first cycle does nothing, 1: enable pc update
     logic [`DATA_WID] target_pc0;
     wire  [`DATA_WID] pc_plus_4 = pc + 4;
     assign target_pc = excp ? `EXCP_ADDR : target_pc0;
 
     initial begin
-        for (int i = 0; i < (1 << 10); i = i + 1) begin
+        for (int i = 0; i < (1 << BHT_SIZE); i = i + 1) begin
             History_Table[i] = 2'b01;
         end
     end
@@ -42,9 +46,9 @@ module Branch_Predictor (
         else sepc <= sepc;
     end
 
-    logic [9:0] table_addr, update_addr; // use pc[11:2] as index since last 2 bits are always 0
-    assign table_addr  = pc[11:2];
-    assign update_addr = old_branch_pc[11:2];
+    logic [BHT_SIZE-1:0] table_addr, update_addr; // use pc[11:2] as index since last 2 bits are always 0
+    assign table_addr  = pc[BHT_SIZE+1:2];
+    assign update_addr = old_branch_pc[BHT_SIZE+1:2];
     assign predict_fail = old_predict != old_actual;
 
     always_ff @(posedge clk) begin
@@ -87,7 +91,7 @@ module Branch_Predictor (
 
     always_ff @(posedge clk) begin : Update_Table
         if (rst) begin
-            for (int i = 0; i < (1 << 10); i = i + 1) begin
+            for (int i = 0; i < (1 << BHT_SIZE); i = i + 1) begin
                 History_Table[i] <= 2'b01;
             end
         end else if (old_branch && !stall) begin // update table
