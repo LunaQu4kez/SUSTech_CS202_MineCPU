@@ -9,7 +9,7 @@ module PC (
     output logic [`DATA_WID] pc_out
 );
 
-    logic [`DATA_WID] pc = -4 /*verilator public*/;
+    logic [`DATA_WID] pc = 0;
     assign pc_out = pc;
 
     always_ff @(negedge clk) begin

@@ -17,12 +17,10 @@ module ICache #(
     // format: valid[38] | tag[37:32] | data[31:0]
     reg  [46-CACHE_WID:0] cache [0: (1 << CACHE_WID) - 1];
     reg  [1:0] read_state = 0;
-    wire [CACHE_WID-1:0]  offset;
-    wire [13-CACHE_WID:0] tag;
+    wire [CACHE_WID-1:0] offset = addr[CACHE_WID+1:2];
+    wire [13-CACHE_WID:0] tag = addr[15:CACHE_WID+2];
     assign mem_pc = addr;
-    assign offset = addr[CACHE_WID+1:2];
-    assign tag    = addr[15:CACHE_WID+2];
-    assign inst   = read_state == 2 ? mem_inst : cache[offset][`DATA_WID];
+    assign inst = read_state == 2 ? mem_inst : cache[offset][`DATA_WID];
     assign icache_stall = !predict_fail && (!cache[offset][46-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag) && (read_state != 2);
 
     initial begin

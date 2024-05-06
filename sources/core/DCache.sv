@@ -1,6 +1,8 @@
 `include "Const.svh"
 
-module DCache (
+module DCache #(
+    parameter CACHE_WID = 8
+)(
     input  logic             clk, rst,
     // cpu interface
     input  logic [`DATA_WID] addr,
@@ -17,25 +19,24 @@ module DCache (
     output logic             mem_web
 );
 
-    // format: valid[41] | dirty[40] | tag[39:32] | data[31:0]
-    reg  [`CACHE_WID] cache [0: (1 << 10) - 1];
+    // format: valid[47-CACHE_WID] | dirty[46-CACHE_WID] | tag[45-CACHE_WID:32] | data[31:0]
+    reg  [47-CACHE_WID:0] cache [0: (1 << CACHE_WID) - 1];
     // state: 0: idle, 1: reading, 2: finish [3: writing, 4: finish]
     reg  [2:0] cache_state = 0;
     reg  [`DATA_WID] rdata_out;
-    reg  [`CACHE_WID] old_cache;
-    wire [9:0] offset = addr[11:2];
-    wire [7:0] tag = addr[19:12];
+    reg  [47-CACHE_WID:0] old_cache;
+    wire [CACHE_WID-1:0] offset = addr[CACHE_WID+1:2];
+    wire [13-CACHE_WID:0] tag = addr[15:CACHE_WID+2];
     wire uncached = (addr[19:16] == 4'hf);  // 1: mmio, 0: memory
     wire [`DATA_WID] rdata_in = (cache_state == 2) ? mem_data : cache[offset][31:0];
-    wire [2:0] end_state = (old_cache[40] && old_cache[39:32] != tag) ? 4 : 2;
-    wire cache_web = (MemRead && cache_state == 2) || (MemWrite && cache_state == 2) || (MemWrite && cache[offset][41] && cache_state == 0);
+    wire [2:0] end_state = (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag) ? 4 : 2;
+    wire cache_web = (MemRead && cache_state == 2) || (MemWrite && cache_state == 2) || (MemWrite && cache[offset][47-CACHE_WID] && cache_state == 0);
     assign data_out = (cache_state == 2 || uncached) ? mem_data : rdata_out;
     assign dcache_stall = !uncached && (MemRead || MemWrite) && cache_state != end_state
-    && (!cache[offset][41] || cache[offset][39:32] != tag || (old_cache[40] && old_cache[39:32] != tag));
+    && (!cache[offset][47-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag || (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag));
 
     initial begin
-        // cache_state = 0;
-        for (int i = 0; i < (1 << 10); i++) begin
+        for (int i = 0; i < (1 << CACHE_WID); i++) begin
             cache[i] = 0;
         end        
     end
@@ -53,7 +54,7 @@ module DCache (
     always_ff @(posedge clk) begin
         if (rst) begin
             old_cache <= 0;
-            for (int i = 0; i < (1 << 10); i++) begin
+            for (int i = 0; i < (1 << CACHE_WID); i++) begin
                 cache[i] <= 0;
             end
         end else begin
@@ -76,12 +77,12 @@ module DCache (
                 mem_web = 0;
             end
             2: begin
-                mem_addr = {12'b0, old_cache[39:32], addr[11:0]};
+                mem_addr = {16'b0, old_cache[45-CACHE_WID:32], addr[CACHE_WID+1:0]};
                 mem_write_data = old_cache[31:0];
                 mem_web = 1;
             end
             3: begin
-                mem_addr = {12'b0, old_cache[39:32], addr[11:0]};
+                mem_addr = {16'b0, old_cache[45-CACHE_WID:32], addr[CACHE_WID+1:0]};
                 mem_write_data = old_cache[31:0];
                 mem_web = 1;
             end
