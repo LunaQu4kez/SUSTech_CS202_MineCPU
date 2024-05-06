@@ -1,7 +1,7 @@
 `include "Const.svh"
 
 module Branch_Predictor # (
-    parameter BHT_SIZE = 8,
+    parameter BHT_SIZE = 4,
     parameter RAS_SIZE = 7
 ) (
     input  logic             clk, rst,
