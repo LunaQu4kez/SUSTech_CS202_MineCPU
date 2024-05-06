@@ -7,7 +7,7 @@ module DCache #(
     // cpu interface
     input  logic [`DATA_WID] addr,
     input  logic [`DATA_WID] write_data,
-    input  logic [`LDST_WID] ldst,
+    input  logic [`LDST_WID] MEMOp,
     input  logic             MemRead,
     input  logic             MemWrite,
     output logic [`DATA_WID] data_out,
@@ -96,7 +96,7 @@ module DCache #(
 
     // input: rdata_in, output: rdata_out
     always_comb begin
-        unique case (ldst)
+        unique case (MEMOp)
             `LW_OP: begin
                 rdata_out = rdata_in;
             end

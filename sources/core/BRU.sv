@@ -3,6 +3,7 @@
 module BRU (
 	input  logic [`DATA_WID ] src1, src2, pc, imm,
 	input  logic [`BRUOP_WID] BRU_op,
+	input  logic              Jalr,
 	output logic [`DATA_WID ] old_pc,
 	output logic              old_branch, result
 );
@@ -26,7 +27,7 @@ module BRU (
 	always_comb begin : Actual_PC
 		unique case (result)
 			1'b0: old_pc = pc + 4;   // not taken
-			1'b1: old_pc = pc + imm; // taken
+			1'b1: old_pc = Jalr ? src1 + imm : pc + imm; // taken
 		endcase
 	end
 
