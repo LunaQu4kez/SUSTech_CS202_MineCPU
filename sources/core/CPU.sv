@@ -33,7 +33,9 @@ module CPU (
     logic PC_Write, rst, icache_stall, dcache_stall;
     logic [`DATA_WID] new_pc, IF_pc_in;
     assign rst = ~rst_n | ~uart_done;
-    assign led3_out = 0;
+    assign led3_out[5:0] = 0;
+    assign led3_out[6] = uart_done;
+    assign led3_out[7] = IF_pc_in == 32'h1c090044;
 
     PC pc_inst (
         .clk(cpuclk),
