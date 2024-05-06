@@ -1,6 +1,6 @@
 module UART_board (
     input clk, rst_n, rx,
-    output reg [7:0] led1_out, led2_out
+    output reg [7:0] led1_out, led2_out, led3_out
 );
 
     wire [31:0] data_out, addr_out;
@@ -35,6 +35,9 @@ module UART_board (
     end
 
     assign led1_out = reg1;
-    assign led2_out = reg2;
+    assign led2_out = addr_out[9:2];
+    assign led3_out[7] = done;
+    assign led3_out[6] = rst_n;
+    assign led3_out[5] = rx;
 
 endmodule
