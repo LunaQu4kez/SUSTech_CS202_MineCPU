@@ -10,7 +10,7 @@ module Top (
     input  logic              bt1, bt2, bt3, bt4, bt5,
     input  logic [`KBPIN_WID] kp,
     output logic [`LED_WID  ] led1_out, led2_out, led3_out,
-    output logic [`LED_WID  ] seg_en, seg_out0, seg_out1,
+    output logic [`LED_WID  ] seg_en, seg_out,
     // vga interface
     output logic              hsync,              // line synchronization signal
     output logic              vsync,              // vertical synchronization signal
@@ -76,8 +76,7 @@ module Top (
         .seg1_in(seg1_out),
         .seg2_in(seg2_out),
         .seg_en,
-        .seg_out0,
-        .seg_out1
+        .seg_out
     );
 
     VGA vga_inst(

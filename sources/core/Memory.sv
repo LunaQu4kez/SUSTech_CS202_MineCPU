@@ -19,7 +19,7 @@ module Memory (
     output logic [`INFO_WID  ] color_out
 );
 
-    logic [`DATA_WID] rdataa, rdatab, datab_io, edataa = 0;
+    logic [`DATA_WID] rdataa, rdatab, datab_io, edataa;
     logic bool_io;   // mmio or mem
     logic bool_exc;  // exception or not
     assign bool_io = (addrb[31:16] == 16'hffff);  // 1: io, 0: mem
