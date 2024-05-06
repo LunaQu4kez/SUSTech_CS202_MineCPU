@@ -11,7 +11,7 @@ module Memory (
     input  logic [`SWCH_WID  ] switches1, switches2, switches3,
     input                      bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
     input  logic [`KBCODE_WID] kb_idx,                    // keyboard index: 0 1 2 3 4 5 6 7 8 9 A B C D * #
-    output logic [`DATA_WID  ] seg1_out, seg2_out,
+    output logic [`DATA_WID  ] seg1_out,
     output logic [`LED_WID   ] led1_out, led2_out,
     // vga related
     input  logic [`VGA_ADDR  ] vga_addr,
@@ -62,13 +62,12 @@ module Memory (
 
     // MMIO related
     logic [`LED_WID ] led1, led2;
-    logic [`DATA_WID] seg1, seg2;
+    logic [`DATA_WID] seg1;
     logic [`INFO_WID] chars [`INFO_NUM];
     logic [`INFO_WID] color [`INFO_NUM]; 
     assign led1_out = led1;
     assign led2_out = led2;
     assign seg1_out = seg1;
-    assign seg2_out = seg2;
     assign char_out = chars[vga_addr];
     assign color_out = color[vga_addr];
 
@@ -79,112 +78,90 @@ module Memory (
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff04: begin     // switches2
                 datab_io = {24'h000000, switches2};
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff08: begin     // switches3
                 datab_io = {24'h000000, switches3};
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff0c: begin     // led1
                 datab_io = 0;
                 led1 = write_datab[7:0];
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff10: begin     // led2
                 datab_io = 0;
                 led1 = led1;
                 led2 = write_datab[7:0];
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff14: begin     // button1 middle
                 datab_io = bt1 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff18: begin     // button2 up
                 datab_io = bt2 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff1c: begin     // button3 down
                 datab_io = bt3 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff20: begin     // button4 left
                 datab_io = bt4 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff24: begin     // button5 right
                 datab_io = bt5 ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff28: begin     // sepc: read
                 datab_io = sepc;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff2c: begin     // seg1: write
                 datab_io = datab_io;
                 led1 = led1;
                 led2 = led2;
                 seg1 = write_datab;
-                seg2 = seg2;
-            end
-            32'hffff_ff30: begin     // seg2: write
-                datab_io = datab_io;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
-                seg2 = write_datab;
             end
             32'hffff_ff34: begin     // keyboard enable
                 datab_io = kb_idx[4] ? 32'h00000001 : 32'h00000000;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             32'hffff_ff38: begin     // 4*4 keyboard
                 datab_io = {28'h0000000, kb_idx[3:0]};
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
             default: begin
                 datab_io = 0;
                 led1 = led1;
                 led2 = led2;
                 seg1 = seg1;
-                seg2 = seg2;
             end
         endcase
     end

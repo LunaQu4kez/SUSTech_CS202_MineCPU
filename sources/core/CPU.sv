@@ -11,7 +11,7 @@ module CPU (
     input  logic               bt1, bt2, bt3, bt4, bt5,
     input  logic [`KBCODE_WID] kb_idx,
     output logic [`LED_WID   ] led1_out, led2_out, led3_out,
-    output logic [`DATA_WID  ] seg1_out, seg2_out,
+    output logic [`DATA_WID  ] seg1_out,
     // vga interface
     input  logic [`VGA_ADDR  ] vga_addr,
     output logic [`INFO_WID  ] char_out,
@@ -298,7 +298,6 @@ module CPU (
         .led1_out,
         .led2_out,
         .seg1_out,
-        .seg2_out,
         .vga_addr,
         .char_out,
         .color_out

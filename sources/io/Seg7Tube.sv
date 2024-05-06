@@ -2,25 +2,25 @@
 
 module Seg7Tube(
     input               clk, rst_n,                // clock, reset
-    input        [31:0] seg1_in, seg2_in,          // 7-segment display data
+    input        [31:0] data_in,                   // 7-segment display data
     output logic [7:0]  seg_en,                    // scan signal
     output logic [7:0]  seg_out                    // 7-segment display
 );
 
-    logic [7:0]  p0, p1, p2, p3, p4, p5, p6, p7;  // data input
+    logic [3:0]  p0, p1, p2, p3, p4, p5, p6, p7;  // data input
     logic        clk_500hz;                       // 500Hz clock
     logic [31:0] cnt;                             // Counter for the 500Hz clock
     logic [2:0]  scan_cnt;                        // Scan signal for the 7-segment display
-    logic [7:0]  seg_in;                // Data for the 7-segment display
+    logic [7:0]  seg_in;                          // Data for the 7-segment display
     parameter  period = `SEG_FREQ;                // Period of the 500Hz clock
-    assign p0 = seg1_in[ 7: 0];
-    assign p1 = seg1_in[15: 8];
-    assign p2 = seg1_in[23:16];
-    assign p3 = seg1_in[31:24];
-    assign p4 = seg2_in[ 7: 0];
-    assign p5 = seg2_in[15: 8];
-    assign p6 = seg2_in[23:16];
-    assign p7 = seg2_in[31:24];
+    assign p0 = data_in[3:0];
+    assign p1 = data_in[7:4];
+    assign p2 = data_in[11:8];
+    assign p3 = data_in[15:12];
+    assign p4 = data_in[19:16];
+    assign p5 = data_in[23:20];
+    assign p6 = data_in[27:24];
+    assign p7 = data_in[31:28];
 
     always_comb begin
         case(seg_in)

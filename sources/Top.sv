@@ -24,7 +24,7 @@ module Top (
     wire [`DATA_WID] uart_data, uart_addr;
     wire [`VGA_ADDR] vga_addr;
     wire [`INFO_WID] char_out, color_out;
-    wire [`DATA_WID] seg1_out, seg2_out;
+    wire [`DATA_WID] seg1_out;
     wire [4:0] kb_idx;
 
     assign cpuclk = clk;  // 100MHz
@@ -55,7 +55,6 @@ module Top (
         .led2_out,
         .led3_out,
         .seg1_out,
-        .seg2_out,
         .vga_addr,
         .char_out,
         .color_out
