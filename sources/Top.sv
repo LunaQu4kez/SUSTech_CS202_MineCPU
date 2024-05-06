@@ -41,7 +41,8 @@ module Top (
         .rst_n,
         .uart_data,
         .uart_addr,
-        .uart_done,
+        //.uart_done,
+        .uart_done(1'b1),
         .switches1,
         .switches2,
         .switches3,
@@ -72,8 +73,7 @@ module Top (
     Seg7Tube seg7tube_inst(
         .clk(cpuclk),
         .rst_n,
-        .seg1_in(seg1_out),
-        .seg2_in(seg2_out),
+        .data_in(seg1_out),
         .seg_en,
         .seg_out
     );

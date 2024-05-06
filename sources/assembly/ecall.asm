@@ -45,42 +45,8 @@ ecall_printint2:
 
 # ecall_printseg: print a word to seg7tube
 ecall_printseg:
-    addi t1, zero, 0
-    li t0, 0xf0000000
-    and t0, a0, t0
-    srli t0, t0, 1
-    add t1, t1, t0
-    li t0, 0x0f000000
-    and t0, a0, t0
-    srli t0, t0, 2
-    add t1, t1, t0
-    li t0, 0x00f00000
-    and t0, a0, t0
-    srli t0, t0, 3
-    add t1, t1, t0
-    li t0, 0x000f0000
-    and t0, a0, t0
-    srli t0, t0, 4
-    add t1, t1, t0
-    sw t1, 44(gp)
-    addi t1, zero, 0
-    li t0, 0x0000f000
-    and t0, a0, t0
-    slli t0, t0, 4
-    add t1, t1, t0
-    li t0, 0x00000f00
-    and t0, a0, t0
-    slli t0, t0, 3
-    add t1, t1, t0
-    li t0, 0x000000f0
-    and t0, a0, t0
-    slli t0, t0, 2
-    add t1, t1, t0
-    li t0, 0x0000000f
-    and t0, a0, t0
-    slli t0, t0, 1
-    add t1, t1, t0
-    sw t1, 48(gp)
+    sw a0, 44(gp)
+    j exit
 
 # restore context and return
 exit:
