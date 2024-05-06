@@ -14,7 +14,12 @@ module VGA (  // 800×600 60Hz
     output logic [`COLOR_WID] green,
     output logic [`COLOR_WID] blue
 );
-    
+    assign vga_addr = 0;
+    assign hsync = 0;
+    assign vsync = 0;
+    assign red = 0;
+    assign green = 0;
+    assign blue = 0;
 
 
 endmodule

@@ -2,7 +2,7 @@
 
 module Top (
     // clk -> cpuclk, memclk, vgaclk
-    input                     clk, rst_n,
+    input                     clk, rst,
     // uart related
     input  logic              rx,
     // interact with devices
@@ -38,7 +38,7 @@ module Top (
     CPU cpu_inst(
         .cpuclk,
         .memclk,
-        .rst_n,
+        .rst_n(~rst),
         .uart_data,
         .uart_addr,
         //.uart_done,
@@ -63,7 +63,7 @@ module Top (
 
     UART uart_inst(
         .clk,
-        .rst(~rst_n),
+        .rst,
         .rx(rx),
         .data_out(uart_data),
         .addr_out(uart_addr),
@@ -72,7 +72,7 @@ module Top (
 
     Seg7Tube seg7tube_inst(
         .clk(cpuclk),
-        .rst_n,
+        .rst_n(~rst),
         .data_in(seg1_out),
         .seg_en,
         .seg_out
