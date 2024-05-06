@@ -85,7 +85,7 @@ module CPU (
     logic [`DATA_WID] ID_data1_out, ID_data2_out, ID_imm_out, ID_pc_out;
     logic ID_predict_result_out;
     logic [`DATA_WID] sepc;
-
+    logic [`DATA_WID] EX_old_predict_pc_out;
 
     Stage_ID id_inst (
         .clk(cpuclk),
@@ -119,7 +119,8 @@ module CPU (
         .predict_result(ID_predict_result_out),
         .predict_fail,
         .new_pc,
-        .sepc
+        .sepc,
+        .old_predict_pc(EX_old_predict_pc_out)
     );
 
     logic [`DATA_WID] EX_pc_in, EX_data1_in, EX_data2_in, EX_imm_in;
@@ -145,6 +146,8 @@ module CPU (
         .flush,
         .dcache_stall,
         .predict_result_in(ID_predict_result_out),
+        .old_predict_pc_in(new_pc),
+        .old_predict_pc_out(EX_old_predict_pc_out),
         .pc_out(EX_pc_in),
         .data1_out(EX_data1_in),
         .data2_out(EX_data2_in),

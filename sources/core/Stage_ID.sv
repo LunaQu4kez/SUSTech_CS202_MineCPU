@@ -9,7 +9,7 @@ module Stage_ID (
     // signal from EX stage
     input  logic [`REGS_WID    ] ID_EX_rd, MEM_WB_rd,
     input  logic                 old_predict, old_branch, branch_result,
-    input  logic [`DATA_WID    ] old_pc, old_branch_pc,
+    input  logic [`DATA_WID    ] old_pc, old_branch_pc, old_predict_pc,
     input  logic                 ID_EX_MemRead,
     // signal from WB stage
     input  logic [`DATA_WID    ] data_WB,
@@ -30,11 +30,11 @@ module Stage_ID (
 );
 
     logic [`REGS_WID] rs1, rs2, rd;
-    logic stall, branch, predict, ujtype, excp;
+    logic stall, branch, predict, excp;
     logic [`CTRL_WID] total_ctrl, ctrl_out;
     logic [`DATA_WID] rs1_data, rs2_data, imm;
 
-    assign rs1 = ujtype ? 0 : inst[19:15];
+    assign rs1 = inst[19:15];
     assign rs2 = inst[24:20];
     assign rd = inst[11:7];
     assign rs1_out = rs1;
@@ -42,7 +42,7 @@ module Stage_ID (
     assign rd_out  = rd;
     assign pc_out = pc_in;
     assign ctrl_out = (stall == 1'b0) ? total_ctrl : 0;
-    assign EX_ctrl  = ctrl_out[15:7];
+    assign EX_ctrl  = ctrl_out[16:7];
     assign MEM_ctrl = ctrl_out[6:2];
     assign WB_ctrl  = ctrl_out[1:0];
     assign reg_data1 = rs1_data;
@@ -81,7 +81,6 @@ module Stage_ID (
         .total_ctrl,
         .branch,
         .predict,
-        .ujtype,
         .excp
     );
 
@@ -91,8 +90,6 @@ module Stage_ID (
         .stall(dcache_stall),
         .branch,
         .predict,
-        .rs1_data,
-        .ujtype,
         .rs1,
         .rd,
         .excp,
@@ -106,7 +103,8 @@ module Stage_ID (
         .target_pc(new_pc),
         .predict_result,
         .predict_fail,
-        .sepc
+        .sepc,
+        .old_predict_pc
     );
 
 endmodule

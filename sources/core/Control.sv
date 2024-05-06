@@ -3,13 +3,15 @@
 module Control (
     input  logic [`DATA_WID] inst, 
     output logic [`CTRL_WID] total_ctrl,
-    output logic             branch, predict, ujtype, excp
+    output logic             branch, predict, excp
 );
 
     // atom ctrl wire
+    logic Jalr;
     logic [`ALUOP_WID]  ALUOp;
     logic [`BRUOP_WID]  BRUOp;
     logic [`ALUSRC_WID] ALUSrc;       // 1: imm, 0: reg
+    logic [`LDST_WID]   MEMOp;
     logic MemWrite;     // 1: write to memory, 0: no write
     logic MemRead;      // 1: read from memory, 0: no read
     logic RegWrite;     // 1: write to regs, 0: no write
@@ -19,11 +21,10 @@ module Control (
     logic [`EX_CTRL_WID]  EX_ctrl;
     logic [`MEM_CTRL_WID] MEM_ctrl;
     logic [`WB_CTRL_WID]  WB_ctrl;
-    logic [`LDST_WID]     ldst;
 
     // part control signal
-    assign EX_ctrl  = {BRUOp, ALUOp, ALUSrc};
-    assign MEM_ctrl = {ldst, MemWrite, MemRead};
+    assign EX_ctrl  = {Jalr, BRUOp, ALUOp, ALUSrc};
+    assign MEM_ctrl = {MEMOp, MemWrite, MemRead};
     assign WB_ctrl  = {RegWrite, MemtoReg};
 
     // total control
@@ -58,6 +59,7 @@ module Control (
                     endcase
                 end
                 BRUOp    = `BRU_NOP;
+                Jalr     = 0;
                 ALUSrc   = 0;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -65,8 +67,7 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 0;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
             `ART_IMM_OP: begin
@@ -82,6 +83,7 @@ module Control (
                        default: ALUOp = 0;
                 endcase
                 BRUOp    = `BRU_NOP;
+                Jalr     = 0;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -89,13 +91,13 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 0;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
             `LOAD_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_NOP;
+                Jalr     = 0;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 1;
@@ -103,20 +105,20 @@ module Control (
                 MemtoReg = 1;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 0;
                 unique case (inst[`FUNC3_WID])
-                    `LB_FUNC3:  ldst = `LB_OP;
-                    `LH_FUNC3:  ldst = `LH_OP;
-                    `LW_FUNC3:  ldst = `LW_OP;
-                    `LBU_FUNC3: ldst = `LBU_OP;
-                    `LHU_FUNC3: ldst = `LHU_OP;  
-                    default:    ldst = 0;
+                    `LB_FUNC3:  MEMOp = `LB_OP;
+                    `LH_FUNC3:  MEMOp = `LH_OP;
+                    `LW_FUNC3:  MEMOp = `LW_OP;
+                    `LBU_FUNC3: MEMOp = `LBU_OP;
+                    `LHU_FUNC3: MEMOp = `LHU_OP;  
+                    default:    MEMOp = 0;
                 endcase
                 excp     = 0;
             end
             `STORE_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_NOP;
+                Jalr     = 0;
                 ALUSrc   = 1;
                 MemWrite = 1;
                 MemRead  = 0;
@@ -124,12 +126,11 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 0;
                 unique case (inst[`FUNC3_WID])
-                    `SB_FUNC3 : ldst = `SB_OP; 
-                    `SH_FUNC3 : ldst = `SH_OP; 
-                    `SW_FUNC3 : ldst = `SW_OP; 
-                    default:    ldst = 0;
+                    `SB_FUNC3 : MEMOp = `SB_OP; 
+                    `SH_FUNC3 : MEMOp = `SH_OP; 
+                    `SW_FUNC3 : MEMOp = `SW_OP; 
+                    default:    MEMOp = 0;
                 endcase
                 excp     = 0;
             end
@@ -144,6 +145,7 @@ module Control (
                        default: BRUOp = `BRU_NOP;
                 endcase
                 ALUOp    = `ALU_ADD;
+                Jalr     = 0;
                 ALUSrc   = 0;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -151,13 +153,13 @@ module Control (
                 MemtoReg = 0;
                 branch   = 1;
                 predict  = 1;
-                ujtype   = 0;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
             `JALR_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_JMP;
+                Jalr     = 1;
                 ALUSrc   = 2;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -165,13 +167,13 @@ module Control (
                 MemtoReg = 0;
                 branch   = 1;
                 predict  = 0;
-                ujtype   = 0;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
             `JAL_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_JMP;
+                Jalr     = 0;
                 ALUSrc   = 2;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -179,13 +181,13 @@ module Control (
                 MemtoReg = 0;
                 branch   = 1;
                 predict  = 0;
-                ujtype   = 1;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
             `LUI_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_NOP;
+                Jalr     = 0;
                 ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -193,13 +195,13 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 1;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
             `AUIPC_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_NOP;
+                Jalr     = 0;
                 ALUSrc   = 3;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -207,13 +209,13 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 1;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
             `ECALL_OP: begin
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_NOP;
+                Jalr     = 0;
                 ALUSrc   = 0;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -221,13 +223,13 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 0;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 1;
             end
             default: begin
                 ALUOp    = 0;
                 BRUOp    = 0;
+                Jalr     = 0;
                 ALUSrc   = 0;
                 MemWrite = 0;
                 MemRead  = 0;
@@ -235,8 +237,7 @@ module Control (
                 MemtoReg = 0;
                 branch   = 0;
                 predict  = 0;
-                ujtype   = 0;
-                ldst     = 0;
+                MEMOp     = 0;
                 excp     = 0;
             end
         endcase

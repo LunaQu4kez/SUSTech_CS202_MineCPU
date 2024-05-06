@@ -9,13 +9,11 @@ module Branch_Predictor # (
     // whether to branch and predict, from Control
     input  logic             branch, predict,
     // process jalr, ujtype indicates jal
-    input  logic [`DATA_WID] rs1_data,
-    input  logic             ujtype,
     input  logic [`REGS_WID] rs1, rd,
     // process exception
     input  logic             excp,
     // pc is from IF, imm is from ID, old_pc is from EX
-    input  logic [`DATA_WID] pc, imm, old_pc, old_branch_pc,
+    input  logic [`DATA_WID] pc, imm, old_pc, old_branch_pc, old_predict_pc,
     input  logic             old_predict, old_actual, old_branch,
     // target pc is predicted pc, pass predict_result to EX, predict_fail to flush
     output logic [`DATA_WID] target_pc,
@@ -49,7 +47,7 @@ module Branch_Predictor # (
     logic [BHT_SIZE-1:0] table_addr, update_addr; // use pc[11:2] as index since last 2 bits are always 0
     assign table_addr  = pc[BHT_SIZE+1:2];
     assign update_addr = old_branch_pc[BHT_SIZE+1:2];
-    assign predict_fail = old_predict != old_actual;
+    assign predict_fail = old_actual != old_predict && old_predict_pc != old_pc;
 
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -74,8 +72,7 @@ module Branch_Predictor # (
                 end
                 2'b10: begin // branch, no predict: jump
                     predict_result = 1'b1;
-                    if (ujtype) target_pc0 = pc + imm; // jal(call rd == 1)
-                    else target_pc0 = (rs1 == 1) ? Return_Addr[RAS_top] : rs1_data + imm;  // jalr(ret rs1 == 1)
+                    target_pc0 = (rs1 == 1) ? Return_Addr[RAS_top] : pc + imm;
                 end
                 2'b11: begin // branch, predict: beq, bne, blt, bge, bltu, bgeu
                     predict_result = History_Table[table_addr] > 2'b01;

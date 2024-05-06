@@ -8,6 +8,8 @@ module ID_EX (
     input                  flush,              // control hazard flush, 1 yes, 0 no
     input                  predict_result_in,
     input                  dcache_stall,
+    input  [`DATA_WID    ] old_predict_pc_in,
+    output [`DATA_WID    ] old_predict_pc_out, 
     output [`DATA_WID    ] pc_out, data1_out, data2_out, imm_out,
     output [`REGS_WID    ] rd_out,             // inst[11-7], rd_out
     output [`REGS_WID    ] rs1_out, rs2_out,   // ID_EX_rs1, ID_EX_rs2
@@ -29,6 +31,7 @@ module ID_EX (
     reg [`REGS_WID] rs1 = 0;
     reg [`REGS_WID] rs2 = 0;
     reg predict_result = 0;
+    reg [`DATA_WID] old_predict_pc = 0;
     reg [`EX_CTRL_WID]  EX_ctrl = 0;
     reg [`MEM_CTRL_WID] MEM_ctrl = 0;
     reg [`WB_CTRL_WID]  WB_ctrl = 0;
@@ -43,6 +46,7 @@ module ID_EX (
     assign MEM_ctrl_out = MEM_ctrl;
     assign WB_ctrl_out = WB_ctrl;
     assign predict_result_out = predict_result;
+    assign old_predict_pc_out = old_predict_pc;
 
     always_ff @(posedge clk) begin
         if (rst || (flush && !dcache_stall)) begin
@@ -57,6 +61,7 @@ module ID_EX (
             MEM_ctrl <= 0;
             WB_ctrl <= 0;
             predict_result <= 0;
+            old_predict_pc <= 0;
         end else if (dcache_stall) begin
             pc <= pc;
             data1 <= data1;
@@ -69,6 +74,7 @@ module ID_EX (
             MEM_ctrl <= MEM_ctrl;
             WB_ctrl <= WB_ctrl;
             predict_result <= predict_result;
+            old_predict_pc <= old_predict_pc;
         end else begin
             pc <= pc_in;
             data1 <= data1_in;
@@ -81,6 +87,7 @@ module ID_EX (
             MEM_ctrl <= MEM_ctrl_in;
             WB_ctrl <= WB_ctrl_in;
             predict_result <= predict_result_in;
+            old_predict_pc <= old_predict_pc_in;
         end
     end
     
