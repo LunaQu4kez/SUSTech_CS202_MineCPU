@@ -24,23 +24,23 @@ module Seg7Tube(
 
     always_comb begin
         case(seg_in)
-            `IN0: seg_out = `SEG0; // Display '0'
-            `IN1: seg_out = `SEG1; // Display '1'
-            `IN2: seg_out = `SEG2; // Display '2'
-            `IN3: seg_out = `SEG3; // Display '3'
-            `IN4: seg_out = `SEG4; // Display '4'
-            `IN5: seg_out = `SEG5; // Display 'S'
-            `IN6: seg_out = `SEG6; // Display '6'
-            `IN7: seg_out = `SEG7; // Display '7'
-            `IN8: seg_out = `SEG8; // Display '8'
-            `IN9: seg_out = `SEG9; // Display '9'
-            `INA: seg_out = `SEGA; // Display 'A'
-            `INB: seg_out = `SEGB; // Display 'b'
-            `INC: seg_out = `SEGC; // Display 'C'
-            `IND: seg_out = `SEGD; // Display 'd'
-            `INE: seg_out = `SEGE; // Display 'E'
-            `INF: seg_out = `SEGF; // Display 'F'
-         default: seg_out = 0;     // Display nothing
+            `IN0: seg_out = ~`SEG0; // Display '0'
+            `IN1: seg_out = ~`SEG1; // Display '1'
+            `IN2: seg_out = ~`SEG2; // Display '2'
+            `IN3: seg_out = ~`SEG3; // Display '3'
+            `IN4: seg_out = ~`SEG4; // Display '4'
+            `IN5: seg_out = ~`SEG5; // Display 'S'
+            `IN6: seg_out = ~`SEG6; // Display '6'
+            `IN7: seg_out = ~`SEG7; // Display '7'
+            `IN8: seg_out = ~`SEG8; // Display '8'
+            `IN9: seg_out = ~`SEG9; // Display '9'
+            `INA: seg_out = ~`SEGA; // Display 'A'
+            `INB: seg_out = ~`SEGB; // Display 'b'
+            `INC: seg_out = ~`SEGC; // Display 'C'
+            `IND: seg_out = ~`SEGD; // Display 'd'
+            `INE: seg_out = ~`SEGE; // Display 'E'
+            `INF: seg_out = ~`SEGF; // Display 'F'
+         default: seg_out = ~0;     // Display nothing
         endcase
     end
 
@@ -76,15 +76,15 @@ module Seg7Tube(
     // Control the 7-segment display
     always @(*) begin
         case (scan_cnt)
-            3'b000: begin seg_en = 8'b00000001; seg_in = p0; end
-            3'b001: begin seg_en = 8'b00000010; seg_in = p1; end
-            3'b010: begin seg_en = 8'b00000100; seg_in = p2; end
-            3'b011: begin seg_en = 8'b00001000; seg_in = p3; end
-            3'b100: begin seg_en = 8'b00010000; seg_in = p4; end
-            3'b101: begin seg_en = 8'b00100000; seg_in = p5; end
-            3'b110: begin seg_en = 8'b01000000; seg_in = p6; end
-            3'b111: begin seg_en = 8'b10000000; seg_in = p7; end
-            default: seg_en = 8'b00000000;
+            3'b000: begin seg_en = ~8'b00000001; seg_in = p0; end
+            3'b001: begin seg_en = ~8'b00000010; seg_in = p1; end
+            3'b010: begin seg_en = ~8'b00000100; seg_in = p2; end
+            3'b011: begin seg_en = ~8'b00001000; seg_in = p3; end
+            3'b100: begin seg_en = ~8'b00010000; seg_in = p4; end
+            3'b101: begin seg_en = ~8'b00100000; seg_in = p5; end
+            3'b110: begin seg_en = ~8'b01000000; seg_in = p6; end
+            3'b111: begin seg_en = ~8'b10000000; seg_in = p7; end
+            default: seg_en = ~8'b00000000;
         endcase
     end
 endmodule

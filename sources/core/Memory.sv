@@ -61,8 +61,8 @@ module Memory (
     );
 
     // MMIO related
-    logic [`LED_WID ] led1, led2;
-    logic [`DATA_WID] seg1;
+    logic [`LED_WID ] led1 = 0, led2 = 0;
+    logic [`DATA_WID] seg1 = 0;
     logic [`INFO_WID] chars [`INFO_NUM];
     logic [`INFO_WID] color [`INFO_NUM]; 
     assign led1_out = led1;
@@ -75,93 +75,73 @@ module Memory (
         unique case (addrb)
             32'hffff_ff00: begin     // switches1
                 datab_io = {24'h000000, switches1};
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff04: begin     // switches2
                 datab_io = {24'h000000, switches2};
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff08: begin     // switches3
                 datab_io = {24'h000000, switches3};
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff0c: begin     // led1
                 datab_io = 0;
-                led1 = write_datab[7:0];
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff10: begin     // led2
                 datab_io = 0;
-                led1 = led1;
-                led2 = write_datab[7:0];
-                seg1 = seg1;
             end
             32'hffff_ff14: begin     // button1 middle
                 datab_io = bt1 ? 32'h00000001 : 32'h00000000;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff18: begin     // button2 up
                 datab_io = bt2 ? 32'h00000001 : 32'h00000000;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff1c: begin     // button3 down
                 datab_io = bt3 ? 32'h00000001 : 32'h00000000;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff20: begin     // button4 left
                 datab_io = bt4 ? 32'h00000001 : 32'h00000000;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff24: begin     // button5 right
                 datab_io = bt5 ? 32'h00000001 : 32'h00000000;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff28: begin     // sepc: read
                 datab_io = sepc;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff2c: begin     // seg1: write
-                datab_io = datab_io;
-                led1 = led1;
-                led2 = led2;
-                seg1 = write_datab;
+                datab_io = 0;
             end
             32'hffff_ff34: begin     // keyboard enable
                 datab_io = kb_idx[4] ? 32'h00000001 : 32'h00000000;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             32'hffff_ff38: begin     // 4*4 keyboard
                 datab_io = {28'h0000000, kb_idx[3:0]};
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
             end
             default: begin
                 datab_io = 0;
-                led1 = led1;
-                led2 = led2;
-                seg1 = seg1;
+            end
+        endcase
+    end
+
+    always_ff @(posedge clkb) begin
+        unique case (addrb)
+            32'hffff_ff0c: begin     // led1
+                led1 <= write_datab[7:0];
+                led2 <= led2;
+                seg1 <= seg1;
+            end
+            32'hffff_ff10: begin     // led2
+                led1 <= led1;
+                led2 <= write_datab[7:0];
+                seg1 <= seg1;
+            end
+            32'hffff_ff2c: begin     // seg1: write
+                led1 <= led1;
+                led2 <= led2;
+                seg1 <= write_datab;
+            end
+            default: begin
+                led1 <= led1;
+                led2 <= led2;
+                seg1 <= seg1;
             end
         endcase
     end
