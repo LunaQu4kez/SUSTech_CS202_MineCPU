@@ -184,7 +184,7 @@ module CPU (
         .predict_fail,
         .dcache_stall,
         .predict_result_in(IF_predict_result_out),
-        .old_predict_pc_in(IF_pc_out),
+        .old_predict_pc_in(IF_predict_pc_out),
         .old_predict_pc_out(EX_old_predict_pc_out),
         .pc_out(EX_pc_in),
         .data1_out(EX_data1_in),
