@@ -71,22 +71,21 @@ module Memory (
             32'h1c090034: edataa = 32'h00300293;
             32'h1c090038: edataa = 32'h02588663;
             32'h1c09003c: edataa = 32'h0300006f;
-            32'h1c090040: edataa = 32'h00000013;
-            32'h1c090044: edataa = 32'h0000006f;
-            32'h1c090048: edataa = 32'h0001a503;
-            32'h1c09004c: edataa = 32'h0240006f;
-            32'h1c090050: edataa = 32'h0041a503;
-            32'h1c090054: edataa = 32'h01c0006f;
-            32'h1c090058: edataa = 32'h00a1a623;
-            32'h1c09005c: edataa = 32'h0140006f;
-            32'h1c090060: edataa = 32'h00a1a823;
-            32'h1c090064: edataa = 32'h00c0006f;
-            32'h1c090068: edataa = 32'h02a1a623;
-            32'h1c09006c: edataa = 32'h0040006f;
-            32'h1c090070: edataa = 32'h00012303;
-            32'h1c090074: edataa = 32'h00412283;
-            32'h1c090078: edataa = 32'h00810113;
-            32'h1c09007c: edataa = 32'h10200073;
+            32'h1c090040: edataa = 32'h0000006f;
+            32'h1c090044: edataa = 32'h0001a503;
+            32'h1c090048: edataa = 32'h0240006f;
+            32'h1c09004c: edataa = 32'h0041a503;
+            32'h1c090050: edataa = 32'h01c0006f;
+            32'h1c090054: edataa = 32'h00a1a623;
+            32'h1c090058: edataa = 32'h0140006f;
+            32'h1c09005c: edataa = 32'h00a1a823;
+            32'h1c090060: edataa = 32'h01c0006f;
+            32'h1c090064: edataa = 32'h02a1a623;
+            32'h1c090068: edataa = 32'h0040006f;
+            32'h1c09006c: edataa = 32'h00012303;
+            32'h1c090070: edataa = 32'h00412283;
+            32'h1c090074: edataa = 32'h00810113;
+            32'h1c090078: edataa = 32'h10200073;
             default: edataa = 32'h00000000;
         endcase
     end

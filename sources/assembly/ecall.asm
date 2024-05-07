@@ -27,7 +27,7 @@ ecall_getint1:
     lw a0, 0(gp)
     j exit
 
-# ecall_getint2: read switches1 value, 1 bytes
+# ecall_getint2: read switches2 value, 1 bytes
 ecall_getint2:
     lw a0, 4(gp)
     j exit
@@ -52,4 +52,4 @@ exit:
     lw t1, 0(sp)
     lw t0, 4(sp)
     addi sp, sp, 8
-    sret
+    #sret
