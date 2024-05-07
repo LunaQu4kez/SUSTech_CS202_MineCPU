@@ -39,8 +39,8 @@ module Top (
 
     // assign clk0 = clk;              // 100mhz
 
-    assign cpuclk = uart_done ? clk1 : clk0;
-    assign memclk = uart_done ? clk1 : clk0;
+    assign cpuclk = uart_done ? clk1 : clk;
+    assign memclk = uart_done ? clk1 : clk;
 
     VGAClkGen vga_clk_gen_inst (  // 40MHz
         .clk_in1(clk),

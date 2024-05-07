@@ -7,10 +7,8 @@ module UART_board (
 
     wire [31:0] data_out, addr_out, data_in;
     wire done;
-    reg [31:0] mem [0:16383];
     wire [13:0] temp;
     assign temp = {switches1, switches2[7:2]};
-    assign data_in = mem[temp];
 
     UART uart_inst (
         .clk,
@@ -29,9 +27,20 @@ module UART_board (
         .seg_out
     );
 
-    always_ff @(posedge clk) begin
-        mem[addr_out[15:2]] <= data_out;
-    end
+    Mem mem_inst (
+        .addra(temp),
+        .clka(~clk),
+        .dina(0),
+        .douta(data_in),
+        .ena(1'b1),
+        .wea(1'b0),
+        .addrb(addr_out[15:2]),
+        .clkb(~clk),
+        .dinb(data_out),
+        //.doutb(),
+        .enb(1'b1),
+        .web(~done)
+    );
 
     assign led1_out = addr_out[15:8];
     assign led2_out[7:2] = addr_out[7:2];
