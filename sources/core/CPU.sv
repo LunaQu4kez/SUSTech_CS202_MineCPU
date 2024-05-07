@@ -18,11 +18,11 @@ module CPU (
     output logic [`INFO_WID  ] color_out,
     // debug port
     output logic [31:0]      pc_t,
-    // output logic [31:0]      inst_t,
+    output logic [31:0]      inst_t
     // output logic [31:0]      EX_data1_t,
     // output logic [31:0]      EX_data2_t,
     // output logic [31:0]      EX_imm_t,
-    output logic [31:0]      MEM_addr_t
+    // output logic [31:0]      MEM_addr_t,
     // output logic [31:0]      MEM_data_t,
     // output logic [31:0]      WB_data_t,
     // output logic [31:0]      WB_mem_t,
@@ -75,18 +75,19 @@ module CPU (
     assign uart_mem_data = uart_done ? mem_write_data : uart_data;
     assign web = ~uart_done || mem_web;
     assign rst = ~rst_n | ~uart_done;
-    assign led3_out[5:0] = 0;
-    assign led3_out[6] = uart_done;
-    assign led3_out[7] = IF_pc_in == 32'h1c090044;
+    
+    assign led3_out[5:0] = pc_t[7:2];
+    assign led3_out[6] = IF_pc_in == 32'h1c090044;
+    assign led3_out[7] = uart_done;
     assign ID_old_branch_pc = EX_pc_in;
 
     // debug port
     assign pc_t = IF_pc_in;
-    // assign inst_t = ID_inst_in;
+    assign inst_t = ID_inst_in;
     // assign EX_data1_t = EX_data1_in;
     // assign EX_data2_t = EX_data2_in;
     // assign EX_imm_t = EX_imm_in;
-    assign MEM_addr_t = MEM_data1_in;
+    // assign MEM_addr_t = MEM_data1_in;
     // assign MEM_data_t = MEM_data2_in;
     // assign WB_data_t = WB_data1_in;
     // assign WB_mem_t = WB_data2_in;

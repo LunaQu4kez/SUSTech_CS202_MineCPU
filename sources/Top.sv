@@ -19,7 +19,7 @@ module Top (
     output logic [`COLOR_WID] blue
 );
 
-    wire clk0, cpuclk, memclk, vgaclk;
+    wire clk0, clk1, cpuclk, memclk, vgaclk;
     wire uart_done;
     wire [`DATA_WID] uart_data, uart_addr;
     wire [`VGA_ADDR] vga_addr;
@@ -27,27 +27,27 @@ module Top (
     wire [`DATA_WID] seg1_out;
     wire [4:0] kb_idx;
 
-    // CPUClk cpu_clk_inst (
-    //     .clk_in1(clk),
-    //     .clk_out1(clk0)
-    // );
+    CPUClk cpu_clk_inst (              // 1m-99mhz
+        .clk_in1(clk),
+        .clk_out1(clk0)
+    );
 
-    // SlowClock slow_clk_inst (
-    //     .clk,
-    //     .clk0
-    // );
+    SlowClock slow_clk_inst (       // 1hz, for debug
+        .clk,
+        .clk0(clk1)
+    );
 
-    assign clk0 = clk;
+    // assign clk0 = clk;              // 100mhz
 
-    assign cpuclk = clk0;  // 10MHz
-    assign memclk = clk0;  // 10MHz
+    assign cpuclk = uart_done ? clk1 : clk0;
+    assign memclk = uart_done ? clk1 : clk0;
 
     VGAClkGen vga_clk_gen_inst (  // 40MHz
         .clk_in1(clk),
         .clk_out1(vgaclk)
     );
 
-    wire [31:0] pc_t, MEM_addr_t;
+    wire [31:0] pc_t, inst_t;
 
     CPU cpu_inst(
         .cpuclk,
@@ -74,7 +74,7 @@ module Top (
         .char_out,
         .color_out,
         .pc_t,
-        .MEM_addr_t
+        .inst_t
     );
 
     UART uart_inst(
@@ -87,7 +87,7 @@ module Top (
     );
 
     wire [31:0] seg7data;
-    assign seg7data = {pc_t[15:0], MEM_addr_t[15:0]};
+    assign seg7data = inst_t;
 
     Seg7Tube seg7tube_inst(
         .clk,

@@ -133,16 +133,13 @@ module Memory (
             32'hffff_ff24: begin     // button5 right
                 datab_io = bt5 ? 32'h00000001 : 32'h00000000;
             end
-            32'hffff_ff28: begin     // reserved
+            32'hffff_ff28: begin     // seg: write
                 datab_io = 0;
             end
-            32'hffff_ff2c: begin     // seg1: write
-                datab_io = 0;
-            end
-            32'hffff_ff34: begin     // keyboard enable
+            32'hffff_ff2c: begin     // keyboard enable
                 datab_io = kb_idx[4] ? 32'h00000001 : 32'h00000000;
             end
-            32'hffff_ff38: begin     // 4*4 keyboard
+            32'hffff_ff30: begin     // 4*4 keyboard
                 datab_io = {28'h0000000, kb_idx[3:0]};
             end
             default: begin
@@ -163,7 +160,7 @@ module Memory (
                 led2 <= write_datab[7:0];
                 seg1 <= seg1;
             end
-            32'hffff_ff2c: begin     // seg1: write
+            32'hffff_ff28: begin     // seg: write
                 led1 <= led1;
                 led2 <= led2;
                 seg1 <= write_datab;
