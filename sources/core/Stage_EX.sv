@@ -29,7 +29,8 @@ module Stage_EX (
 	logic [`BRUOP_WID ] BRU_op;
 	logic [`DATA_WID  ] src1, src2, src1_mux, src2_mux;
 	logic [`FW_WID    ] fwA, fwB;
-	logic Jalr = EX_ctrl_in[9];
+	logic Jalr;
+	assign Jalr = EX_ctrl_in[9];
 
 	// control signals
 	assign BRU_op = EX_ctrl_in[8:6];
