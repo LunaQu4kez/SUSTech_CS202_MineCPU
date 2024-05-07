@@ -21,7 +21,7 @@ module ICache #(
     wire [13-CACHE_WID:0] tag = addr[15:CACHE_WID+2];
     assign mem_pc = addr;
     assign inst = read_state == 2 ? mem_inst : cache[offset][`DATA_WID];
-    assign icache_stall = !predict_fail && (!cache[offset][46-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag) && (read_state != 2);
+    assign icache_stall = !predict_fail && (!cache[offset][46-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag) && (read_state != 3);
 
     initial begin
         // read_state = 0;
@@ -35,7 +35,7 @@ module ICache #(
         if (rst || !icache_stall) begin
             read_state <= 0;
         end else begin
-            read_state <= read_state == 2 ? 0 : read_state + 1;
+            read_state <= read_state + 1;
         end
     end
 
