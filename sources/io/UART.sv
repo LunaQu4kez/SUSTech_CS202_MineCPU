@@ -33,7 +33,7 @@ module UART (
     wire nedge;
     assign nedge = !rxd_t1 & rxd_t2;
 
-    assign done = (addr_out >= `MAX_DATA & addr_out != 32'hfffffffc) | (received & (idle_cnt == `MAX_IDLE));
+    assign done = (addr_out >= `MAX_DATA) | (received & (idle_cnt == `MAX_IDLE));
     always_ff @(posedge clk) begin
         if (rst | en_state) begin
             idle_cnt0 <= 10'h0;
@@ -102,14 +102,14 @@ module UART (
         end else if (en_state) begin
             received <= 1'b1;
             case (bit_cnt)
-                4'd2: rx_data[0] <= rxd_t2;
-                4'd3: rx_data[1] <= rxd_t2;
-                4'd4: rx_data[2] <= rxd_t2;
-                4'd5: rx_data[3] <= rxd_t2;
-                4'd6: rx_data[4] <= rxd_t2;
-                4'd7: rx_data[5] <= rxd_t2;
-                4'd8: rx_data[6] <= rxd_t2;
-                4'd9: rx_data[7] <= rxd_t2;
+                4'd1: rx_data[0] <= rxd_t2;
+                4'd2: rx_data[1] <= rxd_t2;
+                4'd3: rx_data[2] <= rxd_t2;
+                4'd4: rx_data[3] <= rxd_t2;
+                4'd5: rx_data[4] <= rxd_t2;
+                4'd6: rx_data[5] <= rxd_t2;
+                4'd7: rx_data[6] <= rxd_t2;
+                4'd8: rx_data[7] <= rxd_t2;
              default: rx_data <= rx_data;
             endcase
         end else begin
@@ -124,7 +124,7 @@ module UART (
             rx_done <= 1'b0;
         end else if (en_state) begin
             if(bit_cnt == 0) rx_done <= 1'b0;
-            else if(bit_cnt == 10 && baud_cnt == `BPS_CNT - 1) rx_done <= 1'b1;
+            else if(bit_cnt == 9 && baud_cnt == `BPS_CNT - 1) rx_done <= 1'b1;
             else if(rx_done == 1'b1) rx_done <= 1'b0;
             else rx_done <= rx_done;
         end else if(rx_done == 1'b1) rx_done <= 1'b0;
