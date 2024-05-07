@@ -28,6 +28,7 @@
 `define LUI_OP     7'b0110111  // U type
 `define AUIPC_OP   7'b0010111  // U type
 `define ECALL_OP   7'b1110011  // I type
+`define SRET_OP    7'b0001000
 // ALU Control lines
 `define ALU_AND    4'b0000
 `define ALU_OR     4'b0001

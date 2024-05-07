@@ -1,7 +1,6 @@
 entry:
     addi sp, sp, -8
     # save context
-    lw tp, 40(gp)
     sw t0, 4(sp)
     sw t1, 0(sp)
     # process
@@ -17,7 +16,7 @@ entry:
     beq a7, t0, ecall_printint2
     addi t0, zero, 3
     beq a7, t0, ecall_printseg
-    beq zero, zero, exit
+    j exit
 
 # ecall_exit: infinite loop
 ecall_exit:
@@ -53,4 +52,4 @@ exit:
     lw t1, 0(sp)
     lw t0, 4(sp)
     addi sp, sp, 8
-    jalr zero, tp, 0
+    sret

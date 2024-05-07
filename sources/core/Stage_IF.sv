@@ -12,12 +12,11 @@ module Stage_IF (
     output logic             predict_result,
     output logic             predict_fail,
     // interact with Memory
-    output logic [`DATA_WID] sepc,
     input  logic [`DATA_WID] mem_inst,
     output logic [`DATA_WID] mem_pc
 );
 
-    logic branch, predict, excp, jump;
+    logic branch, predict, excp, jump, sret;
     logic [`REGS_WID] rs1, rd;
     logic [`DATA_WID] new_pc, imm, inst;
     assign inst_out = inst;
@@ -26,6 +25,7 @@ module Stage_IF (
     assign branch = inst[6:0] == `BRANCH_OP || jump;
     assign predict = !jump && branch;
     assign excp = inst[6:0] == `ECALL_OP;
+    assign sret = excp && inst[31:25] == `SRET_OP;
     assign rs1 = inst[6:0] != `JAL_OP ? inst[19:15] : 0;
     assign rd = inst[11:7];
 
@@ -52,6 +52,7 @@ module Stage_IF (
         .branch,
         .predict,
         .excp,
+        .sret,
         .rs1,
         .rd,
         .pc(pc_in),
@@ -64,8 +65,7 @@ module Stage_IF (
         .old_predict_pc,
         .target_pc(new_pc),
         .predict_result,
-        .predict_fail,
-        .sepc
+        .predict_fail
     );
 
 endmodule

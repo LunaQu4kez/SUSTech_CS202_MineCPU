@@ -7,7 +7,7 @@ module Branch_Predictor # (
     input  logic             clk, rst,
     input  logic             stall,
     // whether to branch and predict, excp is ecall
-    input  logic             branch, predict, excp,
+    input  logic             branch, predict, excp, sret,
     // calculate branch target
     input  logic [`REGS_WID] rs1, rd,
     input  logic [`DATA_WID] pc, imm,
@@ -16,11 +16,10 @@ module Branch_Predictor # (
     input  logic             old_predict, old_actual, old_branch,
     // target pc is predicted pc, pass predict_result to EX, predict_fail to flush
     output logic [`DATA_WID] target_pc,
-    output logic             predict_result, predict_fail,
-    // sepc
-    output logic [`DATA_WID] sepc
+    output logic             predict_result, predict_fail
 );
 
+    reg [`DATA_WID] sepc = 0;
     // BHT & RAS
     reg [`BHT_WID ] History_Table [0: (1 << BHT_SIZE) - 1]; // BHT/PHT
     reg [`DATA_WID] Return_Addr   [0: (1 << RAS_SIZE) - 1]; // RAS
@@ -29,7 +28,7 @@ module Branch_Predictor # (
     reg start_flag = 0;               // 0: first cycle does nothing, 1: enable pc update
     logic [`DATA_WID] target_pc0;
     wire  [`DATA_WID] pc_plus_4 = pc + 4;
-    assign target_pc = excp ? `EXCP_ADDR : target_pc0;
+    assign target_pc = excp ? (sret ? sepc : `EXCP_ADDR) : target_pc0;
 
     initial begin
         for (int i = 0; i < (1 << BHT_SIZE); i = i + 1) begin
@@ -37,9 +36,9 @@ module Branch_Predictor # (
         end
     end
 
-    always_ff @(negedge clk) begin
+    always_ff @(posedge clk) begin
         if (rst) sepc <= 0;
-        else if (excp) sepc <= pc_plus_4;
+        else if (excp && !sret) sepc <= pc_plus_4;
         else sepc <= sepc;
     end
 

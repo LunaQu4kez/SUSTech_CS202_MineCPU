@@ -15,19 +15,18 @@ module CPU (
     // vga interface
     input  logic [`VGA_ADDR  ] vga_addr,
     output logic [`INFO_WID  ] char_out,
-    output logic [`INFO_WID  ] color_out,
+    output logic [`INFO_WID  ] color_out
     // debug port
-    output logic [31:0]      pc_t,
+    // output logic [31:0]      pc_t,
     // output logic [31:0]      inst_t,
     // output logic [31:0]      EX_data1_t,
     // output logic [31:0]      EX_data2_t,
     // output logic [31:0]      EX_imm_t,
-    output logic [31:0]      MEM_addr_t//,
+    // output logic [31:0]      MEM_addr_t,
     // output logic [31:0]      MEM_data_t,
     // output logic [31:0]      WB_data_t,
     // output logic [31:0]      WB_mem_t,
     // output logic [31:0]      WB_data_ot,
-    // output logic [31:0]      sepc_t
 );
 
     logic PC_Write, rst, icache_stall, dcache_stall;
@@ -44,7 +43,6 @@ module CPU (
     logic [`WB_CTRL_WID] IF_WB_ctrl_out;
     logic [`REGS_WID] ID_rs1_out, ID_rs2_out, ID_rd_out;
     logic [`DATA_WID] ID_data1_out, ID_data2_out, ID_imm_out, ID_pc_out;
-    logic [`DATA_WID] sepc;
     logic [`DATA_WID] EX_old_predict_pc_out;
     logic [`DATA_WID] EX_pc_in, EX_data1_in, EX_data2_in, EX_imm_in;
     logic [`REGS_WID] EX_rd_in, EX_rs1_in, EX_rs2_in;
@@ -83,17 +81,16 @@ module CPU (
     assign ID_old_branch_pc = EX_pc_in;
 
     // debug port
-    assign pc_t = IF_pc_in;
+    // assign pc_t = IF_pc_in;
     // assign inst_t = ID_inst_in;
     // assign EX_data1_t = EX_data1_in;
     // assign EX_data2_t = EX_data2_in;
     // assign EX_imm_t = EX_imm_in;
-    assign MEM_addr_t = MEM_data1_in;
+    // assign MEM_addr_t = MEM_data1_in;
     // assign MEM_data_t = MEM_data2_in;
     // assign WB_data_t = WB_data1_in;
     // assign WB_mem_t = WB_data2_in;
     // assign WB_data_ot = WB_data_out;
-    // assign sepc_t = sepc;
 
     PC pc_inst (
         .clk(cpuclk),
@@ -118,7 +115,6 @@ module CPU (
         .old_pc(EX_old_pc_out),
         .old_branch_pc(ID_old_branch_pc),
         .pc_out(IF_pc_out),
-        .sepc,
         .inst_out(IF_inst_out),
         .icache_stall,
         .dcache_stall,
@@ -296,7 +292,6 @@ module CPU (
         .addrb(uart_mem_addr),
         .write_datab(uart_mem_data),
         .web,
-        .sepc,
         .dataa(mem_inst),
         .datab(mem_data),
         .switches1,

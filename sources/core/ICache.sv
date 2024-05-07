@@ -23,7 +23,7 @@ module ICache #(
     assign mem_pc = addr;
     assign uncached = addr[31:16] == 16'h1c09;
     assign inst = (read_state == 2 || uncached) ? mem_inst : cache[offset][`DATA_WID];
-    assign icache_stall = !predict_fail && (!cache[offset][46-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag) && (read_state != 3);
+    assign icache_stall = !uncached && !predict_fail && (!cache[offset][46-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag) && (read_state != 3);
 
     initial begin
         // read_state = 0;
