@@ -79,7 +79,7 @@ module DCache #(
             2: begin
                 mem_addr = {16'b0, old_cache[45-CACHE_WID:32], addr[CACHE_WID+1:0]};
                 mem_write_data = old_cache[31:0];
-                mem_web = 1;
+                mem_web = (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag);
             end
             3: begin
                 mem_addr = {16'b0, old_cache[45-CACHE_WID:32], addr[CACHE_WID+1:0]};
