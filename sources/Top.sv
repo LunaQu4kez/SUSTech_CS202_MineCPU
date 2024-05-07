@@ -27,20 +27,20 @@ module Top (
     wire [`DATA_WID] seg1_out;
     wire [4:0] kb_idx;
 
-    CPUClk cpu_clk_inst (              // 1m-99mhz
+    CPUClk cpu_clk_inst (              // 6m-80mhz
         .clk_in1(clk),
         .clk_out1(clk0)
     );
 
-    SlowClock slow_clk_inst (       // 1hz, for debug
-        .clk,
-        .clk0(clk1)
-    );
+    // SlowClock slow_clk_inst (       // 1hz, for debug
+    //     .clk,
+    //     .clk0(clk0)
+    // );
 
     // assign clk0 = clk;              // 100mhz
 
-    assign cpuclk = uart_done ? clk1 : clk;
-    assign memclk = uart_done ? clk1 : clk;
+    assign cpuclk = uart_done ? clk0 : clk;
+    assign memclk = uart_done ? clk0 : clk;
 
     VGAClkGen vga_clk_gen_inst (  // 40MHz
         .clk_in1(clk),
