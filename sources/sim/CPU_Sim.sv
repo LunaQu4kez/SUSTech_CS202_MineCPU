@@ -4,8 +4,8 @@ module CPU_Sim ();
     logic [7:0] switches1;
     logic [7:0] led1;
     logic bt1;
-    logic [31:0] pc_t, inst_t;
-    logic [31:0] EX_data1_t, EX_data2_t, EX_imm_t, MEM_addr_t, MEM_data_t, WB_data_t, WB_mem_t, WB_data_ot, sepc_t;
+    logic [31:0] pc_t;
+    logic [31:0] MEM_addr_t;
     
     CPU cpu_inst (
         .cpuclk,
@@ -16,16 +16,7 @@ module CPU_Sim ();
         .bt1,
         .led1_out(led1),
         .pc_t,
-        .inst_t,
-        .EX_data1_t, 
-        .EX_data2_t, 
-        .EX_imm_t, 
-        .MEM_addr_t, 
-        .MEM_data_t, 
-        .WB_data_t, 
-        .WB_mem_t, 
-        .WB_data_ot,
-        .sepc_t
+        .MEM_addr_t
     );
 
     initial begin
@@ -53,7 +44,7 @@ module CPU_Sim ();
     initial fork
         #200 switches1 = 8'h09;
         #253 bt1 = 1;
-        #600 bt1 = 0;
+        #680 bt1 = 0;
     join
 
     initial fork

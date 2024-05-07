@@ -27,10 +27,17 @@ module Top (
     wire [`DATA_WID] seg1_out;
     wire [4:0] kb_idx;
 
-    CPUClk cpu_clk_inst (
-        .clk_in1(clk),
-        .clk_out1(clk0)
-    );
+    // CPUClk cpu_clk_inst (
+    //     .clk_in1(clk),
+    //     .clk_out1(clk0)
+    // );
+
+    // SlowClock slow_clk_inst (
+    //     .clk,
+    //     .clk0
+    // );
+
+    assign clk0 = clk;
 
     assign cpuclk = clk0;  // 10MHz
     assign memclk = clk0;  // 10MHz
