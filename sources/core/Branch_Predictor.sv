@@ -1,19 +1,18 @@
 `include "Const.svh"
 
 module Branch_Predictor # (
-    parameter BHT_SIZE = 4,
+    parameter BHT_SIZE = 8,
     parameter RAS_SIZE = 7
 ) (
     input  logic             clk, rst,
     input  logic             stall,
-    // whether to branch and predict, from Control
-    input  logic             branch, predict,
-    // process jalr, ujtype indicates jal
+    // whether to branch and predict, excp is ecall
+    input  logic             branch, predict, excp,
+    // calculate branch target
     input  logic [`REGS_WID] rs1, rd,
-    // process exception
-    input  logic             excp,
-    // pc is from IF, imm is from ID, old_pc is from EX
-    input  logic [`DATA_WID] pc, imm, old_pc, old_branch_pc, old_predict_pc,
+    input  logic [`DATA_WID] pc, imm,
+    // update table, and predict fail
+    input  logic [`DATA_WID] old_pc, old_branch_pc, old_predict_pc,
     input  logic             old_predict, old_actual, old_branch,
     // target pc is predicted pc, pass predict_result to EX, predict_fail to flush
     output logic [`DATA_WID] target_pc,
@@ -112,7 +111,7 @@ module Branch_Predictor # (
     always_ff @(posedge clk) begin : Update_RAS
         if (rst || ~start_flag) begin
             RAS_top <= 0;
-        end else if ({branch, predict} == 2'b10 && !stall) begin
+        end else if ({branch, predict} == 2'b10 && !stall && !predict_fail) begin
             if (rd == 1) begin // push return address
                 Return_Addr[RAS_top + 1] <= pc_plus_4;
                 RAS_top <= RAS_top + 1;

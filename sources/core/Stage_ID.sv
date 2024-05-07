@@ -8,8 +8,6 @@ module Stage_ID (
     input  logic [`DATA_WID    ] inst,
     // signal from EX stage
     input  logic [`REGS_WID    ] ID_EX_rd, MEM_WB_rd,
-    input  logic                 old_predict, old_branch, branch_result,
-    input  logic [`DATA_WID    ] old_pc, old_branch_pc, old_predict_pc,
     input  logic                 ID_EX_MemRead,
     // signal from WB stage
     input  logic [`DATA_WID    ] data_WB,
@@ -20,17 +18,11 @@ module Stage_ID (
     output logic [`WB_CTRL_WID ] WB_ctrl,
     output logic [`REGS_WID    ] rs1_out, rs2_out, rd_out,
     output logic [`DATA_WID    ] reg_data1, reg_data2, imm_out, pc_out,
-    output logic                 IF_ID_Write, PC_Write,
-    output logic                 predict_result,
-    output logic                 predict_fail,
-    // signal to IF stage
-    output logic [`DATA_WID    ] new_pc,
-    // signal to Memory
-    output logic [`DATA_WID    ] sepc
+    output logic                 IF_ID_Write, PC_Write
 );
 
+    logic stall;
     logic [`REGS_WID] rs1, rs2, rd;
-    logic stall, branch, predict, excp;
     logic [`CTRL_WID] total_ctrl, ctrl_out;
     logic [`DATA_WID] rs1_data, rs2_data, imm;
 
@@ -78,33 +70,7 @@ module Stage_ID (
 
     Control ctrl_unit (
         .inst,
-        .total_ctrl,
-        .branch,
-        .predict,
-        .excp
-    );
-
-    Branch_Predictor bp_inst (
-        .clk,
-        .rst,
-        .stall(dcache_stall),
-        .branch,
-        .predict,
-        .rs1,
-        .rd,
-        .excp,
-        .pc(pc_in),
-        .imm,
-        .old_pc,
-        .old_predict,
-        .old_actual(branch_result),
-        .old_branch,
-        .old_branch_pc,
-        .target_pc(new_pc),
-        .predict_result,
-        .predict_fail,
-        .sepc,
-        .old_predict_pc
+        .total_ctrl
     );
 
 endmodule

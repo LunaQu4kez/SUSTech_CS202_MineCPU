@@ -106,8 +106,8 @@
 `define KBCODE_WID 4:0 
 // UART related
 `define BPS_CNT 868
-`define MAX_DATA 32'h7ffffffc
-`define MAX_IDLE 16'hffff
+`define MAX_DATA 32'h7fff
+`define MAX_IDLE 16'hf
 // VGA chars
 `define CHAR_0   128'h00000000000000010100000000000000  // left of a point
 `define CHAR_1   128'h00000000000000808000000000000000  // right of a point

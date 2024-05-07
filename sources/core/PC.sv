@@ -12,7 +12,7 @@ module PC (
     logic [`DATA_WID] pc = 0 /*verilator public*/;
     assign pc_out = pc;
 
-    always_ff @(negedge clk) begin
+    always_ff @(posedge clk) begin
         if (rst) pc <= 0;
         else pc <= (PC_Write || icache_stall || dcache_stall) ? pc : new_pc;
     end

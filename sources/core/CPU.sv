@@ -15,14 +15,14 @@ module CPU (
     // vga interface
     input  logic [`VGA_ADDR  ] vga_addr,
     output logic [`INFO_WID  ] char_out,
-    output logic [`INFO_WID  ] color_out,
+    output logic [`INFO_WID  ] color_out //,
     // debug port
-    output logic [31:0]      pc_t,
+    // output logic [31:0]      pc_t,
     // output logic [31:0]      inst_t,
     // output logic [31:0]      EX_data1_t,
     // output logic [31:0]      EX_data2_t,
     // output logic [31:0]      EX_imm_t,
-    output logic [31:0]      MEM_addr_t//,
+    // output logic [31:0]      MEM_addr_t,
     // output logic [31:0]      MEM_data_t,
     // output logic [31:0]      WB_data_t,
     // output logic [31:0]      WB_mem_t,
@@ -31,50 +31,10 @@ module CPU (
 );
 
     logic PC_Write, rst, icache_stall, dcache_stall;
-    logic [`DATA_WID] new_pc, IF_pc_in;
-    assign rst = ~rst_n | ~uart_done;
-    assign led3_out[4:0] = 0;
-    assign led3_out[5] = cpuclk;
-    assign led3_out[6] = uart_done;
-    assign led3_out[7] = IF_pc_in == 32'h1c090044;
-
-    PC pc_inst (
-        .clk(cpuclk),
-        .rst,
-        .PC_Write,
-        .icache_stall,
-        .dcache_stall,
-        .new_pc,
-        .pc_out(IF_pc_in)
-    );
-
-    logic [`DATA_WID] IF_pc_out, IF_inst_out, mem_pc, mem_inst;
-    logic IF_ID_Write, predict_fail, flush;
-    logic [`DATA_WID] ID_inst_in, ID_pc_in;
-
-    Stage_IF if_inst (
-        .clk(cpuclk),
-        .rst,
-        .predict_fail,
-        .new_pc(IF_pc_in),
-        .pc_out(IF_pc_out),
-        .inst(IF_inst_out),
-        .icache_stall,
-        .mem_inst,
-        .mem_pc
-    );
-
-    IF_ID if_id_inst (
-        .clk(cpuclk),
-        .rst,
-        .icache_stall,
-        .dcache_stall,
-        .inst_in(IF_inst_out),
-        .pc_in(IF_pc_out),
-        .inst_out(ID_inst_in),
-        .pc_out(ID_pc_in)
-    );
-
+    logic [`DATA_WID] IF_pc_in, IF_pc_out;
+    logic [`DATA_WID] IF_inst_out, mem_pc, mem_inst;
+    logic IF_ID_Write, predict_fail, IF_predict_result_in, IF_predict_result_out;
+    logic [`DATA_WID] ID_inst_in, ID_pc_in, IF_predict_pc_out;
     logic [`REGS_WID] ID_EX_rd, MEM_WB_rd;
     logic EX_old_predict_out, EX_old_branch_out, EX_branch_result_out;
     logic ID_EX_MemRead, MEM_WB_RegWrite;
@@ -84,9 +44,105 @@ module CPU (
     logic [`WB_CTRL_WID] IF_WB_ctrl_out;
     logic [`REGS_WID] ID_rs1_out, ID_rs2_out, ID_rd_out;
     logic [`DATA_WID] ID_data1_out, ID_data2_out, ID_imm_out, ID_pc_out;
-    logic ID_predict_result_out;
     logic [`DATA_WID] sepc;
     logic [`DATA_WID] EX_old_predict_pc_out;
+    logic [`DATA_WID] EX_pc_in, EX_data1_in, EX_data2_in, EX_imm_in;
+    logic [`REGS_WID] EX_rd_in, EX_rs1_in, EX_rs2_in;
+    logic EX_predict_result_in;
+    logic [`EX_CTRL_WID] EX_EX_ctrl_in;
+    logic [`MEM_CTRL_WID] EX_MEM_ctrl_in;
+    logic [`WB_CTRL_WID] EX_WB_ctrl_in;
+    logic [`DATA_WID] MEMtoEX_data;
+    logic [`REGS_WID] MEM_rd_in, EX_rd_out;
+    logic EX_MEM_RegWrite;
+    logic [`DATA_WID] EX_data_out, EX_ALU_res_out;
+    logic [`MEM_CTRL_WID] EX_MEM_ctrl_out;
+    logic [`WB_CTRL_WID] EX_WB_ctrl_out;
+    logic [`DATA_WID] WB_data1_in, WB_data2_in;
+    logic [`WB_CTRL_WID] WB_WB_ctrl_in;
+    logic [`DATA_WID] uart_mem_data, uart_mem_addr;
+    logic [`DATA_WID] MEM_data1_in, MEM_data2_in;
+    logic [`MEM_CTRL_WID] MEM_MEM_ctrl_in;
+    logic [`WB_CTRL_WID] MEM_WB_ctrl_in;
+    logic [`REGS_WID] MEM_rd_out;
+    logic [`DATA_WID] MEM_data1_out, MEM_data2_out;
+    logic [`WB_CTRL_WID] MEM_WB_ctrl_out;
+    logic [`DATA_WID] mem_addr, mem_write_data, mem_data;
+    logic mem_web, web;
+    assign MEMtoEX_data = mem_addr;
+    assign EX_MEM_RegWrite = MEM_WB_ctrl_in[1];
+    assign MEM_WB_RegWrite = WB_WB_ctrl_in[1];
+    // select uart or internal access
+    assign uart_mem_addr = uart_done ? mem_addr : uart_addr;
+    assign uart_mem_data = uart_done ? mem_write_data : uart_data;
+    assign web = ~uart_done || mem_web;
+    assign rst = ~rst_n | ~uart_done;
+    assign led3_out[5:0] = 0;
+    assign led3_out[6] = uart_done;
+    assign led3_out[7] = IF_pc_in == 32'h1c090044;
+    assign ID_old_branch_pc = EX_pc_in;
+
+    // // debug port
+    // assign pc_t = IF_pc_in;
+    // assign inst_t = ID_inst_in;
+    // assign EX_data1_t = EX_data1_in;
+    // assign EX_data2_t = EX_data2_in;
+    // assign EX_imm_t = EX_imm_in;
+    // assign MEM_addr_t = MEM_data1_in;
+    // assign MEM_data_t = MEM_data2_in;
+    // assign WB_data_t = WB_data1_in;
+    // assign WB_mem_t = WB_data2_in;
+    // assign WB_data_ot = WB_data_out;
+    // assign sepc_t = sepc;
+
+    PC pc_inst (
+        .clk(cpuclk),
+        .rst,
+        .PC_Write,
+        .icache_stall,
+        .dcache_stall,
+        .new_pc(IF_pc_out),
+        .pc_out(IF_pc_in)
+    );
+
+    Stage_IF if_inst (
+        .clk(cpuclk),
+        .rst,
+        .pc_in(IF_pc_in),
+        .predict_result(IF_predict_result_in),
+        .predict_fail,
+        .old_predict(EX_old_predict_out),
+        .old_predict_pc(EX_old_predict_pc_out),
+        .old_branch(EX_old_branch_out),
+        .branch_result(EX_branch_result_out),
+        .old_pc(EX_old_pc_out),
+        .old_branch_pc(ID_old_branch_pc),
+        .pc_out(IF_pc_out),
+        .sepc,
+        .inst_out(IF_inst_out),
+        .icache_stall,
+        .dcache_stall,
+        .IF_ID_Write,
+        .mem_inst,
+        .mem_pc
+    );
+
+    IF_ID if_id_inst (
+        .clk(cpuclk),
+        .rst,
+        .icache_stall,
+        .dcache_stall,
+        .predict_fail,
+        .IF_ID_Write,
+        .predict_in(IF_predict_result_in),
+        .predict_pc_in(IF_pc_out),
+        .inst_in(IF_inst_out),
+        .pc_in(IF_pc_in),
+        .inst_out(ID_inst_in),
+        .pc_out(ID_pc_in),
+        .predict_out(IF_predict_result_out),
+        .predict_pc_out(IF_predict_pc_out)
+    );
 
     Stage_ID id_inst (
         .clk(cpuclk),
@@ -97,11 +153,6 @@ module CPU (
         .inst(ID_inst_in),
         .ID_EX_rd,
         .MEM_WB_rd,
-        .old_predict(EX_old_predict_out),
-        .old_branch(EX_old_branch_out),
-        .branch_result(EX_branch_result_out),
-        .old_pc(EX_old_pc_out),
-        .old_branch_pc(ID_old_branch_pc),
         .ID_EX_MemRead,
         .data_WB(WB_data_out),
         .RegWrite(MEM_WB_RegWrite),
@@ -116,23 +167,8 @@ module CPU (
         .imm_out(ID_imm_out),
         .pc_out(ID_pc_out),
         .IF_ID_Write,
-        .PC_Write,
-        .predict_result(ID_predict_result_out),
-        .predict_fail,
-        .new_pc,
-        .sepc,
-        .old_predict_pc(EX_old_predict_pc_out)
+        .PC_Write
     );
-
-    logic [`DATA_WID] EX_pc_in, EX_data1_in, EX_data2_in, EX_imm_in;
-    logic [`REGS_WID] EX_rd_in, EX_rs1_in, EX_rs2_in;
-    logic EX_predict_result_in;
-    logic [`EX_CTRL_WID] EX_EX_ctrl_in;
-    logic [`MEM_CTRL_WID] EX_MEM_ctrl_in;
-    logic [`WB_CTRL_WID] EX_WB_ctrl_in;
-
-    assign flush = predict_fail | IF_ID_Write;
-    assign ID_old_branch_pc = EX_pc_in;
 
     ID_EX id_ex_inst (
         .clk(cpuclk),
@@ -144,10 +180,11 @@ module CPU (
         .rd_in(ID_rd_out),
         .rs1_in(ID_rs1_out),
         .rs2_in(ID_rs2_out),
-        .flush,
+        .IF_ID_Write,
+        .predict_fail,
         .dcache_stall,
-        .predict_result_in(ID_predict_result_out),
-        .old_predict_pc_in(new_pc),
+        .predict_result_in(IF_predict_result_out),
+        .old_predict_pc_in(IF_pc_out),
         .old_predict_pc_out(EX_old_predict_pc_out),
         .pc_out(EX_pc_in),
         .data1_out(EX_data1_in),
@@ -164,13 +201,6 @@ module CPU (
         .MEM_ctrl_out(EX_MEM_ctrl_in),
         .WB_ctrl_out(EX_WB_ctrl_in)
     );
-
-    logic [`DATA_WID] MEMtoEX_data;
-    logic [`REGS_WID] MEM_rd_in, EX_rd_out;
-    logic EX_MEM_RegWrite;
-    logic [`DATA_WID] EX_data_out, EX_ALU_res_out;
-    logic [`MEM_CTRL_WID] EX_MEM_ctrl_out;
-    logic [`WB_CTRL_WID] EX_WB_ctrl_out;
 
     Stage_EX ex_inst (
         .EX_ctrl_in(EX_EX_ctrl_in),
@@ -203,11 +233,6 @@ module CPU (
         .old_pc(EX_old_pc_out)
     );
 
-    logic [`DATA_WID] MEM_data1_in, MEM_data2_in;
-    logic [`MEM_CTRL_WID] MEM_MEM_ctrl_in;
-    logic [`WB_CTRL_WID] MEM_WB_ctrl_in;
-    assign EX_MEM_RegWrite = MEM_WB_ctrl_in[1];
-
     EX_MEM ex_mem_inst (
         .clk(cpuclk),
         .rst,
@@ -223,13 +248,6 @@ module CPU (
         .MEM_ctrl_out(MEM_MEM_ctrl_in),
         .WB_ctrl_out(MEM_WB_ctrl_in)
     );
-
-    logic [`REGS_WID] MEM_rd_out;
-    logic [`DATA_WID] MEM_data1_out, MEM_data2_out;
-    logic [`WB_CTRL_WID] MEM_WB_ctrl_out;
-    logic [`DATA_WID] mem_addr, mem_write_data, mem_data;
-    logic mem_web, web;
-    assign MEMtoEX_data = mem_addr;
 
     Stage_MEM mem_instance (
         .clk(cpuclk),
@@ -249,15 +267,6 @@ module CPU (
         .mem_web,
         .mem_data
     );
-
-    logic [`DATA_WID] WB_data1_in, WB_data2_in;
-    logic [`WB_CTRL_WID] WB_WB_ctrl_in;
-    logic [`DATA_WID] uart_mem_data, uart_mem_addr;
-    assign MEM_WB_RegWrite = WB_WB_ctrl_in[1];
-    // select uart or internal access
-    assign uart_mem_addr = uart_done ? mem_addr : uart_addr;
-    assign uart_mem_data = uart_done ? mem_write_data : uart_data;
-    assign web = ~uart_done || mem_web;
 
     MEM_WB mem_wb_inst (
         .clk(cpuclk),
@@ -306,18 +315,5 @@ module CPU (
         .char_out,
         .color_out
     );
-
-    // debug port
-    assign pc_t = IF_pc_in;
-    // assign inst_t = ID_inst_in;
-    // assign EX_data1_t = EX_data1_in;
-    // assign EX_data2_t = EX_data2_in;
-    // assign EX_imm_t = EX_imm_in;
-    assign MEM_addr_t = MEM_data1_in;
-    // assign MEM_data_t = MEM_data2_in;
-    // assign WB_data_t = WB_data1_in;
-    // assign WB_mem_t = WB_data2_in;
-    // assign WB_data_ot = WB_data_out;
-    // assign sepc_t = sepc;
 
 endmodule

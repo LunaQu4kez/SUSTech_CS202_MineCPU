@@ -5,9 +5,10 @@ module ID_EX (
     input  [`DATA_WID    ] pc_in, data1_in, data2_in, imm_in,
     input  [`REGS_WID    ] rd_in,              // inst[11-7], rd_in
     input  [`REGS_WID    ] rs1_in, rs2_in,     // ID_EX_rs1, ID_EX_rs2
-    input                  flush,              // control hazard flush, 1 yes, 0 no
-    input                  predict_result_in,
+    input                  IF_ID_Write,        // control hazard flush, 1 yes, 0 no
     input                  dcache_stall,
+    input                  predict_fail,
+    input                  predict_result_in,
     input  [`DATA_WID    ] old_predict_pc_in,
     output [`DATA_WID    ] old_predict_pc_out, 
     output [`DATA_WID    ] pc_out, data1_out, data2_out, imm_out,
@@ -49,7 +50,7 @@ module ID_EX (
     assign old_predict_pc_out = old_predict_pc;
 
     always_ff @(posedge clk) begin
-        if (rst || (flush && !dcache_stall)) begin
+        if (rst || (predict_fail && !dcache_stall)) begin
             pc <= 0;
             data1 <= 0;
             data2 <= 0;
