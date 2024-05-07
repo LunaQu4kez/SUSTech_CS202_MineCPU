@@ -32,24 +32,26 @@ MineCPU
 ├── sources                                              
 │   ├── assembly                # assembly code for test and fun
 │   │   ├── *.asm              
-│   │   └── *.coe             
+│   │   ├── *.coe
+│   │   └── *.txt               # data using UART to be put into memory            
 │   ├── constrain
 │   │   └── constr.xdc          # constrain file
 │   ├── core
 │   │   ├── *.sv                # code of CPU core
 │   │   └── *.svh               # head file for constant
 │   ├── io
-│   │   ├── *.sv                # code related to IO
-│   │   └── *.svh               # head file for constant
+│   │   └── *.sv                # code related to IO and Clock
 │   ├── sim
 │   │   ├── *.cpp               # verilator simulation
 │   │   └── *.sv                # vivado simulation
 │   └── Top.sv                  # top module of MineCPU
 ├── test
 │   ├── DiffTest.cpp            # differential test of CPU
-│   └── Makefile  
+│   ├── *.sv                    # on-board-test code
+│   └── *.xdc                   # on-board-test constrain
 ├── tools
-│   └── coe2txt.py              # coe file to text file for UART
+│   ├── coe2txt.py              # coe file to text file for UART
+│   └── UARTAssist.exe          # tool for UART
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -78,7 +80,6 @@ MineCPU
     - [x] byte / halfword / word 的存取
   - [x] WB Stage
   - [x] Memory
-    - [x] UART *
     - [x] Data Cache *
   - [x] 异常控制 (ecall & sret) *
 - [ ] IO
@@ -86,6 +87,7 @@ MineCPU
   - [x] 4*4 小键盘 *
   - [x] Led & 7 段数码管
   - [ ] VGA *
+  - [x] UART *
 - [ ] 软件
   - [ ] 测试场景1
   - [ ] 测试场景2
@@ -187,10 +189,9 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | 0xFFFFFF1C | R     | 按钮 3 (下)            | 0x00 - 0x01            |
 | 0xFFFFFF20 | R     | 按钮 4 (左)            | 0x00 - 0x01            |
 | 0xFFFFFF24 | R     | 按钮 5 (右)            | 0x00 - 0x01            |
-| 0xFFFFFF28 | R     | 保留                   | N/A                    |
-| 0xFFFFFF2C | W     | 七段数码管              | 0x00000000 - 0xFFFFFFFF |
-| 0xFFFFFF34 | R     | 4*4 小键盘是否被按下     | 0x00 - 0x01            |
-| 0xFFFFFF38 | R     | 4*4 小键盘按下位置       | 0x00 - 0x0F            |
+| 0xFFFFFF28 | W     | 七段数码管              | 0x00000000 - 0xFFFFFFFF |
+| 0xFFFFFF2C | R     | 4*4 小键盘是否被按下     | 0x00 - 0x01            |
+| 0xFFFFFF30 | R     | 4*4 小键盘按下位置       | 0x00 - 0x0F            |
 | 0xFFFFE___ (000-BFF) | W | VGA 字符 | 0x00 - 0xFF |
 | 0xFFFFD___ (000-BFF) | W | VGA 颜色 | 0x00 - 0xFF |
 
