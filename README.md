@@ -64,7 +64,11 @@ MineCPU
 - [x] CPU 核心
   - [x] IF Stage
     - [x] 分支预测模块 (Branch Prediction) *
-    - [x] Instruction Cache *
+      - [x] 预解码 (Pre-Decode) *
+      - [x] 分支历史缓存 (Branch History Table) *
+      - [x] 返回地址栈 (Return Address Stack) *
+    - [x] 指令缓存 (Instruction Cache) *
+      - [x] 直接映射 (Direct Mapping) *
   - [x] ID Stage
     - [x] 立即数生成模块 (ImmGen)
     - [x] 寄存器模块 (Register File)
@@ -80,7 +84,9 @@ MineCPU
     - [x] byte / halfword / word 的存取
   - [x] WB Stage
   - [x] Memory
-    - [x] Data Cache *
+    - [x] 数据缓存 (Data Cache) *
+      - [x] 直接映射 (Direct Mapping) *
+      - [x] 写回策略 (Write Back) *
   - [x] 异常控制 (ecall & sret) *
 - [ ] IO
   - [x] 拨码开关 & 按钮
@@ -109,7 +115,7 @@ MineCPU
 
 RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 
-| 指令                   | 指令类型 | 执行操作                                  |
+| 指令                    | 指令类型  | 执行操作                                   |
 | ---------------------- | -------- | ----------------------------------------- |
 | `add rd, rs1, rs2`     | R        | rd = rs1 + rs2                            |
 | `sub rd, rs1, rs2`     | R        | rd = rs1 - rs2                            |
@@ -155,6 +161,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | `mulhu rd, rs1, rs2` * | R        | rd = ( (u)rs1 * (u)rs2 )[63:32]           |
 | `div rd, rs1, rs2` *   | R        | rd = rs1 / rs2                            |
 | `rem rd, rs1, rs2` *   | R        | rd = rs1 % rs2                            |
+|  `sret`                | I        | 控制权交还给程序                             |
 
 ### IO
 
@@ -164,7 +171,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
   - 规格：115200Hz 波特率, 8 data bits, 1 stop bits
   - 数据直接写入内存，在接收过数据后超过 * 秒空闲会触发超时中断，启动 CPU
 - 输入 (Input)
-  - 支持 24 个拨码开关
+  - 24 个拨码开关
   - 5 个按钮
   - 4 × 4 小键盘
 - 输出 (Output)
@@ -218,7 +225,6 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
     1. :negative_squared_cross_mark: 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
     2. :negative_squared_cross_mark: 进行停顿 / 改进转发单元。前者过于简单，后者工作量太大，且 `ld` 指令的冒险难以解决。~~考虑后续增加记分板~~
     3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。~~那要 ld/sd ra, 4(sp) 有何用~~ 。记录指令跳转目标地址，在EX阶段计算实际跳转，并判断是否预测错误，如错误则更新正确PC并清空错误指令。由于EX不存在Data Hazard，故解决。
-
 - **[Memory/Solved]** 内存读取数据时传入地址会延迟一个周期读取到数据，且 `sh` 和 `sb` 无法直接对内存进行操作.
   - **原因**: 使用 ip RAM 生成的内存以 32 bit 为单位进行存或读取，而 `sh` 和 `sb` 只修改其中的 16 bit 或 8 bit
   - **解决方案**:
