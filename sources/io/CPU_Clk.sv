@@ -1,14 +1,14 @@
-module SlowClock (
+module CPU_Clk (
     input clk,
     output clk0
 );
 
-    reg [31:0] cnt;
+    reg cnt = 0;
     reg t = 0;
     assign clk0 = t;
 
     always @(posedge clk) begin
-        if (cnt == 50000000) begin
+        if (cnt == 1) begin
             cnt <= 0;
         end
         else begin
@@ -17,7 +17,7 @@ module SlowClock (
     end
 
     always @(posedge clk) begin
-        if (cnt == 50000000) begin
+        if (cnt == 1) begin
             t <= ~t;
         end 
     end

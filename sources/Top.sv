@@ -27,17 +27,10 @@ module Top (
     wire [`DATA_WID] seg1_out;
     wire [4:0] kb_idx;
 
-    CPUClk cpu_clk_inst (              // 6m-80mhz
-        .clk_in1(clk),
-        .clk_out1(clk0)
+    CPU_Clk cpu_clk_inst (       // 50MHz
+        .clk,
+        .clk0
     );
-
-    // SlowClock slow_clk_inst (       // 1hz, for debug
-    //     .clk,
-    //     .clk0(clk0)
-    // );
-
-    // assign clk0 = clk;              // 100mhz
 
     assign cpuclk = uart_done ? clk0 : clk;
     assign memclk = uart_done ? clk0 : clk;
@@ -80,7 +73,7 @@ module Top (
     UART uart_inst(
         .clk,
         .rst,
-        .rx(rx),
+        .rx,
         .data_out(uart_data),
         .addr_out(uart_addr),
         .done(uart_done)
@@ -92,8 +85,8 @@ module Top (
     Seg7Tube seg7tube_inst(
         .clk,
         .rst_n(~rst),
-        //.data_in(seg1_out),
-        .data_in(seg7data),
+        .data_in(seg1_out),
+        //.data_in(seg7data),
         .seg_en,
         .seg_out
     );

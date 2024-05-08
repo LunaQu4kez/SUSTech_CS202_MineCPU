@@ -70,16 +70,18 @@ module CPU (
     assign MEMtoEX_data = mem_addr;
     assign EX_MEM_RegWrite = MEM_WB_ctrl_in[1];
     assign MEM_WB_RegWrite = WB_WB_ctrl_in[1];
+    assign ID_old_branch_pc = EX_pc_in;
+
     // select uart or internal access
     assign uart_mem_addr = uart_done ? mem_addr : uart_addr;
     assign uart_mem_data = uart_done ? mem_write_data : uart_data;
     assign web = ~uart_done || mem_web;
     assign rst = ~rst_n | ~uart_done;
     
+    // led3
     assign led3_out[5:0] = pc_t[7:2];
-    assign led3_out[6] = IF_pc_in == 32'h1c090044;
+    assign led3_out[6] = IF_pc_in == 32'h1c090040;
     assign led3_out[7] = uart_done;
-    assign ID_old_branch_pc = EX_pc_in;
 
     // debug port
     assign pc_t = IF_pc_in;
@@ -287,6 +289,7 @@ module CPU (
     );
 
     Memory memory_inst (
+        .rst,
         .clka(memclk),
         .clkb(memclk),
         .addra(mem_pc),

@@ -1,6 +1,7 @@
 `include "Const.svh"
 
 module Memory (
+    input                      rst,
     input                      clka, clkb,
     input  logic [`DATA_WID  ] addra, addrb,
     input  logic [`DATA_WID  ] write_datab,
@@ -112,12 +113,6 @@ module Memory (
             32'hffff_ff08: begin     // switches3
                 datab_io = {24'h000000, switches3};
             end
-            32'hffff_ff0c: begin     // led1
-                datab_io = 0;
-            end
-            32'hffff_ff10: begin     // led2
-                datab_io = 0;
-            end
             32'hffff_ff14: begin     // button1 middle
                 datab_io = bt1 ? 32'h00000001 : 32'h00000000;
             end
@@ -133,9 +128,6 @@ module Memory (
             32'hffff_ff24: begin     // button5 right
                 datab_io = bt5 ? 32'h00000001 : 32'h00000000;
             end
-            32'hffff_ff28: begin     // seg: write
-                datab_io = 0;
-            end
             32'hffff_ff2c: begin     // keyboard enable
                 datab_io = kb_idx[4] ? 32'h00000001 : 32'h00000000;
             end
@@ -149,28 +141,34 @@ module Memory (
     end
 
     always_ff @(posedge clkb) begin
-        unique case (addrb)
-            32'hffff_ff0c: begin     // led1
-                led1 <= write_datab[7:0];
-                led2 <= led2;
-                seg1 <= seg1;
-            end
-            32'hffff_ff10: begin     // led2
-                led1 <= led1;
-                led2 <= write_datab[7:0];
-                seg1 <= seg1;
-            end
-            32'hffff_ff28: begin     // seg: write
-                led1 <= led1;
-                led2 <= led2;
-                seg1 <= write_datab;
-            end
-            default: begin
-                led1 <= led1;
-                led2 <= led2;
-                seg1 <= seg1;
-            end
-        endcase
+        if (rst) begin
+            led1 <= 0;
+            led2 <= 0;
+            seg1 <= 0;
+        end else begin
+            unique case (addrb)
+                32'hffff_ff0c: begin     // led1
+                    led1 <= write_datab[7:0];
+                    led2 <= led2;
+                    seg1 <= seg1;
+                end
+                32'hffff_ff10: begin     // led2
+                    led1 <= led1;
+                    led2 <= write_datab[7:0];
+                    seg1 <= seg1;
+                end
+                32'hffff_ff28: begin     // seg: write
+                    led1 <= led1;
+                    led2 <= led2;
+                    seg1 <= write_datab;
+                end
+                default: begin
+                    led1 <= led1;
+                    led2 <= led2;
+                    seg1 <= seg1;
+                end
+            endcase
+        end
     end
 
     // vga write
