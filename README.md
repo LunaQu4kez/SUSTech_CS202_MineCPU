@@ -2,7 +2,9 @@
 
 # SUSTech CS202 Course Project: MineCPU
 
-南方科技大学 2024 年春季 `CS202 计算机组成原理` 的课程 Project RISC-V CPU（标准五级流水线版）
+南方科技大学 2024 年春季 `CS202 计算机组成原理` 的课程 Project 
+
+**支持 RISC-V ISA 的冯诺依曼架构含 Cache 和异常控制并附带手搓 UART 的标准五级 pipeline CPU**
 
 </div>
 
@@ -25,6 +27,9 @@ MineCPU
 │   ├── project_desciption.pdf  # project description
 │   ├── Report.md               # report of this project
 │   └── riscv-card.pdf          # ISA reference
+├── generated                   # bitstream file with different parameters
+│   └── *.bit                   
+├── pic                         # picture used in repo
 ├── program
 │   ├── lib                     # library of some API
 │   ├── my_pacman               # game by C++ (easier cross-compiling to RV)
@@ -82,11 +87,13 @@ MineCPU
     - [x] 前递模块 (Forward Unit) *
   - [x] MEM Stage
     - [x] byte / halfword / word 的存取
-  - [x] WB Stage
-  - [x] Memory
     - [x] 数据缓存 (Data Cache) *
       - [x] 直接映射 (Direct Mapping) *
       - [x] 写回策略 (Write Back) *
+  - [x] WB Stage
+  - [x] Memory
+    - [x] MMIO
+    - [x] 异常执行指令
   - [x] 异常控制 (ecall & sret) *
 - [ ] IO
   - [x] 拨码开关 & 按钮
@@ -107,8 +114,8 @@ MineCPU
 
 - **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU
 - 时钟频率:
-  + CPU: 100MHz
-  + MEM: 100MHz (使用 **Cache** 进行读取写入管理)
+  + CPU: 50MHz
+  + MEM: 50MHz (使用 **Cache** 进行读取写入管理)
   + VGA: 40MHz
 
 ### ISA
@@ -155,13 +162,13 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | `lui rd, imm`          | U        | rd = imm << 12                            |
 | `auipc rd, imm`        | U        | rd = PC + (imm << 12)                     |
 | `ecall`                | I        | 控制权交给固件 (采用输入设备模拟)              |
+| `sret` (自定义扩展指令) | I | 控制权交还给程序 |
 | `mul rd, rs1, rs2` *   | R        | rd = (rs1 * rs2)[31:0]                    |
 | `mulh rd, rs1, rs2` *  | R        | rd = (rs1 * rs2)[63:32]                   |
 | `mulhsu rd, rs1, rs2` *| R        | rd = (rs1 * (u)rs2)[63:32]                |
 | `mulhu rd, rs1, rs2` * | R        | rd = ( (u)rs1 * (u)rs2 )[63:32]           |
 | `div rd, rs1, rs2` *   | R        | rd = rs1 / rs2                            |
 | `rem rd, rs1, rs2` *   | R        | rd = rs1 % rs2                            |
-|  `sret`                | I        | 控制权交还给程序                             |
 
 ### IO
 
@@ -175,8 +182,8 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
   - 5 个按钮
   - 4 × 4 小键盘
 - 输出 (Output)
-  - 支持 24 个 LED 灯, 其中 8 个用于显示CPU状态
-  - 7 段数码管 (可显示4 Bytes)
+  - 支持 24 个 LED 灯, 其中 8 个用于显示 CPU 状态
+  - 7 段数码管 (可显示 4 Bytes)
   - VGA
     - 使用软硬件协同的方式实现
     - 800×600 60Hz
