@@ -1,6 +1,6 @@
 .text
 main:
-	li a0, 5
+	li a0, 16
 	jal fib
 	j exit
 fib:
