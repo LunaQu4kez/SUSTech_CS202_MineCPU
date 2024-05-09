@@ -12,9 +12,9 @@
 
 | 成员 | CPU核心 | IO | 仿真 & 测试 | 汇编 & 应用 | 报告 |
 | --- | --- | --- | --- | --- | --- |
-| [@wLUOw](https://github.com/wLUOw) | :heavy_check_mark: |  | :heavy_check_mark: |  |  |
-| [@Yao1OoO](https://github.com/Yao1OoO) |  | :heavy_check_mark: |  | :heavy_check_mark: |  |
-| [@chanbengz](https://github.com/chanbengz) | :heavy_check_mark: |  | :heavy_check_mark: |  |  |
+| [@wLUOw](https://github.com/wLUOw) | :heavy_check_mark: |  | :heavy_check_mark: |  | :heavy_check_mark: |
+| [@Yao1OoO](https://github.com/Yao1OoO) |  | :heavy_check_mark: |  | :heavy_check_mark: | :heavy_check_mark: |
+| [@chanbengz](https://github.com/chanbengz) | :heavy_check_mark: |  | :heavy_check_mark: |  | :heavy_check_mark: |
 
 
 
@@ -27,17 +27,17 @@ MineCPU
 │   ├── project_desciption.pdf  # project description
 │   ├── Report.md               # report of this project
 │   └── riscv-card.pdf          # ISA reference
-├── generated                   # bitstream file with different parameters
-│   └── *.bit                   
+├── generated
+│   └── *.bit                   # bitstream file with different parameters                   
 ├── pic                         # picture used in repo
 ├── program
-│   ├── lib                     # library of some API
+│   ├── lib                     # library of hardware API (driver)
 │   ├── my_pacman               # game by C++ (easier cross-compiling to RV)
-│   └── testcase                # used for project defense (答辩)
-├── sources                                              
-│   ├── assembly                # assembly code for test and fun
-│   │   ├── *.asm              
-│   │   ├── *.coe
+│   └── testcase                # used for project presentation
+├── sources
+│   ├── assembly
+│   │   ├── *.asm               # assembly code for test and fun
+│   │   ├── *.coe               # hex version of machine code
 │   │   └── *.txt               # data using UART to be put into memory            
 │   ├── constrain
 │   │   └── constr.xdc          # constrain file
@@ -56,7 +56,7 @@ MineCPU
 │   └── *.xdc                   # on-board-test constrain
 ├── tools
 │   ├── inst2txt.py             # instruction to text file for UART
-│   ├── ecall2sv.py
+│   ├── ecall2sv.py             # coe to code for burning into ROM
 │   └── UARTAssist.exe          # tool for UART
 ├── .gitignore
 ├── LICENSE
@@ -75,6 +75,7 @@ MineCPU
       - [x] 返回地址栈 (Return Address Stack) *
     - [x] 指令缓存 (Instruction Cache) *
       - [x] 直接映射 (Direct Mapping) *
+      - [ ] 预取指 (Pre-Fetch)
   - [x] ID Stage
     - [x] 立即数生成模块 (ImmGen)
     - [x] 寄存器模块 (Register File)
@@ -87,14 +88,14 @@ MineCPU
     - [x] 分支判断 (BRU)
     - [x] 前递模块 (Forward Unit) *
   - [x] MEM Stage
-    - [x] byte / halfword / word 的存取
+    - [x] Byte / Halfword / Word 的存取
     - [x] 数据缓存 (Data Cache) *
       - [x] 直接映射 (Direct Mapping) *
       - [x] 写回策略 (Write Back) *
   - [x] WB Stage
   - [x] Memory
     - [x] MMIO
-    - [x] 异常执行指令
+    - [x] 异常执行指令 (ROM)
   - [x] 异常控制 (ecall & sret) *
 - [ ] IO
   - [x] 拨码开关 & 按钮
@@ -163,7 +164,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | `lui rd, imm`          | U        | rd = imm << 12                            |
 | `auipc rd, imm`        | U        | rd = PC + (imm << 12)                     |
 | `ecall`                | I        | 控制权交给固件 (采用输入设备模拟)              |
-| `sret` (自定义扩展指令) | I | 控制权交还给程序 |
+| `sret` *               | I        | 控制权交还给程序                            |
 | `mul rd, rs1, rs2` *   | R        | rd = (rs1 * rs2)[31:0]                    |
 | `mulh rd, rs1, rs2` *  | R        | rd = (rs1 * rs2)[63:32]                   |
 | `mulhsu rd, rs1, rs2` *| R        | rd = (rs1 * (u)rs2)[63:32]                |
@@ -233,12 +234,25 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
     1. :negative_squared_cross_mark: 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
     2. :negative_squared_cross_mark: 进行停顿 / 改进转发单元。前者过于简单，后者工作量太大，且 `ld` 指令的冒险难以解决。~~考虑后续增加记分板~~
     3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。~~那要 ld/sd ra, 4(sp) 有何用~~ 。记录指令跳转目标地址，在EX阶段计算实际跳转，并判断是否预测错误，如错误则更新正确PC并清空错误指令。由于EX不存在Data Hazard，故解决。
-- **[Memory/Solved]** 内存读取数据时传入地址会延迟一个周期读取到数据，且 `sh` 和 `sb` 无法直接对内存进行操作.
++ **[Memory/Solved]** 内存读取数据时传入地址会延迟一个周期读取到数据，且 `sh` 和 `sb` 无法直接对内存进行操作.
   - **原因**: 使用 ip RAM 生成的内存以 32 bit 为单位进行存或读取，而 `sh` 和 `sb` 只修改其中的 16 bit 或 8 bit
   - **解决方案**:
     1. :negative_squared_cross_mark: 加快内存时钟频率，先读取再修改最后存入
     2. :white_check_mark: 使用 Cache 进行管理
-- **[Instruction auipc/Solved]** 指令 `auipc` 的实现.
++ **[Instruction `auipc`/Solved]** 指令 `auipc` 的实现.
   - **原因**: 指令 `auipc` 需要进行 pc 相关的计算，而 ALU 没有相关数据的输入
   - **解决方案**:
-    1. :white_check_mark: 在 ALU 输入 rs1 的端口前添加选择器，对 pc 和 rs1_data 进行选择，同时拓宽控制信号 ALUSrc. 
+    1. :white_check_mark: 在 ALU 输入 rs1 的端口前添加选择器，对 pc 和 rs1_data 进行选择，同时拓宽控制信号 ALUSrc.
++ **[UART/Pending]** 第一个Byte接收会有概率出错/丢失
+  - **原因**: 未知
+  - **解决方案**:
+    1. :white_check_mark: 在开头插入`nop`或0
+    2. :negative_squared_cross_mark: 使用课程提供的IP ~~不优雅~~
+
+
+
+## 开发工具
+
++ 汇编: [riscv-gnu-toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) 下载3GB的源代码再编译半小时，妈妈再也不用担心我不会写汇编啦
++ 仿真: [Verilator](https://verilator.org/guide/latest/overview.html)将System Verilog编译成C++并运行~~所以不能模拟不定态我**~~, Vivado(不推荐), [Unicorn](https://github.com/unicorn-engine/unicorn) 用于与CPU对拍(差分测试DiffTest)
++ 串口: [UARTAssist](./tools/UartAssist.exe) 收发UART信号, [coe2txt](./tools/coe2txt.py) 将指令的coe文件转为UARTAssist接收的文本
