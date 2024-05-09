@@ -33,7 +33,7 @@ MineCPU
 ├── program
 │   ├── lib                     # library of some API
 │   ├── my_pacman               # game by C++ (easier cross-compiling to RV)
-│   └── pacman                  # game by C
+│   └── testcase                # used for project defense (答辩)
 ├── sources                                              
 │   ├── assembly                # assembly code for test and fun
 │   │   ├── *.asm              
@@ -55,7 +55,8 @@ MineCPU
 │   ├── *.sv                    # on-board-test code
 │   └── *.xdc                   # on-board-test constrain
 ├── tools
-│   ├── coe2txt.py              # coe file to text file for UART
+│   ├── inst2txt.py             # instruction to text file for UART
+│   ├── ecall2sv.py
 │   └── UARTAssist.exe          # tool for UART
 ├── .gitignore
 ├── LICENSE
