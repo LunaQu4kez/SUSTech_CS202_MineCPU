@@ -8,7 +8,7 @@
 
 using std::vector;
 const char *REG_NAMES[32] = {"x0", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
-const int SIM_TIME = 300;
+const int SIM_TIME = 1000;
 
 // verilator
 const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
@@ -66,7 +66,7 @@ void run_one_cycle() {
 }
 
 vector<uint32_t> load_program() {
-    vector<char> data = read_binary("../assembly/test/test7.bin"); // modify the path to the binary file
+    vector<char> data = read_binary("../assembly/test/test.bin"); // modify the path to the binary file
     vector<unsigned int> inst;
     uint32_t concat_data, size = data.size() / 4;
 
@@ -104,6 +104,7 @@ bool diff_check() {
 void set_device() {
     top->switches1 = 7;
     top->switches2 = 4;
+    top->bt1 = 1;
 }
 
 int main(int argc, char** argv) {
@@ -140,7 +141,7 @@ int main(int argc, char** argv) {
 
     while (uc_pc != inst.size() * 4){
         if(time++ > SIM_TIME) break;
-        set_device();
+        if(time == 100) set_device();
         run_one_cycle();
     	VerilatedVpi::callValueCbs();
         // run one instruction on unicorn
