@@ -8,7 +8,7 @@
 
 using std::vector;
 const char *REG_NAMES[32] = {"x0", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
-const int SIM_TIME = 200;
+const int SIM_TIME = 300;
 
 // verilator
 const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
         uc_reg_read(uc, UC_RISCV_REG_PC, &uc_pc);
     }
     
-    while(get_value(pc) <= inst.size() * 4 + 10) run_one_cycle();
+    while(get_value(pc) <= inst.size() * 4 + 10 && time++ < SIM_TIME) run_one_cycle();
 
     diff_check();
     printf("pc: 0x%x\n", get_value(pc));

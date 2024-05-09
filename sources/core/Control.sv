@@ -144,7 +144,7 @@ module Control (
                 ALUOp    = `ALU_ADD;
                 BRUOp    = `BRU_JMP;
                 Jalr     = 1;
-                ALUSrc   = 2;
+                ALUSrc   = 1;
                 MemWrite = 0;
                 MemRead  = 0;
                 RegWrite = 1;

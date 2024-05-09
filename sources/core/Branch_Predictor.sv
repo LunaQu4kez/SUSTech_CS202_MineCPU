@@ -45,7 +45,7 @@ module Branch_Predictor # (
     logic [BHT_SIZE-1:0] table_addr, update_addr; // use pc[11:2] as index since last 2 bits are always 0
     assign table_addr  = pc[BHT_SIZE+1:2];
     assign update_addr = old_branch_pc[BHT_SIZE+1:2];
-    assign predict_fail = old_actual != old_predict && old_predict_pc != old_pc;
+    assign predict_fail = old_actual != old_predict || (old_predict_pc != old_pc && old_branch);
 
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -60,7 +60,7 @@ module Branch_Predictor # (
             predict_result = 1'b0;
             target_pc0 = 0;
         end else if (predict_fail) begin
-            predict_result = old_actual;
+            predict_result = 1'b0;
             target_pc0 = old_pc;
         end else begin
             unique case ({branch, predict})
