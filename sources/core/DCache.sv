@@ -1,7 +1,7 @@
 `include "Const.svh"
 
 module DCache #(
-    parameter CACHE_WID = 6
+    parameter CACHE_WID = 5
 )(
     input  logic             clk, rst,
     // cpu interface

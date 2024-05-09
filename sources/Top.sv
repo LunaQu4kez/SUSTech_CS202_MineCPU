@@ -85,8 +85,8 @@ module Top (
     Seg7Tube seg7tube_inst(
         .clk,
         .rst_n(~rst),
-        .data_in(seg1_out),
-        //.data_in(seg7data),
+        //.data_in(seg1_out),
+        .data_in(seg7data),
         .seg_en,
         .seg_out
     );

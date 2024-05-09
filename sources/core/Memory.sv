@@ -172,19 +172,19 @@ module Memory (
     end
 
     // vga write
-    always_comb begin
+    always_ff @(posedge clkb) begin
         unique case (addrb[31:12])
             20'hffffe: begin
-                chars[addrb[11:0]] = write_datab[7:0];
-                color = color;
+                chars[addrb[11:0]] <= write_datab[7:0];
+                color <= color;
             end
             20'hffffd: begin
-                chars = chars;
-                color[addrb[11:0]] = write_datab[7:0];
+                chars <= chars;
+                color[addrb[11:0]] <= write_datab[7:0];
             end
             default: begin
-                chars = chars;
-                color = color;
+                chars <= chars;
+                color <= color;
             end
         endcase
     end

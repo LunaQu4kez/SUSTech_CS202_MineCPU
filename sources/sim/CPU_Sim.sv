@@ -5,7 +5,7 @@ module CPU_Sim ();
     logic [7:0] led1;
     logic bt1;
     logic [31:0] pc_t;
-    logic [31:0] MEM_addr_t;
+    logic [31:0] inst_t;
     
     CPU cpu_inst (
         .cpuclk,
@@ -16,7 +16,7 @@ module CPU_Sim ();
         .bt1,
         .led1_out(led1),
         .pc_t,
-        .MEM_addr_t
+        .inst_t
     );
 
     initial begin
@@ -32,7 +32,7 @@ module CPU_Sim ();
     end
 
     initial fork
-        #63 uart_done = 1;
+        #5 uart_done = 1;
     join
 
     initial fork
