@@ -228,12 +228,6 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 
 ## 问题及解决方案
 
-+ **[Data Hazard/Solved]** `ret (jalr zero, ra, 0)` 指令必须在 `ld ra, 0(sp)` 4 条指令之后，或者函数指令数必须大于 4，否则会出现异常.
-  - **原因**: ra 寄存器的更改发生在 4 个周期后，而 `ret` 指令在访问 ra 寄存器时导致数据冒险
-  - **解决方案**:
-    1. :negative_squared_cross_mark: 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
-    2. :negative_squared_cross_mark: 进行停顿 / 改进转发单元。前者过于简单，后者工作量太大，且 `ld` 指令的冒险难以解决。~~考虑后续增加记分板~~
-    3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。~~那要 ld/sd ra, 4(sp) 有何用~~ 。记录指令跳转目标地址，在EX阶段计算实际跳转，并判断是否预测错误，如错误则更新正确PC并清空错误指令。由于EX不存在Data Hazard，故解决。
 + **[Memory/Solved]** 内存读取数据时传入地址会延迟一个周期读取到数据，且 `sh` 和 `sb` 无法直接对内存进行操作.
   - **原因**: 使用 ip RAM 生成的内存以 32 bit 为单位进行存或读取，而 `sh` 和 `sb` 只修改其中的 16 bit 或 8 bit
   - **解决方案**:
@@ -242,17 +236,32 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 + **[Instruction `auipc`/Solved]** 指令 `auipc` 的实现.
   - **原因**: 指令 `auipc` 需要进行 pc 相关的计算，而 ALU 没有相关数据的输入
   - **解决方案**:
-    1. :white_check_mark: 在 ALU 输入 rs1 的端口前添加选择器，对 pc 和 rs1_data 进行选择，同时拓宽控制信号 ALUSrc.
-+ **[UART/Pending]** 第一个Byte接收会有概率出错/丢失
-  - **原因**: 未知
+    1. :white_check_mark: 在 ALU 输入 rs1 的端口前添加选择器，对 pc 和 rs1_data 进行选择，同时拓宽控制信号 ALUSrc
++ **[`jalr` Data Hazard/Solved]** `ret (jalr zero, ra, 0)` 指令必须在 `ld ra, 0(sp)` 4 条指令之后，或者函数指令数必须大于 4，否则会出现异常.
+  - **原因**: ra 寄存器的更改发生在 4 个周期后，而 `ret` 指令在访问 ra 寄存器时导致数据冒险
   - **解决方案**:
-    1. :white_check_mark: 在开头插入`nop`或0
-    2. :negative_squared_cross_mark: 使用课程提供的IP ~~不优雅~~
+    1. :negative_squared_cross_mark: 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
+    2. :negative_squared_cross_mark: 进行停顿 / 改进转发单元。前者过于简单，后者工作量太大，且 `ld` 指令的冒险难以解决。~~考虑后续增加记分板~~
+    3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。~~那要 ld/sd ra, 4(sp) 有何用~~ 。记录指令跳转目标地址，在 EX 阶段计算实际跳转，并判断是否预测错误，如错误则更新正确 pc 并清空错误指令。由于 EX 阶段不存在 Data Hazard，故解决。
++ **[CPU Clock Rate/Solved]** CPU 时钟频率上限较低而影响 CPU 的性能.
+  - **原因**: 分支预测速度较慢，且在 ID 阶段需等待寄存器的 rs1_data 才可开始执行
+  - **解决方案**:
+    1. :white_check_mark: 将分支预测移到 IF 阶段进行，但由于 IF 阶段获取指令后未进行解码，因此需要对指令进行预解码 (否则不仅需要预测是否跳转，同时也需要预测该指令是否为分支指令，较为复杂)
++ **[UART/Pending]** 第一个 Byte 接收会有概率出错 / 丢失.
+  - **原因**: 未知 (但大概率是 UART 串口工具发送时的小问题)
+  - **解决方案**:
+    1. :white_check_mark: 在第 1 条指令预先插入 `nop` 或 0x00000000
+    2. :negative_squared_cross_mark: 使用课程提供的 UART IP 核 ~~(但手搓才是 Project 的浪漫)~~
++ **[Branch Instruction Data Hazard/Pending]** `lw` 后的分支指令若存在数据冒险，在 CPU 的时钟频率较高 (50MHz) 时可能执行错误，但频率较低 (1Hz) 时不会执行错误.
+  - **可能原因**: 分支预测 (Branch Predictor) 和指令缓存 (ICache) 耗时较长
+  - **解决方案**:
+    1. :negative_squared_cross_mark: 降低时钟频率，但是会导致 CPU 性能整体全面下降
+    2. :white_check_mark: 在 `lw` 和紧接的分支指令之间插入 `nop` 
 
 
 
 ## 开发工具
 
-+ 汇编: [riscv-gnu-toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) 下载3GB的源代码再编译半小时，妈妈再也不用担心我不会写汇编啦
-+ 仿真: [Verilator](https://verilator.org/guide/latest/overview.html)将System Verilog编译成C++并运行~~所以不能模拟不定态我**~~, Vivado(不推荐), [Unicorn](https://github.com/unicorn-engine/unicorn) 用于与CPU对拍(差分测试DiffTest)
-+ 串口: [UARTAssist](./tools/UartAssist.exe) 收发UART信号, [coe2txt](./tools/coe2txt.py) 将指令的coe文件转为UARTAssist接收的文本
++ 汇编: [riscv-gnu-toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) 下载 3GB 的源代码再编译半小时，妈妈再也不用担心我不会写汇编啦
++ 仿真: [Verilator](https://verilator.org/guide/latest/overview.html) 将 SystemVerilog 编译成 C++ 并运行 ~~所以不能模拟不定态我**~~, Vivado (能用但不推荐), [Unicorn](https://github.com/unicorn-engine/unicorn) 用于与 CPU 对拍 (差分测试 DiffTest)
++ 串口: [UARTAssist](./tools/UartAssist.exe) 收发 UART 信号, [inst2txt](./tools/inst2txt.py) 将指令机器码文件转为 UARTAssist 传输的 16 进制文本
