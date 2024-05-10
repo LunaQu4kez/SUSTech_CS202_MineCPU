@@ -23,13 +23,13 @@
 ```
 MineCPU
 ├── docs
-│   ├── CPU.*                   # design draft
+│   ├── Architecture.drawio     # design draft
+│   ├── architecture.png        # exported image
 │   ├── project_desciption.pdf  # project description
 │   ├── Report.md               # report of this project
 │   └── riscv-card.pdf          # ISA reference
 ├── generated
-│   └── *.bit                   # bitstream file with different parameters                   
-├── pic                         # picture used in repo
+│   └── *.bit                   # bitstream file with different parameters
 ├── program
 │   ├── lib                     # library of hardware API (driver)
 │   ├── my_pacman               # game by C++ (easier cross-compiling to RV)
@@ -109,6 +109,10 @@ MineCPU
   - [ ] 测试场景2
   - [ ] Pac-Man *
 
+
+## 架构设计
+
+![Architecture](./docs/architecture.png)
 
 
 ## 功能
