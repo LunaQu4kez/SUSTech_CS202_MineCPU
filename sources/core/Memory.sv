@@ -11,7 +11,7 @@ module Memory (
     input  logic [`SWCH_WID  ] switches1, switches2, switches3,
     input                      bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
     input  logic [`KBCODE_WID] kb_idx,                    // keyboard index: 0 1 2 3 4 5 6 7 8 9 A B C D * #
-    input  logic [`DATA_WID  ] time,
+    input  logic [`DATA_WID  ] timer,
     output logic [`DATA_WID  ] seg1_out,
     output logic [`LED_WID   ] led1_out, led2_out,
     // vga related
@@ -145,7 +145,7 @@ module Memory (
                 datab_io = {28'h0000000, kb_idx[3:0]};
             end
             32'hffff_ff34: begin     // timer
-                datab_io = time;
+                datab_io = timer;
             end
             default: begin
                 datab_io = 0;

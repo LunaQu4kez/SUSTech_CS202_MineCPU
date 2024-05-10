@@ -10,7 +10,7 @@ module CPU (
     input  logic [`LED_WID   ] switches1, switches2, switches3,
     input  logic               bt1, bt2, bt3, bt4, bt5,
     input  logic [`KBCODE_WID] kb_idx,
-    input  logic [`DATA_WID  ] time,
+    input  logic [`DATA_WID  ] timer,
     output logic [`LED_WID   ] led1_out, led2_out, led3_out,
     output logic [`DATA_WID  ] seg1_out,
     // vga interface
@@ -308,7 +308,7 @@ module CPU (
         .bt4,
         .bt5,
         .kb_idx,
-        .time,
+        .timer,
         .led1_out,
         .led2_out,
         .seg1_out,

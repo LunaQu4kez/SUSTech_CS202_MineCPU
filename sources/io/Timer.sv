@@ -1,14 +1,11 @@
 `include "Const.sv"
 
 module Timer (
-    input         clk, rst,
-    output [31:0] time
+    input               clk, rst,
+    output logic [31:0] timer
 );
 
-    reg [31:0] timer = 0;
-    reg [15:0] cnt = 0;
-    assign time = timer;
-
+    reg [16:0] cnt = 0;
     always_ff @(posedge clk) begin
         if (rst) begin
             timer <= 0;
