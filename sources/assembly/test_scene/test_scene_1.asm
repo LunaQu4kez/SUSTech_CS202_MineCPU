@@ -37,69 +37,69 @@ addi t1,t1,1
 
 test_0:
 mv a0,a2
-li 1,a7
+li a7,1
 ecall
 mv a0,a3
-li 2,a7
+li a7,2
 ecall
 
 test_1:
 lb a0,4(gp)
-li 3,a7
+li a7,3
 ecall
 la t3,num
 sw a0,0(t3)
 
 test_2:
 lb a0,8(gp)
-li 3,a7
+li a7,3
 ecall
 la t3,num
 sw a0,4(t3)
 
 test_3:
 la t3,num
-lw t1,0(num)
-lw t1,4(num)
+lw t1,0(t3)
+lw t1,4(t3)
 beq t1,t2,led_on
 j led_off
 
 
 test_4:
 la t3,num
-lw t1,0(num)
-lw t1,4(num)
+lw t1,0(t3)
+lw t1,4(t3)
 blt t1,t2,led_on
 j led_off
 
 test_5:
 la t3,num
-lw t1,0(num)
-lw t1,4(num)
+lw t1,0(t3)
+lw t1,4(t3)
 bge t1,t2,led_on
 j led_off
 
 test_6:
 la t3,num
-lw t1,0(num)
-lw t1,4(num)
+lw t1,0(t3)
+lw t1,4(t3)
 bltu t1,t2,led_on
 j led_off
 
 test_7:
 la t3,num
-lw t1,0(num)
-lw t1,4(num)
+lw t1,0(t3)
+lw t1,4(t3)
 bgeu t1,t2,led_on
 j led_off
 
 led_on:
-li 1,t6
+li t6,1
 sw t6,12(gp)
 j loop
 
 led_off:
-li 0,t6
+li t6,0
 sw t6,12(gp)
 j loop
 
