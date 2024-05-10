@@ -92,7 +92,7 @@ module Memory (
             32'h1c090080: edataa = 32'h0280006f;
             32'h1c090084: edataa = 32'h02a1a423;
             32'h1c090088: edataa = 32'h0200006f;
-            32'h1c09008c: edataa = 32'h0001a503;
+            32'h1c09008c: edataa = 32'h0341a503;
             32'h1c090090: edataa = 32'h0180006f;
             32'h1c090094: edataa = 32'h0341a283;
             32'h1c090098: edataa = 32'h0341a303;

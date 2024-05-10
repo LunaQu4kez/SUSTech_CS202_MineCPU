@@ -61,7 +61,7 @@ ecall_printseg:
 
 # ecall_gettime: get time from timer
 ecall_gettime:
-    lw a0, 0(gp)
+    lw a0, 52(gp)
     j exit
 
 # ecall_sleep: sleep for a while, input milliseconds
