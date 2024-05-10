@@ -19,10 +19,6 @@ entry:
     beq a7, t0, ecall_getint2
     addi t0, zero, 7
     beq a7, t0, ecall_getint3
-    addi t0, zero, 8
-    beq a7, t0, ecall_gettime
-    addi t0, zero, 9
-    beq a7, t0, ecall_sleep
     j exit
 
 # ecall_exit: infinite loop
@@ -57,20 +53,6 @@ ecall_printint2:
 # ecall_printseg: print a word to seg7tube
 ecall_printseg:
     sw a0, 40(gp)
-    j exit
-
-# ecall_gettime: get time from timer
-ecall_gettime:
-    lw a0, 52(gp)
-    j exit
-
-# ecall_sleep: sleep for a while, input milliseconds
-ecall_sleep:
-    lw t0, 52(gp)
-sleep_loop:
-    lw t1, 52(gp)
-    sub t1, t1, t0
-    blt t1, a0, sleep_loop
     j exit
 
 # restore context and return

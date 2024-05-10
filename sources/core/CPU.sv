@@ -10,7 +10,6 @@ module CPU (
     input  logic [`LED_WID   ] switches1, switches2, switches3,
     input  logic               bt1, bt2, bt3, bt4, bt5,
     input  logic [`KBCODE_WID] kb_idx,
-    input  logic [`DATA_WID  ] timer,
     output logic [`LED_WID   ] led1_out, led2_out, led3_out,
     output logic [`DATA_WID  ] seg1_out,
     // vga interface
@@ -81,7 +80,7 @@ module CPU (
     
     // led3
     assign led3_out[5:0] = pc_t[7:2];
-    assign led3_out[6] = IF_pc_in == 32'h1c090058;
+    assign led3_out[6] = IF_pc_in == 32'h1c090040;
     assign led3_out[7] = uart_done;
 
     // debug port
@@ -308,7 +307,6 @@ module CPU (
         .bt4,
         .bt5,
         .kb_idx,
-        .timer,
         .led1_out,
         .led2_out,
         .seg1_out,

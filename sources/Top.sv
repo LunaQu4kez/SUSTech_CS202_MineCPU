@@ -59,7 +59,6 @@ module Top (
         .bt4,
         .bt5,
         .kb_idx,
-        .timer,
         .led1_out,
         .led2_out,
         .led3_out,
@@ -107,12 +106,6 @@ module Top (
     Keyboard keyboard_inst (
         .kp,
         .kb_idx
-    );
-
-    Timer timer_inst (
-        .clk,
-        .rst,
-        .timer
     );
     
 endmodule
