@@ -221,90 +221,91 @@ void ghost_move(int idx, int tx, int ty) {   // ghost index, target point x, tar
 }
 
 int bfs(int idx, int tx, int ty) {
-    cnt = 0;
-    while (cnt < 300) {
-        bx[cnt] = bxt[cnt];
-        by[cnt] = byt[cnt];
-        bh[cnt] = bht[cnt];
-        cnt++;
-    }
-    cnt = 0;
-    while (cnt < 300) {
-        bxt[cnt] = 0;
-        byt[cnt] = 0;
-        bht[cnt] = 0;
-        cnt++;
-    }
-    cnt = 0;
-    bi = 0;
-    bit = 0;
+    while (true) {
+        cnt = 0;
+        while (cnt < 300) {
+            bx[cnt] = bxt[cnt];
+            by[cnt] = byt[cnt];
+            bh[cnt] = bht[cnt];
+            cnt++;
+        }
+        cnt = 0;
+        while (cnt < 300) {
+            bxt[cnt] = 0;
+            byt[cnt] = 0;
+            bht[cnt] = 0;
+            cnt++;
+        }
+        cnt = 0;
+        bi = 0;
+        bit = 0;
 
-    int x = bx[bi];
-    int y = by[bi];
-    int h = bh[bi];
-    while (x != 0 || y != 0) {
-        if (game[x-1][y] != -1 && bmap[x-1][y] == 0) {  // up
-            if (x - 1 == tx && y == ty) {
-                if (idx == 0) {
-                    wx = x;
-                    wy = y;
+        int x = bx[bi];
+        int y = by[bi];
+        int h = bh[bi];
+        while (x != 0 || y != 0) {
+            if (game[x-1][y] != -1 && bmap[x-1][y] == 0) {  // up
+                if (x - 1 == tx && y == ty) {
+                    if (idx == 0) {
+                        wx = x;
+                        wy = y;
+                    }
+                    return h;
                 }
-                return h;
+                bxt[bit] = x - 1;
+                byt[bit] = y;
+                bht[bit] = h;
+                bmap[x-1][y] = 1;
+                bit++;
             }
-            bxt[bit] = x - 1;
-            byt[bit] = y;
-            bht[bit] = h;
-            bmap[x-1][y] = 1;
-            bit++;
-        }
-        if (game[x+1][y] != -1 && bmap[x+1][y] == 0) {  // down
-            if (x + 1 == tx && y == ty) {
-                if (idx == 0) {
-                    wx = x;
-                    wy = y;
+            if (game[x+1][y] != -1 && bmap[x+1][y] == 0) {  // down
+                if (x + 1 == tx && y == ty) {
+                    if (idx == 0) {
+                        wx = x;
+                        wy = y;
+                    }
+                    return h;
                 }
-                return h;
+                bxt[bit] = x + 1;
+                byt[bit] = y;
+                bht[bit] = h;
+                bmap[x+1][y] = 1;
+                bit++;
             }
-            bxt[bit] = x + 1;
-            byt[bit] = y;
-            bht[bit] = h;
-            bmap[x+1][y] = 1;
-            bit++;
-        }
-        if (game[x][y-1] != -1 && bmap[x][y-1] == 0) {  // left
-            if (x == tx && y - 1 == ty) {
-                if (idx == 0) {
-                    wx = x;
-                    wy = y;
+            if (game[x][y-1] != -1 && bmap[x][y-1] == 0) {  // left
+                if (x == tx && y - 1 == ty) {
+                    if (idx == 0) {
+                        wx = x;
+                        wy = y;
+                    }
+                    return h;
                 }
-                return h;
+                bxt[bit] = x;
+                byt[bit] = y - 1;
+                bht[bit] = h;
+                bmap[x][y-1] = 1;
+                bit++;
             }
-            bxt[bit] = x;
-            byt[bit] = y - 1;
-            bht[bit] = h;
-            bmap[x][y-1] = 1;
-            bit++;
-        }
-        if (game[x][y+1] != -1 && bmap[x][y+1] == 0) {  // right
-            if (x == tx && y + 1 == ty) {
-                if (idx == 0) {
-                    wx = x;
-                    wy = y;
+            if (game[x][y+1] != -1 && bmap[x][y+1] == 0) {  // right
+                if (x == tx && y + 1 == ty) {
+                    if (idx == 0) {
+                        wx = x;
+                        wy = y;
+                    }
+                    return h;
                 }
-                return h;
+                bxt[bit] = x;
+                byt[bit] = y + 1;
+                bht[bit] = h;
+                bmap[x][y+1] = 1;
+                bit++;
             }
-            bxt[bit] = x;
-            byt[bit] = y + 1;
-            bht[bit] = h;
-            bmap[x][y+1] = 1;
-            bit++;
+            bi++;
+            x = bx[bi];
+            y = by[bi];
+            h = bh[bi];
         }
-        bi++;
-        x = bx[bi];
-        y = by[bi];
-        h = bh[bi];
     }
-    return bfs(idx, tx, ty);
 }
 
 void stepA() {
