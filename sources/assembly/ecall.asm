@@ -1,3 +1,4 @@
+.text
 entry:
     addi sp, sp, -8
     # save context
@@ -16,6 +17,10 @@ entry:
     beq a7, t0, ecall_printint2
     addi t0, zero, 3
     beq a7, t0, ecall_printseg
+    addi t0, zero, 7
+    beq a7, t0, ecall_gettime
+    addi t0, zero, 8
+    beq a7, t0, ecall_sleep
     j exit
 
 # ecall_exit: infinite loop
@@ -44,7 +49,18 @@ ecall_printint2:
 
 # ecall_printseg: print a word to seg7tube
 ecall_printseg:
-    sw a0, 44(gp)
+    sw a0, 40(gp)
+    j exit
+
+# ecall_gettime: get time from timer
+ecall_gettime:
+    lw a0, 0(gp)
+    j exit
+
+# ecall_sleep: sleep for a while, input milliseconds
+ecall_sleep:
+    lw t1, 52(gp)
+    blt t1, a0, ecall_sleep
     j exit
 
 # restore context and return

@@ -24,7 +24,7 @@ module Top (
     wire [`DATA_WID] uart_data, uart_addr;
     wire [`VGA_ADDR] vga_addr;
     wire [`INFO_WID] char_out, color_out;
-    wire [`DATA_WID] seg1_out;
+    wire [`DATA_WID] seg1_out, time;
     wire [4:0] kb_idx;
 
     CPU_Clk cpu_clk_inst (       // 50MHz
@@ -59,6 +59,7 @@ module Top (
         .bt4,
         .bt5,
         .kb_idx,
+        .time,
         .led1_out,
         .led2_out,
         .led3_out,
@@ -106,6 +107,12 @@ module Top (
     Keyboard keyboard_inst (
         .kp,
         .kb_idx
+    );
+
+    Timer timer_inst (
+        .clk,
+        .rst,
+        .time
     );
     
 endmodule

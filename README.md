@@ -101,8 +101,9 @@ MineCPU
   - [x] 拨码开关 & 按钮
   - [x] 4*4 小键盘 *
   - [x] Led & 7 段数码管
-  - [ ] VGA *
   - [x] UART *
+  - [x] 计时器 *
+  - [ ] VGA *
 - [ ] 软件
   - [ ] 测试场景1
   - [ ] 测试场景2
@@ -185,7 +186,8 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
   - 4 × 4 小键盘
 - 输出 (Output)
   - 支持 24 个 LED 灯, 其中 8 个用于显示 CPU 状态
-  - 7 段数码管 (可显示 4 Bytes)
+  - 7 段数码管, 可显示 4 Bytes
+  - 内置计时器, 从rst开始计时, 精度为 1ms
   - VGA
     - 使用软硬件协同的方式实现
     - 800×600 60Hz
@@ -205,9 +207,10 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | 0xFFFFFF1C | R     | 按钮 3 (下)            | 0x00 - 0x01            |
 | 0xFFFFFF20 | R     | 按钮 4 (左)            | 0x00 - 0x01            |
 | 0xFFFFFF24 | R     | 按钮 5 (右)            | 0x00 - 0x01            |
-| 0xFFFFFF28 | W     | 七段数码管              | 0x00000000 - 0xFFFFFFFF |
+| 0xFFFFFF28 | W     | 七段数码管             | 0x00000000 - 0xFFFFFFFF |
 | 0xFFFFFF2C | R     | 4*4 小键盘是否被按下     | 0x00 - 0x01            |
 | 0xFFFFFF30 | R     | 4*4 小键盘按下位置       | 0x00 - 0x0F            |
+| 0xFFFFFF34 | R     | 计时器                 | 0x00000000 - 0xFFFFFFFF |
 | 0xFFFFE___ (000-BFF) | W | VGA 字符 | 0x00 - 0xFF |
 | 0xFFFFD___ (000-BFF) | W | VGA 颜色 | 0x00 - 0xFF |
 

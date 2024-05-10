@@ -11,6 +11,7 @@ module Memory (
     input  logic [`SWCH_WID  ] switches1, switches2, switches3,
     input                      bt1, bt2, bt3, bt4, bt5,   // middle, up, down, left, right
     input  logic [`KBCODE_WID] kb_idx,                    // keyboard index: 0 1 2 3 4 5 6 7 8 9 A B C D * #
+    input  logic [`DATA_WID  ] time,
     output logic [`DATA_WID  ] seg1_out,
     output logic [`LED_WID   ] led1_out, led2_out,
     // vga related
@@ -60,33 +61,42 @@ module Memory (
             32'h1c090004: edataa = 32'h00512223;
             32'h1c090008: edataa = 32'h00612023;
             32'h1c09000c: edataa = 32'h00a00293;
-            32'h1c090010: edataa = 32'h02588863;
+            32'h1c090010: edataa = 32'h04588063;
             32'h1c090014: edataa = 32'h00500293;
-            32'h1c090018: edataa = 32'h02588663;
+            32'h1c090018: edataa = 32'h02588e63;
             32'h1c09001c: edataa = 32'h00600293;
-            32'h1c090020: edataa = 32'h02588663;
+            32'h1c090020: edataa = 32'h02588e63;
             32'h1c090024: edataa = 32'h00100293;
-            32'h1c090028: edataa = 32'h02588663;
+            32'h1c090028: edataa = 32'h02588e63;
             32'h1c09002c: edataa = 32'h00200293;
-            32'h1c090030: edataa = 32'h02588663;
+            32'h1c090030: edataa = 32'h02588e63;
             32'h1c090034: edataa = 32'h00300293;
-            32'h1c090038: edataa = 32'h02588663;
-            32'h1c09003c: edataa = 32'h0300006f;
-            32'h1c090040: edataa = 32'h0000006f;
-            32'h1c090044: edataa = 32'h0001a503;
-            32'h1c090048: edataa = 32'h0240006f;
-            32'h1c09004c: edataa = 32'h0041a503;
-            32'h1c090050: edataa = 32'h01c0006f;
-            32'h1c090054: edataa = 32'h00a1a623;
-            32'h1c090058: edataa = 32'h0140006f;
-            32'h1c09005c: edataa = 32'h00a1a823;
-            32'h1c090060: edataa = 32'h01c0006f;
-            32'h1c090064: edataa = 32'h02a1a623;
-            32'h1c090068: edataa = 32'h0040006f;
-            32'h1c09006c: edataa = 32'h00012303;
-            32'h1c090070: edataa = 32'h00412283;
-            32'h1c090074: edataa = 32'h00810113;
-            32'h1c090078: edataa = 32'h10200073;
+            32'h1c090038: edataa = 32'h02588e63;
+            32'h1c09003c: edataa = 32'h00700293;
+            32'h1c090040: edataa = 32'h02588e63;
+            32'h1c090044: edataa = 32'h00800293;
+            32'h1c090048: edataa = 32'h02588e63;
+            32'h1c09004c: edataa = 32'h0440006f;
+            32'h1c090050: edataa = 32'h0000006f;
+            32'h1c090054: edataa = 32'h0001a503;
+            32'h1c090058: edataa = 32'h0380006f;
+            32'h1c09005c: edataa = 32'h0041a503;
+            32'h1c090060: edataa = 32'h0300006f;
+            32'h1c090064: edataa = 32'h00a1a623;
+            32'h1c090068: edataa = 32'h0280006f;
+            32'h1c09006c: edataa = 32'h00a1a823;
+            32'h1c090070: edataa = 32'h0200006f;
+            32'h1c090074: edataa = 32'h02a1a423;
+            32'h1c090078: edataa = 32'h0180006f;
+            32'h1c09007c: edataa = 32'h0001a503;
+            32'h1c090080: edataa = 32'h0100006f;
+            32'h1c090084: edataa = 32'h0341a303;
+            32'h1c090088: edataa = 32'hfea34ee3;
+            32'h1c09008c: edataa = 32'h0040006f;
+            32'h1c090090: edataa = 32'h00012303;
+            32'h1c090094: edataa = 32'h00412283;
+            32'h1c090098: edataa = 32'h00810113;
+            32'h1c09009c: edataa = 32'h10200073;
             default: edataa = 32'h00000000;
         endcase
     end
@@ -133,6 +143,9 @@ module Memory (
             end
             32'hffff_ff30: begin     // 4*4 keyboard
                 datab_io = {28'h0000000, kb_idx[3:0]};
+            end
+            32'hffff_ff34: begin     // timer
+                datab_io = time;
             end
             default: begin
                 datab_io = 0;
