@@ -177,6 +177,20 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | `div rd, rs1, rs2` *   | R        | rd = rs1 / rs2                            |
 | `rem rd, rs1, rs2` *   | R        | rd = rs1 % rs2                            |
 
+### Environment Call
+
+| 调用 No. (a7) | 参数 | 功能                    | 返回值 |
+| :----------- | --- | ---------------------- | ----- |
+| 0x01         | a0  | 写入1Bytes到第一组LED显示 | N/A   |
+| 0x02         | a0  | 写入1Bytes到第二组LED显示 | N/A   |
+| 0x03         | a0  | 写入4Bytes到数码管显示    | N/A   |
+| 0x05         | N/A | 从第一组开关读入1Bytes    | a0    |
+| 0x06         | N/A | 从第二组开关读入1Bytes    | a0    |
+| 0x07         | N/A | 从第三组开关读入1Bytes    | a0    |
+| 0x08         | N/A | 获取计时器时间            | a0    |
+| 0x09         | a0  | 休眠程序 a0 ms后唤醒      | N/A   |
+| 0x0A         | N/A | 结束程序 (死循环)         | N/A   |
+
 ### IO
 
 - 使用 **MMIO** (Memory Mapping IO，内存映射) 进行 IO 操作并支持 UART
