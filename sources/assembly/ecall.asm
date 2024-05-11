@@ -28,31 +28,49 @@ ecall_exit:
 # ecall_getint1: read switches1 value, 1 bytes
 ecall_getint1:
     lw a0, 0(gp)
+    nop
+    nop
+    nop
     j exit
 
 # ecall_getint2: read switches2 value, 1 bytes
 ecall_getint2:
     lw a0, 4(gp)
+    nop
+    nop
+    nop
     j exit
 
 # ecall_getint3: read switches3 value, 1 bytes
 ecall_getint3:
     lw a0, 8(gp)
+    nop
+    nop
+    nop
     j exit
     
 # ecall_printint1: print int to led1, 1 bytes
 ecall_printint1:
     sw a0, 12(gp)
+    nop
+    nop
+    nop
     j exit
     
 # ecall_printint2: print int to led2, 1 bytes
 ecall_printint2:
     sw a0, 16(gp)
+    nop
+    nop
+    nop
     j exit
 
 # ecall_printseg: print a word to seg7tube
 ecall_printseg:
     sw a0, 40(gp)
+    nop
+    nop
+    nop
     j exit
 
 # restore context and return

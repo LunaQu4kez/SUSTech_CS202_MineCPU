@@ -31,27 +31,27 @@ test_0:
     mv a0, a2
     li a7, 1
     ecall
-    #sw a2, 12(gp)
     mv a0, a3
     li a7, 2
     ecall
-    #sw a3, 16(gp)
     j loop
 
 test_1:
     lb a0, 4(gp)
+    nop
     li a7, 3
     ecall
-    #sw a0, 40(gp)
     sw a0, 0(t3)
+    nop
     j loop
 
 test_2:
     lbu a0, 8(gp)
+    nop
     li a7, 3
     ecall
-    #sw a0, 40(gp)
     sw a0, 4(t3)
+    nop
     j loop
 
 test_3:
@@ -79,6 +79,7 @@ test_6:
     lw t1, 0(t3)
     lw t2, 4(t3)
     nop
+    nop
     bltu t1, t2, led_on
     j led_off
 
@@ -90,13 +91,17 @@ test_7:
     j led_off
 
 led_on:
-    li t6, 3
+    li t6, 192
     sw t6, 12(gp)
+    nop
+    nop
     j loop
 
 led_off:
     li t6, 0
     sw t6, 12(gp)
+    nop
+    nop
     j loop
 
 
