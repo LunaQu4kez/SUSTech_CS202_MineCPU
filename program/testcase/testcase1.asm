@@ -1,19 +1,10 @@
 .text
     li t4, 0
-    li t3, 0x00001000
+    li t3, 0x10001000
 loop:
     lw t5, 20(gp)
     nop
     beq t5, t4, loop
-    #li a7, 5
-    #ecall
-    #mv a1, a0
-    #li a7, 6
-    #ecall
-    #mv a2, a0
-    #li a7, 7
-    #ecall
-    #mv a3, a0
     lw a1, 0(gp)
     lw a2, 4(gp)
     lw a3, 8(gp)
@@ -37,22 +28,29 @@ loop:
     j loop
 
 test_0:
-    sw a2, 12(gp)
-    sw a3, 16(gp)
+    mv a0, a2
+    li a7, 1
+    ecall
+    #sw a2, 12(gp)
+    mv a0, a3
+    li a7, 2
+    ecall
+    #sw a3, 16(gp)
     j loop
 
 test_1:
-    #lb a0, 4(gp)
-    lw a0, 4(gp)
-    sw a0, 0(t3)
-    lb a0, 0(t3)
-    sw a0, 40(gp)
+    lb a0, 4(gp)
+    li a7, 3
+    ecall
+    #sw a0, 40(gp)
     sw a0, 0(t3)
     j loop
 
 test_2:
     lbu a0, 8(gp)
-    sw a0, 40(gp)
+    li a7, 3
+    ecall
+    #sw a0, 40(gp)
     sw a0, 4(t3)
     j loop
 
