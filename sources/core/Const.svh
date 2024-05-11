@@ -102,6 +102,16 @@
 `define INFO_NUM   0:3071  // 96*32
 `define COLOR_WID  3:0
 `define VGA_ADDR  11:0
+`define H_SYNC_PULSE 11'd128
+`define H_BACK_PORCH 11'd88
+`define H_ACTIVE_TIME 11'd800
+`define H_FRONT_PORCH 11'd40
+`define H_LINE_PERIOD 11'd1056
+`define V_SYNC_PULSE 11'd4
+`define V_BACK_PORCH 11'd23
+`define V_ACTIVE_TIME 11'd60
+`define V_FRONT_PORCH 11'd1
+`define V_FRAME_PERIOD 11'd623
 // VGA color
 `define WHITH_R 4'hf
 `define WHITH_G 4'hf
