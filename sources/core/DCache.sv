@@ -28,10 +28,10 @@ module DCache #(
     wire [CACHE_WID-1:0] offset = addr[CACHE_WID+1:2];
     wire [13-CACHE_WID:0] tag = addr[15:CACHE_WID+2];
     wire uncached = (addr[19:16] == 4'hf);  // 1: mmio, 0: memory
-    wire [`DATA_WID] rdata_in = (cache_state == 2) ? mem_data : cache[offset][31:0];
+    wire [`DATA_WID] rdata_in = (cache_state == 2 || uncached) ? mem_data : cache[offset][31:0];
     wire [2:0] end_state = (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag) ? 4 : 2;
     wire cache_web = (MemRead && cache_state == 2) || (MemWrite && cache_state == 2) || (MemWrite && cache[offset][47-CACHE_WID] && cache_state == 0);
-    assign data_out = (cache_state == 2 || uncached) ? mem_data : rdata_out;
+    assign data_out = (cache_state == 2) ? mem_data : rdata_out;
     assign dcache_stall = !uncached && (MemRead || MemWrite) && cache_state != end_state
     && (!cache[offset][47-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag || (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag));
 
