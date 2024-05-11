@@ -1,80 +1,104 @@
 .text
-entry:
-    addi sp, sp, -16
-main:
-    lw a0, 8(gp)
-    li a1, 0
-    beq a0, a1, case0
-    li a1, 1
-    beq a0, a1, case1
-    li a1, 2
-    beq a0, a1, case2
-    li a1, 3
-    beq a0, a1, case3
-    li a1, 4
-    beq a0, a1, case4
-    li a1, 5
-    beq a0, a1, case5
-    li a1, 6
-    beq a0, a1, case6
-    li a1, 7
-    beq a0, a1, case7
-    j main
+    li t4, 0
+    li t3, 0x00001000
+loop:
+    lw t5, 20(gp)
+    nop
+    beq t5, t4, loop
+    #li a7, 5
+    #ecall
+    #mv a1, a0
+    #li a7, 6
+    #ecall
+    #mv a2, a0
+    #li a7, 7
+    #ecall
+    #mv a3, a0
+    lw a1, 0(gp)
+    lw a2, 4(gp)
+    lw a3, 8(gp)
 
-case0:
-    lw t0, 0(gp)
-    lw t1, 4(gp)
-    sw t0, 12(gp)
-    sw t1, 16(gp)
-    j main
+    li s1, 0
+    beq a1, s1, test_0
+    li s1, 1
+    beq a1, s1, test_1
+    li s1, 2
+    beq a1, s1, test_2
+    li s1, 3
+    beq a1, s1, test_3
+    li s1, 4
+    beq a1, s1, test_4
+    li s1, 5
+    beq a1, s1, test_5
+    li s1, 6
+    beq a1, s1, test_6
+    li s1, 7
+    beq a1, s1, test_7
+    j loop
 
-case1:
-    lw t0, 0(gp)
-    sw t0, 12(gp)
-    sw t0, 0(sp)
-    lb t0, 0(sp)
-    sw t0, 40(gp)
-    j main
+test_0:
+    sw a2, 12(gp)
+    sw a3, 16(gp)
+    j loop
 
-case2:
-    lw t1, 0(gp)
-    sw t1, 12(gp)
-    sw t1, 4(sp)
-    lbu t1, 4(sp)
-    sw t1, 40(gp)
-    j main
+test_1:
+    #lb a0, 4(gp)
+    lw a0, 4(gp)
+    sw a0, 0(t3)
+    lb a0, 0(t3)
+    sw a0, 40(gp)
+    sw a0, 0(t3)
+    j loop
 
-case3:
-    lb t0, 0(sp)
-    lbu t1, 4(sp)
-    beq t0, t1, light
-    j main
+test_2:
+    lbu a0, 8(gp)
+    sw a0, 40(gp)
+    sw a0, 4(t3)
+    j loop
 
-case4:
-    lb t0, 0(sp)
-    lbu t1, 4(sp)
-    blt t0, t1, light
-    j main
+test_3:
+    lw t1, 0(t3)
+    lw t2, 4(t3)
+    nop
+    beq t1, t2, led_on
+    j led_off
 
-case5:
-    lb t0, 0(sp)
-    lbu t1, 4(sp)
-    bge t0, t1, light
-    j main
+test_4:
+    lw t1, 0(t3)
+    lw t2, 4(t3)
+    nop
+    blt t1, t2, led_on
+    j led_off
 
-case6:
-    lb t0, 0(sp)
-    lbu t1, 4(sp)
-    bltu t0, t1, light
-    j main
+test_5:
+    lw t1, 0(t3)
+    lw t2, 4(t3)
+    nop
+    bge t1, t2, led_on
+    j led_off
 
-case7:
-    lb t0, 0(sp)
-    lbu t1, 4(sp)
-    bgeu t0, t1, light
-    j main
+test_6:
+    lw t1, 0(t3)
+    lw t2, 4(t3)
+    nop
+    bltu t1, t2, led_on
+    j led_off
 
-light:
-    li t3, 255
-    sw t3, 16(gp)
-    j main
+test_7:
+    lw t1, 0(t3)
+    lw t2, 4(t3)
+    nop
+    bgeu t1, t2, led_on
+    j led_off
+
+led_on:
+    li t6, 3
+    sw t6, 12(gp)
+    j loop
+
+led_off:
+    li t6, 0
+    sw t6, 12(gp)
+    j loop
+
+

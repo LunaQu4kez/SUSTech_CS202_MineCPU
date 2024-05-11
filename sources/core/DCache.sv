@@ -21,17 +21,18 @@ module DCache #(
 
     // format: valid[47-CACHE_WID] | dirty[46-CACHE_WID] | tag[45-CACHE_WID:32] | data[31:0]
     reg  [47-CACHE_WID:0] cache [0: (1 << CACHE_WID) - 1];
+    reg  [47-CACHE_WID:0] old_cache;
     // state: 0: idle, 1: reading, 2: finish [3: writing, 4: finish]
     reg  [2:0] cache_state = 0;
     reg  [`DATA_WID] rdata_out;
-    reg  [47-CACHE_WID:0] old_cache;
     wire [CACHE_WID-1:0] offset = addr[CACHE_WID+1:2];
     wire [13-CACHE_WID:0] tag = addr[15:CACHE_WID+2];
     wire uncached = (addr[19:16] == 4'hf);  // 1: mmio, 0: memory
-    wire [`DATA_WID] rdata_in = (cache_state == 2) ? mem_data : cache[offset][31:0];
+    wire [`DATA_WID] rdata_in = (cache_state == 2 || uncached) ? mem_data : cache[offset][31:0];
+    wire [`DATA_WID] cache_wdata = (MemRead && cache_state == 2) ? mem_data : rdata_out;
     wire [2:0] end_state = (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag) ? 4 : 2;
     wire cache_web = (MemRead && cache_state == 2) || (MemWrite && cache_state == 2) || (MemWrite && cache[offset][47-CACHE_WID] && cache_state == 0);
-    assign data_out = (cache_state == 2 || uncached) ? mem_data : rdata_out;
+    assign data_out = rdata_out;
     assign dcache_stall = !uncached && (MemRead || MemWrite) && cache_state != end_state
     && (!cache[offset][47-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag || (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag));
 
@@ -41,25 +42,25 @@ module DCache #(
         end        
     end
 
-    // transition of cache state
+    // transition of cache state and store old cache
     always_ff @(negedge clk) begin
         if (rst || !dcache_stall) begin
             cache_state <= 0;
+            old_cache <= 0;
         end else begin
             cache_state <= cache_state + 1;
+            old_cache <= (cache_state == 0) ? cache[offset] : old_cache;
         end
     end
 
     // write to cache
     always_ff @(posedge clk) begin
         if (rst) begin
-            old_cache <= 0;
             for (int i = 0; i < (1 << CACHE_WID); i++) begin
                 cache[i] <= 0;
             end
         end else begin
-            cache[offset] <= cache_web ? {1'b1, MemWrite, tag, rdata_out} : cache[offset];
-            old_cache <= (cache_state == 0) ? cache[offset] : old_cache;
+            cache[offset] <= cache_web ? {1'b1, MemWrite, tag, cache_wdata} : cache[offset];
         end
     end
 
