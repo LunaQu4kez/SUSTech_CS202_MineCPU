@@ -12,12 +12,6 @@ module VGA (  // 800×600 60Hz
     output logic [`COLOR_WID] green,
     output logic [`COLOR_WID] blue
 );
-    assign vga_addr = 0;
-    assign hsync = 0;
-    assign vsync = 0;
-    assign red = 0;
-    assign green = 0;
-    assign blue = 0;
 
     reg [10:0] hc;
     always @(posedge clk) begin
@@ -43,32 +37,32 @@ module VGA (  // 800×600 60Hz
                     (vc >= `V_SYNC_PULSE + `V_BACK_PORCH) &&
                     (vc < `V_SYNC_PULSE + `V_BACK_PORCH + `V_ACTIVE_TIME) ? 1 : 0;
 
-    wire [7:0] x,y,char_num,char_addr;
+    wire [7:0] x, y, char_addr;
     reg [127:0] have_ch = 0;
     reg [127:0] temp_ch;
     wire have_ch0;
     wire flag = hc0 > 15 && hc0 < 784 && vc0 > 43 && vc0 < 556;
 
-    assign char_addr = (hc0-16)%8 + ((vc0-44)%16)*8;
+    assign char_addr = (hc0-16)&8 + ((vc0-44)&16) << 3;
     assign x = (hc0-16) >> 3;
     assign y = (vc0-44) >> 4;
     assign vga_addr = 96*y+ x;
     assign have_ch0 = have_ch[char_addr];
 
     always @(posedge active) begin
-        have_ch <= temp_ch;
+        have_ch <= flag ? temp_ch : 128'h00000000000000000000000000000000;
     end
 
     always_comb begin
         case (color)
             8'b00000000: {red,green,blue} = have_ch0 ? {`WHITH_R,`WHITH_G,`WHITH_B} : 12'h000;
-            8'b00000001:{red,green,blue} = have_ch0 ? {`YELLOW_R,`YELLOW_G,`YELLOW_B} : 12'h000;
-            8'b00000010:{red,green,blue} = have_ch0 ? {`RED_R,`RED_G,`RED_B} : 12'h000;
-            8'b00000011:{red,green,blue} = have_ch0 ? {`PINK_R,`PINK_G,`PINK_B} : 12'h000;
-            8'b00000100:{red,green,blue} = have_ch0 ? {`ORANGE_R,`ORANGE_G,`ORANGE_B} : 12'h000;
-            8'b00000101:{red,green,blue} = have_ch0 ? {`LBLUE_R,`LBLUE_G,`LBLUE_B} : 12'h000;
-            8'b00000110:{red,green,blue} = have_ch0 ? {`DBLUE_R,`DBLUE_G,`DBLUE_B} : 12'h000;
-            default: {red,green,blue} = 12'b000000000000;
+            8'b00000001: {red,green,blue} = have_ch0 ? {`YELLOW_R,`YELLOW_G,`YELLOW_B} : 12'h000;
+            8'b00000010: {red,green,blue} = have_ch0 ? {`RED_R,`RED_G,`RED_B} : 12'h000;
+            8'b00000011: {red,green,blue} = have_ch0 ? {`PINK_R,`PINK_G,`PINK_B} : 12'h000;
+            8'b00000100: {red,green,blue} = have_ch0 ? {`ORANGE_R,`ORANGE_G,`ORANGE_B} : 12'h000;
+            8'b00000101: {red,green,blue} = have_ch0 ? {`LBLUE_R,`LBLUE_G,`LBLUE_B} : 12'h000;
+            8'b00000110: {red,green,blue} = have_ch0 ? {`DBLUE_R,`DBLUE_G,`DBLUE_B} : 12'h000;
+                default: {red,green,blue} = 12'b000000000000;
         endcase
     end
 
@@ -181,10 +175,8 @@ module VGA (  // 800×600 60Hz
                 8'd124: temp_ch = `CHAR_124;
                 8'd125: temp_ch = `CHAR_125;
                 8'd126: temp_ch = `CHAR_126;
-            default: have_ch =0;
+               default: temp_ch = 0;
         endcase
     end
-
-
 
 endmodule
