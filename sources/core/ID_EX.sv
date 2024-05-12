@@ -50,7 +50,7 @@ module ID_EX (
     assign old_predict_pc_out = old_predict_pc;
 
     always_ff @(posedge clk) begin
-        if (rst || (predict_fail && !dcache_stall)) begin
+        if (rst || ((IF_ID_Write || predict_fail) && !dcache_stall)) begin
             pc <= 0;
             data1 <= 0;
             data2 <= 0;

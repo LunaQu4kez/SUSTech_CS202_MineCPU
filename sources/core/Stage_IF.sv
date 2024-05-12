@@ -48,7 +48,7 @@ module Stage_IF (
     Branch_Predictor bp_inst (
         .clk,
         .rst,
-        .stall(dcache_stall || IF_ID_Write),
+        .stall(icache_stall || dcache_stall || IF_ID_Write),
         .branch,
         .predict,
         .excp,

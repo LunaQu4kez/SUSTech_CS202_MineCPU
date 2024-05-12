@@ -31,7 +31,8 @@ module DCache #(
     wire [`DATA_WID] rdata_in = (cache_state == 2 || uncached) ? mem_data : cache[offset][31:0];
     wire [`DATA_WID] cache_wdata = (MemRead && cache_state == 2) ? mem_data : rdata_out;
     wire [2:0] end_state = (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag) ? 4 : 2;
-    wire cache_web = (MemRead && cache_state == 2) || (MemWrite && cache_state == 2) || (MemWrite && cache[offset][47-CACHE_WID] && cache_state == 0);
+    wire cache_web = (MemRead && cache_state == 2) || (MemWrite && cache_state == 2)
+    || (MemWrite && cache[offset][47-CACHE_WID] && cache[offset][45-CACHE_WID:32] == tag && cache_state == 0);
     assign data_out = rdata_out;
     assign dcache_stall = !uncached && (MemRead || MemWrite) && cache_state != end_state
     && (!cache[offset][47-CACHE_WID] || cache[offset][45-CACHE_WID:32] != tag || (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag));

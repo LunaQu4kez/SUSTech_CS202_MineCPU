@@ -24,12 +24,12 @@ module IF_ID (
     assign predict_pc_out = predict_pc;
 
     always_ff @(posedge clk) begin
-        if (rst | (icache_stall && !dcache_stall) | predict_fail) begin
+        if (rst || (icache_stall && !dcache_stall && !IF_ID_Write) || predict_fail) begin
             inst <= 0;
             pc <= 0;
             predict <= 0;
             predict_pc <= 0;
-        end else if (dcache_stall | IF_ID_Write) begin
+        end else if (dcache_stall || IF_ID_Write) begin
             inst <= inst;
             pc <= pc;
             predict <= predict;
