@@ -5,9 +5,9 @@ loop:
     lw t5, 20(gp)
     nop
     beq t5, t4, loop
-    lw a1, 0(gp)
-    lw a2, 4(gp)
-    lw a3, 8(gp)
+    lw a1, 8(gp)
+    lw a2, 0(gp)
+    lw a3, 4(gp)
 
     li s1, 0
     beq a1, s1, test_0
@@ -37,7 +37,7 @@ test_0:
     j loop
 
 test_1:
-    lb a0, 4(gp)
+    lb a0, 0(gp)
     nop
     li a7, 3
     ecall
@@ -46,7 +46,7 @@ test_1:
     j led_off
 
 test_2:
-    lbu a0, 8(gp)
+    lbu a0, 4(gp)
     nop
     li a7, 3
     ecall
