@@ -3,7 +3,6 @@
     li t3, 0x10001000
 loop:
     lw t5, 20(gp)
-    nop
     beq t5, t4, loop
     lw a1, 8(gp)
     lw a2, 0(gp)

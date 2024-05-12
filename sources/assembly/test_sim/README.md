@@ -15,3 +15,4 @@
 | test7 | 通过递归测试非叶子方法的调用(fib)                |      |
 | test8 | 通过 ecall 测试异常                            |      |
 | test9 | 测试 DCache 写回功能                           ｜     ｜
+| test10| 测试 ld 后接 beq 时的数据冒险                   |      |
