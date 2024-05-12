@@ -43,7 +43,7 @@ test_1:
     ecall
     sw a0, 0(t3)
     nop
-    j loop
+    j led_off
 
 test_2:
     lbu a0, 8(gp)
@@ -52,7 +52,7 @@ test_2:
     ecall
     sw a0, 4(t3)
     nop
-    j loop
+    j led_off
 
 test_3:
     lw t1, 0(t3)

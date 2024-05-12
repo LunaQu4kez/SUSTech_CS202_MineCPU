@@ -80,7 +80,7 @@ module CPU (
     
     // led3
     assign led3_out[5:0] = pc_t[7:2];
-    assign led3_out[6] = IF_pc_in == 32'h1c090040;
+    assign led3_out[6] = IF_pc_in == 32'h1c090048;
     assign led3_out[7] = uart_done;
 
     // debug port
