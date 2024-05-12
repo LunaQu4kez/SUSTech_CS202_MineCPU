@@ -1,7 +1,4 @@
 .text
-    li t4, 0
-    li t3, 0x00001000
-    
 loop:
     lw t5, 20(gp)
     nop
