@@ -33,7 +33,7 @@ module Control (
     always_comb begin : Ctrl_Signal_Gen
         unique case (inst[`OP_WID])
             `ART_LOG_OP: begin
-                if (inst[`FUNC7_WID] == 7'h10) begin
+                if (inst[`FUNC7_WID] == 7'h01) begin
                     unique case (inst[`FUNC3_WID])
                         `MUL_FUNC3: ALUOp = `ALU_MUL;
                        `MULH_FUNC3: ALUOp = `ALU_MULH;
