@@ -20,7 +20,7 @@ module CPU_Sim ();
     );
 
     initial begin
-        rst_n = 1;
+        rst_n = 0;
         cpuclk = 0;
         memclk = 0;
         uart_done = 0;
@@ -39,6 +39,10 @@ module CPU_Sim ();
         forever begin
             #5 cpuclk = ~cpuclk;
         end
+    join
+    
+    initial fork
+        #30 rst_n = 1;
     join
 
     initial fork

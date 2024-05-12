@@ -194,21 +194,30 @@ module Memory (
     end
 
     // vga write
-    always_ff @(posedge clkb) begin
-        unique case (addrb[31:12])
-            20'hffffe: begin
-                chars[addrb[11:0]] <= addrb[1] ? (addrb[0] ? write_datab[31:24] : write_datab[23:16]) : (addrb[0] ? write_datab[15:8] : write_datab[7:0]);
-                color <= color;
+    always_ff @(negedge clkb) begin
+        if (rst) begin
+            for (int i = 0; i < 3072; i++) begin
+                chars[i] <= 8'h00;
+                color[i] <= 8'h00;
             end
-            20'hffffd: begin
-                chars <= chars;
-                color[addrb[11:0]] <= addrb[1] ? (addrb[0] ? write_datab[31:24] : write_datab[23:16]) : (addrb[0] ? write_datab[15:8] : write_datab[7:0]);
-            end
-            default: begin
-                chars <= chars;
-                color <= color;
-            end
-        endcase
+        end
+        else begin
+            unique case (addrb[31:12])
+                20'hffffe: begin
+                    chars[addrb[11:0]] <= write_datab[7:0];
+                    color <= color;
+                end
+                20'hffffd: begin
+                    chars <= chars;
+                    color[addrb[11:0]] <= write_datab[7:0];
+                end
+                default: begin
+                    chars <= chars;
+                    color <= color;
+                end
+            endcase
+        end
+        
     end
 
 endmodule
