@@ -109,9 +109,9 @@
 `define H_LINE_PERIOD 11'd1056
 `define V_SYNC_PULSE 11'd4
 `define V_BACK_PORCH 11'd23
-`define V_ACTIVE_TIME 11'd60
+`define V_ACTIVE_TIME 11'd600
 `define V_FRONT_PORCH 11'd1
-`define V_FRAME_PERIOD 11'd623
+`define V_FRAME_PERIOD 11'd628
 // VGA color
 `define BLACK_R 4'h0
 `define BLACK_G 4'h0
