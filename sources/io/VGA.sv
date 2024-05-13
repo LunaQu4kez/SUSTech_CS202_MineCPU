@@ -3,8 +3,8 @@ module VGA (  // 800×600 60Hz
     // get char and color from memory
     output logic [`VGA_ADDR]  vga_addr,
     input  logic [`INFO_WID ] ch,
-    input  logic [`INFO_WID ] color,    // 0: white   1: yellow      2: red        3: pink
-                                        // 4: orange  5: light blue  6: dark blue
+    input  logic [`INFO_WID ] color,    // 0: black   1: yellow      2: red        3: pink
+                                        // 4: orange  5: light blue  6: dark blue  8: white
     // output to VGA
     output logic              hsync,    // line synchronization signal
     output logic              vsync,    // vertical synchronization signal
@@ -55,13 +55,14 @@ module VGA (  // 800×600 60Hz
 
     always_comb begin
         case (color)
-            8'b00000000: {red,green,blue} = have_ch0 ? {`WHITH_R,`WHITH_G,`WHITH_B} : 12'h000;
+            8'b00000000: {red,green,blue} = have_ch0 ? {`BLACK_R,`BLACK_G,`BLACK_B} : 12'h000;
             8'b00000001: {red,green,blue} = have_ch0 ? {`YELLOW_R,`YELLOW_G,`YELLOW_B} : 12'h000;
             8'b00000010: {red,green,blue} = have_ch0 ? {`RED_R,`RED_G,`RED_B} : 12'h000;
             8'b00000011: {red,green,blue} = have_ch0 ? {`PINK_R,`PINK_G,`PINK_B} : 12'h000;
             8'b00000100: {red,green,blue} = have_ch0 ? {`ORANGE_R,`ORANGE_G,`ORANGE_B} : 12'h000;
             8'b00000101: {red,green,blue} = have_ch0 ? {`LBLUE_R,`LBLUE_G,`LBLUE_B} : 12'h000;
             8'b00000110: {red,green,blue} = have_ch0 ? {`DBLUE_R,`DBLUE_G,`DBLUE_B} : 12'h000;
+            8'b00000111: {red,green,blue} = have_ch0 ? {`WHITH_R,`WHITH_G,`WHITH_B} : 12'h000;
                 default: {red,green,blue} = 12'b000000000000;
         endcase
     end
@@ -80,6 +81,7 @@ module VGA (  // 800×600 60Hz
                 8'd9: temp_ch = `CHAR_9;
                 8'd10: temp_ch = `CHAR_10;
                 8'd11: temp_ch = `CHAR_11;
+                8'd12: temp_ch = `CHAR_12;
                 8'd32: temp_ch = `CHAR_32;
                 8'd33: temp_ch = `CHAR_33;
                 8'd34: temp_ch = `CHAR_34;

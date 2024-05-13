@@ -113,6 +113,9 @@
 `define V_FRONT_PORCH 11'd1
 `define V_FRAME_PERIOD 11'd623
 // VGA color
+`define BLACK_R 4'h0
+`define BLACK_G 4'h0
+`define BLACK_B 4'h0
 `define WHITH_R 4'hf
 `define WHITH_G 4'hf
 `define WHITH_B 4'hf
@@ -142,18 +145,19 @@
 `define MAX_DATA 32'h7ffffffc
 `define MAX_IDLE 16'hffff
 // VGA chars
-`define CHAR_0   128'h00000000000000010100000000000000  // left of a point
-`define CHAR_1   128'h00000000000000808000000000000000  // right of a point
-`define CHAR_2   128'h071f3f7f7fffffffffffff7f7f3f1f07  // left of a circle
-`define CHAR_3   128'he0f8fcfefefffffffffffffefefcf8e0  // right of a circle
-`define CHAR_4   128'he0f8fcf8f0e0c08080c0e0f0f8fcf8e0  // right mouth
-`define CHAR_5   128'h071f3f1f0f0703010103070f1f3f1f07  // left mouth
-`define CHAR_6   128'h0000207078fcfeffffffff7f7f3f1f07  // left of up mouth
-`define CHAR_7   128'h0000040e1e3f7ffffffffffefefcf8e0  // right of up mouth
-`define CHAR_8   128'h071f3f7f7ffffffffffefc7870200000  // left of down mouth
-`define CHAR_9   128'he0f8fcfefeffffffff7f3f1e0e040000  // right of down mouth
-`define CHAR_10  128'h030f3f3f7f67677f7f7f7f7f7f666644  // left of ghost
-`define CHAR_11  128'hc0f0fcfcfee6e6fefefefefefe666622  // right of ghost
+`define CHAR_0   128'h00000000000000000000000000000000  // left of a point
+`define CHAR_1   128'h00000000000000010100000000000000  // left of a point
+`define CHAR_2   128'h00000000000000808000000000000000  // right of a point
+`define CHAR_3   128'h071f3f7f7fffffffffffff7f7f3f1f07  // left of a circle
+`define CHAR_4   128'he0f8fcfefefffffffffffffefefcf8e0  // right of a circle
+`define CHAR_5   128'he0f8fcf8f0e0c08080c0e0f0f8fcf8e0  // right mouth
+`define CHAR_6   128'h071f3f1f0f0703010103070f1f3f1f07  // left mouth
+`define CHAR_7   128'h0000207078fcfeffffffff7f7f3f1f07  // left of up mouth
+`define CHAR_8   128'h0000040e1e3f7ffffffffffefefcf8e0  // right of up mouth
+`define CHAR_9   128'h071f3f7f7ffffffffffefc7870200000  // left of down mouth
+`define CHAR_10   128'he0f8fcfefeffffffff7f3f1e0e040000  // right of down mouth
+`define CHAR_11  128'h030f3f3f7f67677f7f7f7f7f7f666644  // left of ghost
+`define CHAR_12  128'hc0f0fcfcfee6e6fefefefefefe666622  // right of ghost
 
 `define CHAR_32  128'hffffffffffffffffffffffffffffffff  // 0x20: (space)
 `define CHAR_33  128'h00000010383838101010100010000000  // 0x21: !
@@ -218,7 +222,7 @@
 `define CHAR_89  128'h00000082824444282810101010000000  // 0x59: Y
 `define CHAR_90  128'h000000fe0204081010204080fe000000  // 0x5a: Z
 `define CHAR_91  128'h00001c10101010101010101010101c00  // 0x5b: [
-`define CHAR_92  128'h00004040202020101010080808040400  // 0x5c: YOU_KNOW_WHO
+`define CHAR_92  128'h00004040202020101010080808040400  // 0x5c: '\'
 `define CHAR_93  128'h00007010101010101010101010107000  // 0x5d: ]
 `define CHAR_94  128'h00000010284400000000000000000000  // 0x5e: ^
 `define CHAR_95  128'h000000000000000000000000000000fe  // 0x5f: _
