@@ -32,7 +32,7 @@ MineCPU
 │   └── *.bit                   # bitstream file with different parameters
 ├── program
 │   ├── lib                     # library of hardware API (driver)
-│   ├── my_pacman               # game by C++ (easier cross-compiling to RV)
+│   ├── pacman                  # game by C++ (easier cross-compiling to RV)
 │   └── testcase                # used for project presentation
 ├── sources
 │   ├── assembly
