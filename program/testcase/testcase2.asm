@@ -199,17 +199,15 @@ test_5:
 
 test_6:
 	lw a2,0(gp)
+	li t5,0
 	li t6,0
 
 loop_6:
-	addi t3,a1,0
-	addi t4,t5,0
-	li t5,0
 	addi a1,t6,0
 	jal fib
 	addi t6,t6,1
 	blt a1,a2,loop_6
-	lw t4,40(gp)
+	lw t5,40(gp)
 	j loop
 	
 fib:
@@ -236,7 +234,6 @@ L1:
 	lw ra, 4(sp)     # restore the return address
 	lw t1, 8(sp)     # restore fib(n-1)
 	addi sp, sp, 12  # adjust stack pointer to pop 2 items
-	addi t5,t5,3
 	jr ra            # return to the caller
 
 	
@@ -245,8 +242,6 @@ test_7:
 	li t6,0
 	
 loop_7:
-	addi t3,a1,0
-	addi t4,t5,0
 	addi a1,t6,0
 	jal fib_7
 	addi t6,t6,1
