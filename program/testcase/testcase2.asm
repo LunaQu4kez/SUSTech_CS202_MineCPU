@@ -190,13 +190,103 @@ test_5:
 	lw a3,4(gp)
 	li t1,15
 	and t2,t1,a2
-	slli a3,a3,8
-	and t2,a3,a2
+	slli a3,a3,24
+	slli t2,t2,8
+	and t2,a3,t2
 	sw t2,40(gp)
 	j loop
 
-test_6:
-	
 
-test_7:
+test_6:
+	lw a2,0(gp)
+	li t6,0
+
+loop_6:
+	addi t3,a1,0
+	addi t4,t5,0
+	li t5,0
+	addi a1,t6,0
+	jal fib
+	addi t6,t6,1
+	blt a1,a2,loop_6
+	lw t4,40(gp)
 	j loop
+	
+fib:
+	addi sp, sp, -12 # adjust stack for 2 items
+	sw ra, 4(sp)     # save the return address
+	sw a1, 0(sp)     # save the argument n
+	addi t5,t5,2
+	slti t0, a1, 2   # test for n < 2
+	beq t0, zero, L1 # if n >= 2, go to L1
+	addi a1, zero, 1 # else return 1
+	addi sp, sp, 12  # pop 2 items off stack
+	addi t5,t5,3
+	jr ra            # return to caller
+L1:
+	addi a1, a1, -1  # n >= 2; argument gets(n-1)
+	jal fib          # call fib(n-1)
+	sw a1, 8(sp)     # save result for fib(n-1)
+	addi t5,t5,1
+	lw a1, 0(sp)     # load n
+	addi a1, a1, -2  # n >= 2; argument gets(n-2)
+	jal fib          # call fib(n-2)
+	lw t1, 8(sp)     # restore fib(n-1)
+	add a1, a1, t1   # ao = fib(n-1) + fib(n-2)
+	lw ra, 4(sp)     # restore the return address
+	lw t1, 8(sp)     # restore fib(n-1)
+	addi sp, sp, 12  # adjust stack pointer to pop 2 items
+	addi t5,t5,3
+	jr ra            # return to the caller
+
+	
+test_7:
+	lw a2,0(gp)
+	li t6,0
+	
+loop_7:
+	addi t3,a1,0
+	addi t4,t5,0
+	addi a1,t6,0
+	jal fib_7
+	addi t6,t6,1
+	blt a1,a2,loop_7
+	j loop
+	
+fib_7:
+	addi sp, sp, -12 # adjust stack for 2 items
+	sw ra, 4(sp)     # save the return address
+	sw a1, 0(sp)     # save the argument n
+	sw a1,40(gp)
+	jal stop
+	slti t0, a1, 2   # test for n < 2
+	beq t0, zero, L1_7 # if n >= 2, go to L1
+	addi a1, zero, 1 # else return 1
+	addi sp, sp, 12  # pop 2 items off stack
+	jr ra            # return to caller
+L1_7:
+	addi a1, a1, -1  # n >= 2; argument gets(n-1)
+	jal fib_7          # call fib(n-1)
+	sw a1, 8(sp)     # save result for fib(n-1)
+	sw a1,40(gp)
+	jal stop
+	lw a1, 0(sp)     # load n
+	addi a1, a1, -2  # n >= 2; argument gets(n-2)
+	jal fib_7         # call fib(n-2)
+	lw t1, 8(sp)     # restore fib(n-1)
+	add a1, a1, t1   # ao = fib(n-1) + fib(n-2)
+	lw ra, 4(sp)     # restore the return address
+	lw t1, 8(sp)     # restore fib(n-1)
+	addi sp, sp, 12  # adjust stack pointer to pop 2 items
+	jr ra            # return to the caller
+	
+stop:
+	li t5,10000000
+	li t4,0
+	j stop_1
+stop_1:
+	nop
+	nop
+	addi t4,t4,1
+	ble t4,t5,stop_1
+	jr ra
