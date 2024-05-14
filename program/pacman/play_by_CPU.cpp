@@ -38,14 +38,6 @@ int main() {
         }
 
         while (true) {
-            ///******  for test  ******
-            int t;
-            cin >> t;
-            if (t == 8) dir = 0;
-            if (t == 5) dir = 1;
-            if (t == 4) dir = 2;
-            if (t == 6) dir = 3;
-            // ******  for test  ******/
             time_delay();
             stepO();
             stepA();
@@ -110,7 +102,78 @@ void time_delay() {
 }
 
 void print_map() {
-    // toDo
+    int adio1 = 0xffffe00f;
+    int adio2 = 0xffffd00f;
+    int adda = 0x10014000;
+    for (int i = 0; i < 31; i++) {
+        for (int j = 0; j < 28; j++) {
+            int ch, co;
+            int num = game[i][j];
+            if (num == -1) {        // wall
+                ch = 32;
+                co = 6;
+                // sw ch, 0(adio1)
+                // sw co, 0(adio2)
+                // nop
+                // sw ch, 1(adio1)
+                // sw co, 1(adio2)
+                // nop
+            } else if (num == 1) {  // point
+                ch = 1;
+                co = 7;
+                // sw ch, 0(adio1)
+                // sw co, 0(adio2)
+                // nop
+                ch = 2;
+                // sw ch, 1(adio1)
+                // sw co, 1(adio2)
+                // nop
+            } else if (num == 2) {  // pacman
+                co = 1;
+                if (dir == 0) ch = 7;
+                else if (dir == 1) ch = 9;
+                else if (dir == 2) ch = 6;
+                else if (dir == 3) ch = 3;
+                // sw ch, 0(adio1)
+                // sw co, 0(adio2)
+                // nop
+                if (dir == 0) ch = 8;
+                else if (dir == 1) ch = 10;
+                else if (dir == 2) ch = 4;
+                else if (dir == 3) ch = 5;
+                // sw ch, 1(adio1)
+                // sw co, 1(adio2)
+                // nop
+            } else if (num >= 3) {  // ghost
+                ch = 11;
+                if (num == 3) co = 2;
+                else if (num == 4) co = 3;
+                else if (num == 5) co = 5;
+                else if (num == 6) co = 4;
+                // sw ch, 0(adio1)
+                // sw co, 0(adio2)
+                // nop
+                ch = 12;
+                // sw ch, 1(adio1)
+                // sw co, 1(adio2)
+                // nop
+            } else {                       // road
+                ch = 32;
+                co = 0;
+                // sw ch, 0(adio1)
+                // sw co, 0(adio2)
+                // nop
+                // sw ch, 1(adio1)
+                // sw co, 1(adio2)
+                // nop
+            }
+            adio1 += 2;
+            adio2 += 2;
+            adda += 4;
+        }
+        adio1 += 40;
+        adio2 += 40;
+    }
 }
 
 void init() {
