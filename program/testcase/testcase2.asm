@@ -1,7 +1,6 @@
 .text
 loop:
     lw t5, 20(gp)
-    nop
     beq t5, t4, loop
     lw a1, 8(gp)
     li s1, 0
@@ -22,6 +21,7 @@ loop:
     beq a1, s1, test_7
     j loop
     
+
 test_0:
 	lw a2,0(gp)
 	li t0,0
@@ -36,6 +36,7 @@ test_0:
 	sw t0,12(gp)
 	j loop
 
+
 test_1:
 	lw a2,0(gp)
 	lw a3,4(gp)
@@ -45,32 +46,44 @@ test_1:
 	add t1,t1,t2
 	andi t2,a2,124
 	srli t2,t2,2
-	addi t1,t1,1024 #此时寄存器中是t1已经加了1的值
-	
+	addi t1,t1,1024
+	li a5,128
+	and t3,a2,a5
+	#t1是已经加了1的f，t2是位移之后的e,t3是没有位移的符号位
 	li t6,25
 	sub t4,t6,t2
-	
-	bge t4,zero,shift_right_1
-
+	bge t4,zero,shift_right_1  #右移
 	sub t4,t2,t6
 	sll t5,t1,t4
-	#t5里是值
-	j out_123
+	j out_1
 	
-
+out_1:
+	beq t3,zero,positive_1_1
+	sub t5,zero,t5
+	lw t5,40(gp)
+	j loop
+	
+positive_1_1:
+	lw t5,40(gp)
+	j loop
+	
 shift_right_1:
 	srl t5,t1,t4
 	li t6,32
 	sub t4,t6,t4
 	sll t1,t1,t4
-	beq t1,zero,out_123
-	addi t5,t5,1
-	#t5里是值
-	j out_123
+	beq t1,zero,out_1
+	beq t3,zero,positive_1_2
+	sub t5,zero,t5
+	lw t5,40(gp)
+	j loop
 	
+positive_1_2:
+	addi t5,t5,1
+	lw t5,40(gp)
+	j loop
 	
 
-	
 test_2:
 	lw a2,0(gp)
 	lw a3,4(gp)
@@ -80,23 +93,33 @@ test_2:
 	add t1,t1,t2
 	andi t2,a2,124
 	srli t2,t2,2
-	addi t1,t1,1024 #此时寄存器中是t1已经加了1的值
-	
+	addi t1,t1,1024
+	li a5,128
+	and t3,a2,a5
+	#t1是已经加了1的f，t2是位移之后的e,t3是没有位移的符号位
 	li t6,25
 	sub t4,t6,t2
-	
-	bge t4,zero,shift_right_2
-
+	bge t4,zero,shift_right_2  #右移
 	sub t4,t2,t6
 	sll t5,t1,t4
-	#t5里是值
-	j out_123
+	j out_1
 	
-
 shift_right_2:
 	srl t5,t1,t4
-	#t5里是值
-	j out_123
+	li t6,32
+	sub t4,t6,t4
+	sll t1,t1,t4
+	beq t1,zero,out_1
+	beq t3,zero,positive_2_2
+	addi t5,t5,1
+	sub t5,zero,t5
+	lw t5,40(gp)
+	j loop
+	
+positive_2_2:
+	lw t5,40(gp)
+	j loop
+	
 	
 test_3:
 	lw a2,0(gp)
@@ -107,58 +130,48 @@ test_3:
 	add t1,t1,t2
 	andi t2,a2,124
 	srli t2,t2,2
-	addi t1,t1,1024 #此时寄存器中是t1已经加了1的值
-	
+	addi t1,t1,1024
+	li a5,128
+	and t3,a2,a5
+	#t1是已经加了1的f，t2是位移之后的e,t3是没有位移的符号位
 	li t6,25
 	sub t4,t6,t2
-	
-	bge t4,zero,shift_right_3
-
+	bge t4,zero,shift_right_3  #右移
 	sub t4,t2,t6
 	sll t5,t1,t4
-	#t5里是值
-	j out_123
+	j out_1
 	
 shift_right_3:
 	srl t5,t1,t4
+	li t6,32
+	sub s1,t6,t4
+	sll s0,t1,s1
+	beq s0,zero,out_1
 	li t6,1
 	addi t4,t4,-1
 	sll t6,t6,t4
-	and t3,t1,t6
+	and s2,t1,t6
 	addi t4,t4,1
-	beq t3,zero,test_3_down
+	beq s2,zero,test_3_down
 	j test_3_up
 	
-test_3_up:
-	li t6,32
-	sub t4,t6,t4
-	sll t1,t1,t4
-	beq t1,zero,out_123
-	addi t5,t5,1
-	#t5里是值
-	j out_123
-
-
 test_3_down:
-	srl t5,t1,t4
-	#t5里是值
-	j out_123
-
-out_123:
-	li a5,-2147483648
-	and a6,a2,a5
-	beq a6,zero,positive
+	beq t3,zero,positive_2_2
 	sub t5,zero,t5
-	sw t5,40(gp)
+	lw t5,40(gp)
 	j loop
-
-positive:
-	sw t5,40(gp)
+	
+test_3_up:
+	beq t3,zero,positive_1_2
+	addi t5,t5,1
+	sub t5,zero,t5
+	lw t5,40(gp)
 	j loop
+	
 
 test_4:
-	lw a2,4(gp)
-	lw a3,8(gp)
+	lw a2,0(gp)
+	lw a3,4(gp)
 	add t1,a2,a3
 	srli t2,t1,8
 	beq t2,zero,inverse_num
@@ -169,13 +182,21 @@ inverse_num:
 	li t3,-1
 	xor t1,t1,t3
 	sw t3,12(gp)
+	j loop
 	
+
 test_5:
+	lw a2,0(gp)
+	lw a3,4(gp)
+	li t1,15
+	and t2,t1,a2
+	slli a3,a3,8
+	and t2,a3,a2
+	sw t2,40(gp)
+	j loop
 
 test_6:
+	
 
 test_7:
-
-j loop
-	
-	
+	j loop
