@@ -25,7 +25,7 @@ module Top (
     wire [`VGA_ADDR] vga_addr;
     wire [`INFO_WID] char_out, color_out;
     wire [`DATA_WID] seg1_out, timer;
-    wire [4:0] kb_idx;
+    wire [`KBCODE_WID] kb_idx;
 
     CPU_Clk cpu_clk_inst (       // 50MHz
         .clk,
@@ -40,7 +40,7 @@ module Top (
         .clk_out1(vgaclk)
     );
 
-    wire [31:0] pc_t, inst_t;
+    wire [`DATA_WID] pc_t, inst_t;
 
     CPU cpu_inst(
         .cpuclk,
@@ -79,7 +79,7 @@ module Top (
         .done(uart_done)
     );
 
-    wire [31:0] seg7data;
+    wire [`DATA_WID] seg7data;
     assign seg7data = inst_t;
 
     Seg7Tube seg7tube_inst(
