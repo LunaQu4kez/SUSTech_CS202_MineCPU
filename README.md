@@ -29,7 +29,7 @@ MineCPU
 │   ├── Report.md               # report of this project
 │   └── riscv-card.pdf          # ISA reference
 ├── generated
-│   └── *.bit                   # bitstream file with different parameters
+│   └── *.bit                   # bitstream file with different configurations
 ├── program
 │   ├── lib                     # library of hardware API (driver)
 │   ├── pacman                  # game by C++ (easier cross-compiling to RV)
@@ -106,14 +106,15 @@ MineCPU
 - [ ] 软件
   - [x] 测试场景1
   - [ ] 测试场景2
-  - [ ] Pac-Man *
+  - [ ] Pacman *
+  - [ ] Bonus 测试场景
 
 
 
 ## 架构设计
 
 ![Architecture](./docs/architecture.png)
-
+Powered by [draw.io](https://app.diagrams.net/)
 
 
 ## 功能
@@ -123,8 +124,17 @@ MineCPU
 - **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU
 - 时钟频率:
   + CPU: 50MHz
-  + MEM: 50MHz (使用 **Cache** 进行读取写入管理)
+  + MEM: 50MHz
   + VGA: 40MHz
+- **分支预测**:
+  + BHT: 32 entries, 2 bits
+  + RAS: 32 entries, 32 bits
+- **Cache**:
+  + ICache: 直接映射, 1472 bits, 32 entries
+  + DCache: 直接映射/写回, 3008 bits, 64 entries
+- **异常控制**:
+  + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见[Environment Call](#environment-call)
+
 
 ### ISA
 
@@ -275,7 +285,8 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
   - **可能原因**: 分支预测 (Branch Predictor) 和指令缓存 (ICache) 耗时较长
   - **解决方案**:
     1. :negative_squared_cross_mark: 降低时钟频率，但是会导致 CPU 性能整体全面下降
-    2. :white_check_mark: 在 `lw` 和紧接的分支指令之间插入 `nop` 
+    2. :negative_squared_cross_mark: 在 `lw` 和紧接的分支指令之间插入 `nop` 
+    3. :white_check_mark: 调整预测表和缓存的大小，减少访问时间
 
 
 

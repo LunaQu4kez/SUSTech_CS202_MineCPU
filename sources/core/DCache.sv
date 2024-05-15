@@ -27,7 +27,7 @@ module DCache #(
     reg  [`DATA_WID] rdata_out;
     wire [CACHE_WID-1:0] offset = addr[CACHE_WID+1:2];
     wire [13-CACHE_WID:0] tag = addr[15:CACHE_WID+2];
-    wire uncached = (addr[19:16] == 4'hf);  // 1: mmio, 0: memory
+    wire uncached = (addr[31:16] == 16'hffff);  // 1: mmio, 0: memory
     wire [`DATA_WID] rdata_in = (cache_state == 2 || uncached) ? mem_data : cache[offset][31:0];
     wire [`DATA_WID] cache_wdata = (MemRead && cache_state == 2) ? mem_data : rdata_out;
     wire [2:0] end_state = (old_cache[46-CACHE_WID] && old_cache[45-CACHE_WID:32] != tag) ? 4 : 2;
