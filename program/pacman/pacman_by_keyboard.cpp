@@ -44,9 +44,13 @@ int main() {
             time_delay();
             stepO();
             stepA();
+            ghost_move();
             stepB();
+            ghost_move();
             stepC();
+            ghost_move();
             stepD();
+            ghost_move();
             print_map();
             if (checkover()) {
                 printf("********************\n");
@@ -130,25 +134,32 @@ void ghost_move() {   // ghost index, target point x, target point y
         d = 1;
     }
 
-    game[x][y] = st[idx];
     if (d == 0) {   // move up
         // printf("%d move up\n", idx);
         x--;
+        if (game[x][y] >= 3) return;
+        game[x+1][y] = st[idx];
         gx[idx]--;
     }
     if (d == 1) {   // move down
         // printf("%d move down\n", idx);
         x++;
+        if (game[x][y] >= 3) return;
+        game[x-1][y] = st[idx];
         gx[idx]++;
     }
     if (d == 2) {   // move left
         // printf("%d move left\n", idx);
         y--;
+        if (game[x][y] >= 3) return;
+        game[x][y+1] = st[idx];
         gy[idx]--;
     }
     if (d == 3) {   // move right
         // printf("%d move right\n", idx);
         y++;
+        if (game[x][y] >= 3) return;
+        game[x][y-1] = st[idx];
         gy[idx]++;
     }
     st[idx] = game[x][y];
@@ -165,75 +176,68 @@ void stepA() {
     idx = 0;
     tx = ox;
     ty = oy;
-    ghost_move();
+    return;
 }
 
 void stepB() {
-    int bx = gx[1];
-    int by = gy[1];
-    if(((bx-ox >= 0) ? bx-ox : ox-bx) + ((by-oy >= 0) ? by-oy : oy-by) <= 2) {
+    int bx = gx[1] - ox;
+    int by = gy[1] - oy;
+    if (bx < 0) bx = -bx;
+    if (by < 0) by = -by;
+    if(bx + by <= 2) {
         idx = 1;
         tx = ox;
         ty = oy;
-        ghost_move();
         return;
     }
     if (dir == 0) {
-        cnt = 2;
-        while (cnt >= 0) {
-            if (ox - cnt >= 0 && game[ox-cnt][oy] != -1) {
+        int c = 2;
+        while (c >= 0) {
+            if (ox - c >= 0 && game[ox-c][oy] != -1) {
                 idx = 1;
-                tx = ox-cnt;
+                tx = ox-c;
                 ty = oy;
-                ghost_move();
-                cnt = 0;
-                break;
+                return;
             }
-            cnt--;
+            c--;
         }
     } 
     if (dir == 1) {
-        cnt = 2;
-        while (cnt >= 0) {
-            if (ox + cnt < 31 && game[ox+cnt][oy] != -1) {
+        int c = 2;
+        while (c >= 0) {
+            if (ox + c < 31 && game[ox+c][oy] != -1) {
                 idx = 1;
-                tx = ox+cnt;
+                tx = ox+c;
                 ty = oy;
-                ghost_move();
-                cnt = 0;
-                break;
+                return;
             }
-            cnt--;
+            c--;
         }
     } 
     if (dir == 2) {
-        cnt = 2;
-        while (cnt >= 0) {
-            if (oy - cnt >= 0 && game[ox][oy-cnt] != -1) {
+        int c = 2;
+        while (c >= 0) {
+            if (oy - c >= 0 && game[ox][oy-c] != -1) {
                 idx = 1;
                 tx = ox;
-                ty = oy-cnt;
-                ghost_move();
-                cnt = 0;
-                break;
+                ty = oy-c;
+                return;
             }
-            cnt--;
+            c--;
         }
     } 
     if (dir == 3) {
-        cnt = 2;
-        while (cnt >= 0) {
-            if (oy + cnt < 28 && game[ox][oy+cnt] != -1) {
+        int c = 2;
+        while (c >= 0) {
+            if (oy + c < 28 && game[ox][oy+c] != -1) {
                 idx = 1;
                 tx = ox;
-                ty = oy+cnt;
-                ghost_move();
-                cnt = 0;
-                break;
+                ty = oy+c;
+                return;
             }
-            cnt--;
+            c--;
         }
-    } 
+    }
 }
 
 void stepC() {
@@ -244,75 +248,27 @@ void stepC() {
     if (py < 0) py = 0;
     if (py >= 28) py = 27;
     
-    if (px > ox) {
-        while (px >= ox) {
-            if (game[px][py] != -1) {
-                idx = 2;
-                tx = px;
-                ty = py;
-                ghost_move();
-                return;
-            }
-            px--;
-        }
-    }
-    if (px < ox) {
-        while (px <= ox) {
-            if (game[px][py] != -1) {
-                idx = 2;
-                tx = px;
-                ty = py;
-                ghost_move();
-                return;
-            }
-            px++;
-        }
-    }
-    if (py > oy) {
-        while (py >= oy) {
-            if (game[px][py] != -1) {
-                idx = 2;
-                tx = px;
-                ty = py;
-                ghost_move();
-                return;
-            }
-            py--;
-        }
-    }
-    if (py < oy) {
-        while (py <= oy) {
-            if (game[px][py] != -1) {
-                idx = 2;
-                tx = px;
-                ty = py;
-                ghost_move();
-                return;
-            }
-            py++;
-        }
-    }
+    idx = 2;
+    tx = px;
+    ty = py;
 }
 
 void stepD() {
     int v = gx[3] - ox;
     int h = gy[3] - oy;
-    if ((v >= 0 ? v : -v) + (h >= 0 ? h : -h) > 8) {
+    if (v < 0) v = -v;
+    if (h < 0) h = -h;
+    if (v + h > 8) {
         idx = 3;
         tx = ox;
         ty = oy;
-        ghost_move();
+        return;
     } else {
         idx = 3;
         tx = 29;
         ty = 1;
-        ghost_move();
+        return;
     }
-    game[ox][oy] = 2;
-    game[gx[0]][gy[0]] = 3;
-    game[gx[1]][gy[1]] = 4;
-    game[gx[2]][gy[2]] = 5;
-    game[gx[3]][gy[3]] = 6;
 }
 
 
