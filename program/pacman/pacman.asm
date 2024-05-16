@@ -32,33 +32,455 @@ main:
 .lp1:	jal	td
 	jal	stepO
 	jal	stepA
+	jal	ghost_move
 	jal	stepB
+	jal	ghost_move
 	jal	stepC
+	jal	ghost_move
 	jal	stepD
+	jal	ghost_move
 	jal	print_map
-	jal   	checkover
 	nop
+	jal   	checkover
        	beq    a0,zero,.lp1
        	nop
 .bt2:	lw	t1,24(gp)
 	nop
 	beq	t1,zero,.bt2
 	j	main
-	j	main
 	nop
 	
 
-stepA:	ret
-	nop
+stepB:
+        lui     a5,0x10013
+        addi    a5,a5,0
+        lui     a4,0x10013
+        lw      a0,4(a5)
+        lw      a1,20(a5)
+        lw      a4,0x120(a4)
+        lui     a5,0x10013
+        lw      a5,0x11c(a5)
+        sub     a3,a0,a4
+        sub     a2,a1,a5
+        bge     a3,zero,.B2
+        sub     a3,a4,a0
+.B2:
+        bge     a2,zero,.B3
+        sub     a2,a5,a1
+.B3:
+        add     a3,a3,a2
+        li      a2,2
+        bgt     a3,a2,.B4
+        lui     a3,0x10013
+        li      a2,1
+        sw      a2,0x108(a3)
+        lui     a3,0x10013
+        sw      a4,0x104(a3)
+.B21:
+        lui     a4,0x10013
+        sw      a5,0x100(a4)
+        ret
+        nop
+.B4:
+        lui     a3,0x10013
+        lw      a3,0x118(a3)
+        bne     a3,zero,.B6
+        lui     a1,0x10014
+        addi    a3,a4,-2
+        slli    a0,a5,2
+        li      a6,112
+        addi    a1,a1,0
+        li      a7,-1
+.B8:
+        blt     a3,zero,.B7
+        mul     a2,a3,a6
+        add     a2,a2,a0
+        add     a2,a2,a1
+        lw      a2,0(a2)
+        beq     a2,a7,.B7
+.B22:
+        lui     a4,0x10013
+        li      a2,1
+        sw      a2,0x108(a4)
+        lui     a4,0x10013
+        sw      a3,0x104(a4)
+        j       .B21
+        nop
+.B17:
+        mv      a3,a2
+        j       .B8
+        nop
+.B7:
+        addi    a2,a3,1
+        bne     a3,a4,.B17
+        ret
+        nop
+.B6:
+        li      a1,1
+        bne     a3,a1,.B9
+        lui     a1,0x10014
+        addi    a3,a4,2
+        slli    a0,a5,2
+        li      a6,30
+        li      a7,112
+        addi    a1,a1,0
+        li      t1,-1
+.B11:
+        bgt     a3,a6,.B10
+        mul     a2,a3,a7
+        add     a2,a2,a0
+        add     a2,a2,a1
+        lw      a2,0(a2)
+        bne     a2,t1,.B22
+.B10:
+        addi    a2,a3,-1
+        bne     a3,a4,.B18
+        ret
+.B18:
+        mv      a3,a2
+        j       .B11
+        nop
+.B9:
+        bne     a3,a2,.B12
+        li      a1,112
+        mul     a1,a4,a1
+        lui     a0,0x10014
+        addi    a3,a5,-2
+        addi    a0,a0,0
+        li      a6,-1
+.B14:
+        blt     a3,zero,.B13
+        slli    a2,a3,2
+        add     a2,a2,a1
+        add     a2,a2,a0
+        lw      a2,0(a2)
+        beq     a2,a6,.B13
+.B23:
+        lui     a5,0x10013
+        li      a2,1
+        sw      a2,0x108(a5)
+        lui     a5,0x10013
+        sw      a4,0x104(a5)
+        lui     a5,0x10013
+        sw      a3,0x100(a5)
+        ret
+        nop
+.B19:
+        mv      a3,a2
+        j       .B14
+        nop
+.B13:
+        addi    a2,a3,1
+        bne     a3,a5,.B19
+        ret
+        nop
+.B12:
+        li      a2,3
+        bne     a3,a2,.B1
+        li      a1,112
+        mul     a1,a4,a1
+        lui     a0,0x10014
+        addi    a3,a5,2
+        li      a6,27
+        addi    a0,a0,0
+        li      a7,-1
+.B16:
+        bgt     a3,a6,.B15
+        slli    a2,a3,2
+        add     a2,a2,a1
+        add     a2,a2,a0
+        lw      a2,0(a2)
+        bne     a2,a7,.B23
+.B15:
+        addi    a2,a3,-1
+        bne     a5,a3,.B20
+.B1:
+        ret
+        nop
+.B20:
+        mv      a3,a2
+        j       .B16
+        nop
+        
 
-stepB:	ret
-	nop
+stepC:
+        lui     a5,0x10013
+        lw      a4,0x120(a5)
+        lui     a5,0x10013
+        addi    a3,a5,0
+        lw      a3,8(a3)
+        slli    a4,a4,1
+        li      a2,30
+        sub     a4,a4,a3
+        addi    a3,a5,0
+        ble     a4,a2,.C2
+        li      a4,30
+.C3:
+        lui     a5,0x10013
+        lw      a5,0x11c(a5)
+        lw      a3,24(a3)
+        slli    a5,a5,1
+        sub     a5,a5,a3
+        li      a3,27
+        ble     a5,a3,.C4
+        li      a5,27
+.C5:
+        lui     a3,0x10013
+        li      a2,2
+        sw      a2,0x108(a3)
+        lui     a3,0x10013
+        sw      a4,0x104(a3)
+        lui     a4,0x10013
+        sw      a5,0x100(a4)
+        ret
+        nop
+.C2:
+        bge     a4,zero,.C3
+        li      a4,0
+        j       .C3
+        nop
+.C4:
+        bge     a5,zero,.C5
+        li      a5,0
+        j       .C5
+        nop
 
-stepC:	ret
-	nop
 
-stepD:	ret
-	nop
+stepD:
+        lui     a4,0x10013
+        addi    a4,a4,0
+        lui     a5,0x10013
+        lw      a0,12(a4)
+        lw      a1,28(a4)
+        lw      a3,0x120(a5)
+        lui     a4,0x10013
+        lw      a4,0x11c(a4)
+        sub     a5,a0,a3
+        sub     a2,a1,a4
+        bge     a5,zero,.D2
+        sub     a5,a3,a0
+.D2:
+        bge     a2,zero,.D3
+        sub     a2,a4,a1
+.D3:
+        add     a5,a5,a2
+        li      a2,8
+        bgt     a5,a2,.D4
+        li      a3,29
+        li      a4,1
+.D4:
+        lui     a5,0x10013
+        li      a2,3
+        sw      a2,0x108(a5)
+        lui     a5,0x10013
+        sw      a3,0x104(a5)
+        lui     a5,0x10013
+        sw      a4,0x100(a5)
+        ret
+        nop
+	
+
+stepA:
+        lui     a5,0x10013
+        sw      zero,0x108(a5)
+        lui     a5,0x10013
+        lw      a4,0x120(a5)
+        lui     a5,0x10013
+        sw      a4,0x104(a5)
+        lui     a5,0x10013
+        lw      a4,0x11c(a5)
+        lui     a5,0x10013
+        sw      a4,0x100(a5)
+        nop
+        ret
+        nop
+
+
+ghost_move:
+        lui     a5,0x10013
+        lw      a6,0x108(a5)
+        lui     a2,0x10013
+        addi    a4,a2,0
+        slli    a1,a6,2
+        add     a4,a4,a1
+        lui     a3,0x10013
+        lw      a5,0(a4)
+        lw      a0,0x104(a3)
+        lui     a3,0x10014
+        lw      a4,16(a4)
+        addi    a2,a2,0
+        addi    a3,a3,0
+        bne     a0,a5,.G2
+        lui     a7,0x10013
+        lw      a7,0x100(a7)
+        bne     a4,a7,.G3
+        li      a5,28
+        mul     a0,a0,a5
+        addi    a6,a6,3
+        add     a0,a0,a4
+        slli    a0,a0,2
+        add     a0,a3,a0
+        sw      a6,0(a0)
+        ret
+.G2:
+        bge     a0,a5,.G5
+        li      a7,28
+        addi    a0,a5,-1
+        mul     a0,a0,a7
+        add     a0,a0,a4
+        slli    a0,a0,2
+        add     a0,a3,a0
+        lw      a7,0(a0)
+        li      a0,-1
+        bne     a7,a0,.G6
+.G3:
+        lui     a0,0x10013
+        lw      a0,0x100(a0)
+        bge     a0,a4,.G10
+        li      a0,28
+        mul     a0,a5,a0
+        addi    a7,a4,-1
+        add     a0,a0,a7
+        slli    a0,a0,2
+        add     a0,a3,a0
+        lw      a7,0(a0)
+        li      a0,-1
+        bne     a7,a0,.G9
+.G10:
+        li      a0,28
+        mul     a0,a5,a0
+        addi    a7,a4,1
+        addi    t1,a4,1
+        add     a0,a0,a7
+        slli    a0,a0,2
+        add     a0,a3,a0
+        lw      a7,0(a0)
+        li      a0,-1
+        bne     a7,a0,.G23
+        li      t1,28
+        mul     a0,a5,t1
+        addi    a7,a4,-1
+        add     a0,a0,a7
+        slli    a0,a0,2
+        add     a0,a3,a0
+        lw      a7,0(a0)
+        li      a0,-1
+        bne     a7,a0,.G9
+        addi    a0,a5,1
+        mul     a0,a0,t1
+        add     a0,a0,a4
+        slli    a0,a0,2
+        add     a0,a3,a0
+        lw      a0,0(a0)
+        bne     a0,a7,.G7
+.G6:
+        addi    t1,a5,-1
+.G22:
+        li      a0,28
+        mul     a7,t1,a0
+        add     a7,a7,a4
+        slli    a7,a7,2
+        add     a7,a3,a7
+        lw      t3,0(a7)
+        li      a7,2
+        bgt     t3,a7,.G1
+        mul     a0,a5,a0
+        add     a5,a2,a1
+        lw      a7,32(a5)
+        sw      t1,0(a5)
+        mv      a5,t1
+        add     a0,a0,a4
+        slli    a0,a0,2
+        add     a0,a3,a0
+        sw      a7,0(a0)
+.G13:
+        li      a0,28
+        mul     a0,a5,a0
+        li      a7,2
+        add     a0,a0,a4
+        slli    a0,a0,2
+        add     a0,a3,a0
+        lw      a0,0(a0)
+        bne     a0,a7,.G14
+        add     a0,a2,a1
+        sw      zero,32(a0)
+.G15:
+        add     a0,a2,a1
+        lw      t1,32(a0)
+        li      a7,4
+        bne     t1,a7,.G16
+        lw      a7,36(a2)
+        sw      a7,32(a0)
+.G16:
+        add     a0,a2,a1
+        lw      t1,32(a0)
+        li      a7,5
+        bne     t1,a7,.G17
+        lw      a7,40(a2)
+        sw      a7,32(a0)
+.G17:
+        add     a1,a2,a1
+        lw      a7,32(a1)
+        li      a0,6
+        bne     a7,a0,.G18
+        lw      a2,44(a2)
+        sw      a2,32(a1)
+.G18:
+        li      a2,28
+        mul     a5,a5,a2
+        addi    a6,a6,3
+        add     a5,a5,a4
+        slli    a5,a5,2
+        add     a3,a3,a5
+        sw      a6,0(a3)
+.G1:
+        ret
+        nop
+.G5:
+        li      a7,28
+        addi    a0,a5,1
+        mul     a0,a0,a7
+        add     a0,a0,a4
+        slli    a0,a0,2
+        add     a0,a3,a0
+        lw      a7,0(a0)
+        li      a0,-1
+        beq     a7,a0,.G3
+.G7:
+        addi    t1,a5,1
+        j       .G22
+        nop
+.G9:
+        addi    t1,a4,-1
+.G23:
+        li      a0,28
+        mul     a0,a5,a0
+        add     a7,a0,t1
+        slli    a7,a7,2
+        add     a7,a3,a7
+        lw      t3,0(a7)
+        li      a7,2
+        bgt     t3,a7,.G1
+        add     a0,a0,a4
+        add     a4,a2,a1
+        lw      a7,32(a4)
+        slli    a0,a0,2
+        add     a0,a3,a0
+        sw      t1,16(a4)
+        sw      a7,0(a0)
+        mv      a4,t1
+        j       .G13
+        nop
+.G14:
+        add     a7,a2,a1
+        sw      a0,32(a7)
+        li      t1,3
+        bne     a0,t1,.G15
+        lw      a0,32(a2)
+        sw      a0,32(a7)
+        j       .G15
+        nop
+
 
 td:
         lw      a6,24(gp)
@@ -326,10 +748,6 @@ checkover:
 
 
 print_map:
-	sw	s0,0(sp)
-	sw	s1,-4(sp)
-	sw	s2,-8(sp)
-	nop
 	li	t1,0xffffe00f	# adio1 = 0xffffe00f
 	li	t2,0xffffd00f	# adio2 = 0xffffd00f
 	li     	t0,0x10014000	# adda  = 0x10014000
@@ -349,87 +767,87 @@ print_map:
 	bge	t5,t6,.p10	# ghost
 	j	.p11		# road
 	nop
-.p7:	li	s1,32		# ch = 32
-	li	s2,6		# co = 6
-	sw 	s1, 0(t1)
+.p7:	li	a1,32		# ch = 32
+	li	a2,6		# co = 6
+	sw 	a1, 0(t1)
 	nop
-       	sw 	s2, 0(t2)
+       	sw 	a2, 0(t2)
        	nop
-     	sw 	s1, 1(t1)
+     	sw 	a1, 1(t1)
      	nop
-     	sw 	s2, 1(t2)
+     	sw 	a2, 1(t2)
      	nop
        	j	.p5
        	nop
-.p8:	li	s1,1		# ch = 1
-	li	s2,7		# co = 7
-	sb 	s1, 0(t1)
+.p8:	li	a1,1		# ch = 1
+	li	a2,7		# co = 7
+	sb 	a1, 0(t1)
 	nop
-       	sb 	s2, 0(t2)
+       	sb 	a2, 0(t2)
        	nop
-     	li	s1,2		# ch = 2
-     	sb 	s1, 1(t1)
+     	li	a1,2		# ch = 2
+     	sb 	a1, 1(t1)
      	nop
-     	sb 	s2, 1(t2)
+     	sb 	a2, 1(t2)
      	nop
        	j	.p5
        	nop
 .p9:	li	t6,0x10013118
-	lw	s0,0(t6)	# s0 = dir
-	li	s2,1		# co = 1
+	lw	a0,0(t6)	# a0 = dir
+	li	a2,1		# co = 1
 	li	t6,0
-	beq	s0,t6,.p17
+	beq	a0,t6,.p17
 	li	t6,1
-	beq	s0,t6,.p18
+	beq	a0,t6,.p18
 	li	t6,2
-	beq	s0,t6,.p19
+	beq	a0,t6,.p19
 	li	t6,3
-	beq	s0,t6,.p20
-.p17:	li	s1,7
+	beq	a0,t6,.p20
+.p17:	li	a1,7
 	j	.p21
 	nop
-.p18:	li	s1,9
+.p18:	li	a1,9
 	j	.p21
 	nop
-.p19:	li	s1,6
+.p19:	li	a1,6
 	j	.p21
 	nop
-.p20:	li	s1,3
+.p20:	li	a1,3
 	j	.p21
 	nop
-.p21:	sb 	s1, 0(t1)
+.p21:	sb 	a1, 0(t1)
 	nop
-       	sb 	s2, 0(t2)
+       	sb 	a2, 0(t2)
        	nop
 	li	t6,0
-	beq	s0,t6,.p22
+	beq	a0,t6,.p22
 	li	t6,1
-	beq	s0,t6,.p23
+	beq	a0,t6,.p23
 	li	t6,2
-	beq	s0,t6,.p24
+	beq	a0,t6,.p24
 	li	t6,3
-	beq	s0,t6,.p25
+	beq	a0,t6,.p25
 	j	.p26
 	nop
-.p22:	li	s1,8
+.p22:	li	a1,8
 	j	.p26
 	nop
-.p23:	li	s1,10
+.p23:	li	a1,10
 	j	.p26
 	nop
-.p24:	li	s1,4
+.p24:	li	a1,4
 	j	.p26
 	nop
-.p25:	li	s1,5
+.p25:	li	a1,5
 	j	.p26
 	nop
-.p26:  	sb 	s1, 1(t1)
+.p26:  	sb 	a1, 1(t1)
 	nop
-     	sb 	s2, 1(t2)
+     	sb 	a2, 1(t2)
      	nop
        	j	.p5
        	nop
-.p10:	li	s1,11		# ch = 11
+.p10:	li	a1,11		# ch = 11
 	li	t6,3
 	beq	t5,t6,.p12	# if num = 3
 	li	t6,4
@@ -440,38 +858,38 @@ print_map:
 	beq	t5,t6,.p15	# if num = 6
 	j	.p16
 	nop
-.p12:	li	s2,2
+.p12:	li	a2,2
 	j	.p16
 	nop
-.p13:	li	s2,3
+.p13:	li	a2,3
 	j	.p16
 	nop
-.p14:	li	s2,5
+.p14:	li	a2,5
 	j	.p16
 	nop
-.p15:	li	s2,4
+.p15:	li	a2,4
 	j	.p16
 	nop
-.p16:	sb 	s1, 0(t1)
+.p16:	sb 	a1, 0(t1)
 	nop
-       	sb 	s2, 0(t2)
+       	sb 	a2, 0(t2)
        	nop
-     	li	s1,12		# ch = 12
-     	sb 	s2, 1(t2)
+     	li	a1,12		# ch = 12
+     	sb 	a2, 1(t2)
      	nop
-     	sb 	s1, 1(t1)
+     	sb 	a1, 1(t1)
      	nop
        	j	.p5
        	nop
-.p11:	li	s1,32		# ch = 32
-	li	s2,0		# co = 0
-	sb 	s1, 0(t1)
+.p11:	li	a1,32		# ch = 32
+	li	a2,0		# co = 0
+	sb 	a1, 0(t1)
 	nop
-       	sb 	s2, 0(t2)
+       	sb 	a2, 0(t2)
        	nop
-     	sb 	s1, 1(t1)
+     	sb 	a1, 1(t1)
      	nop
-     	sb 	s2, 1(t2)
+     	sb 	a2, 1(t2)
      	nop
        	j	.p5
 	nop
@@ -486,9 +904,7 @@ print_map:
 	addi	t3,t3,-1
 	j 	.p2
 	nop
-.p1:	lw	s0,0(sp)
-	lw	s1,-4(sp)
-	lw	s2,-8(sp)
+.p1:	
 	ret
 	nop
 
@@ -1438,3 +1854,4 @@ init:
         li      a5,6
         sw      a5,1268(a6)
         ret
+
