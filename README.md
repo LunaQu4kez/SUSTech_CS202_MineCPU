@@ -6,6 +6,14 @@
 
 **支持 RISC-V ISA 的冯诺依曼架构含 Cache 和异常控制并附带手搓 UART 的标准五级 pipeline CPU**
 
+**附带汇编版吃豆人代码，能够通过 UART 传输至 CPU 运行**
+
+**HAVE FUN ! ! ! :satisfied:**
+
+<div align="center">
+    <img src="./docs/pic/VGA.png" alt="" width="600">
+</div>
+
 </div>
 
 ## 小组成员及分工
@@ -23,8 +31,8 @@
 ```
 MineCPU
 ├── docs
+│   ├── pic                     # pictures used
 │   ├── Architecture.drawio     # design draft
-│   ├── architecture.png        # exported image
 │   ├── project_desciption.pdf  # project description
 │   ├── Report.md               # report of this project
 │   └── riscv-card.pdf          # ISA reference
@@ -106,14 +114,13 @@ MineCPU
 - [ ] 软件
   - [x] 测试场景1
   - [ ] 测试场景2
-  - [ ] Pacman *
-  - [ ] Bonus 测试场景
+  - [x] Pacman *
 
 
 
 ## 架构设计
 
-![Architecture](./docs/architecture.png)
+![Architecture](./docs/pic/architecture.png)
 Powered by [draw.io](https://app.diagrams.net/)
 
 
@@ -131,9 +138,9 @@ Powered by [draw.io](https://app.diagrams.net/)
   + RAS: 32 entries, 32 bits
 - **Cache**:
   + ICache: 直接映射, 1472 bits, 32 entries
-  + DCache: 直接映射/写回, 3008 bits, 64 entries
+  + DCache: 直接映射/写回, 1504 bits, 32 entries
 - **异常控制**:
-  + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见[Environment Call](#environment-call)
+  + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见 [Environment Call](#environment-call)
 
 
 ### ISA
@@ -218,6 +225,10 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
     - 使用软硬件协同的方式实现 (MMIO)
     - 800×600 60Hz
     - 单个字符为 8×16 像素，全屏可显示 96×32 个字符，显示区域长宽比为 3 : 2
+
+<div align="center">
+    <img src="./docs/pic/VGA.png" alt="" width="600">
+</div>
 
 **MMIO 对应地址** 
 
