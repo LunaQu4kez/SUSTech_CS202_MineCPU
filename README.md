@@ -11,8 +11,9 @@
 **HAVE FUN ! ! ! :satisfied:**
 
 <div align="center">
-    <img src="./docs/pic/VGA.png" alt="" width="600">
+    <img src="./docs/pic/pacman.png" alt="" width="600">
 </div>
+
 
 </div>
 
