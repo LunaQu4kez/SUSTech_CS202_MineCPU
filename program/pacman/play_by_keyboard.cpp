@@ -1,5 +1,5 @@
-// #include <bits/stdc++.h>
-// using namespace std;
+#include <bits/stdc++.h>
+using namespace std;
 
 void init();
 void print_map();
@@ -10,8 +10,7 @@ void stepB();
 void stepC();
 void stepD();
 bool checkover();
-void ghost_move(int, int, int);
-int bfs(int, int, int);
+void ghost_move();
 
 
 int game[31][28]; // -1 wall, 0 road, 1 point, 2 pacman, 3 red ghost, 4 pink ghost, 5 blue ghost, 6 orange ghost
@@ -21,10 +20,7 @@ int dir;  // direction: 0 up, 1 down, 2 left, 3 right
 int st[4];  // step now
 int step, score;  
 int cnt;  // for time delay
-int bx[300], by[300], bh[300], bxt[300], byt[300], bht[300];  // t: temp, x,y: x,y, h: head
-int bmap[31][28];
-int bi, bit;  // bfs index
-int wx, wy;
+int idx, tx, ty;
 
 
 int main() {
@@ -38,12 +34,12 @@ int main() {
 
         while (true) {
             ///******  for test  ******
-            // int t;
-            // cin >> t;
-            // if (t == 8) dir = 0;
-            // if (t == 5) dir = 1;
-            // if (t == 4) dir = 2;
-            // if (t == 6) dir = 3;
+            int t;
+            cin >> t;
+            if (t == 8) dir = 0;
+            if (t == 5) dir = 1;
+            if (t == 4) dir = 2;
+            if (t == 6) dir = 3;
             // ******  for test  ******/
             time_delay();
             stepO();
@@ -53,9 +49,9 @@ int main() {
             stepD();
             print_map();
             if (checkover()) {
-                // printf("********************\n");
-                // printf("********LOSE********\n");
-                // printf("********************\n");
+                printf("********************\n");
+                printf("********LOSE********\n");
+                printf("********************\n");
                 break;
             }
         }
@@ -105,91 +101,34 @@ void stepO() {
     }
 }
 
-void ghost_move(int idx, int tx, int ty) {   // ghost index, target point x, target point y
+void ghost_move() {   // ghost index, target point x, target point y
     // printf("%d target %d %d\n", idx, tx, ty);
     // printf("%d pos %d %d\n", idx, gx[idx], gy[idx]);
     // printf("wx wy: %d %d\n", wx, wy);
 
-    if (gx[idx] == tx && gy[idx] == ty) {
+    int x = gx[idx];
+    int y = gy[idx];
+    int d = 0;
+    if (x == tx && y == ty) {
         game[tx][ty] = idx + 3;
         return;
     }
-
-    cnt = 0;
-    while (cnt < 300) {
-        bxt[cnt] = 0;
-        byt[cnt] = 0;
-        bht[cnt] = 0;
-        cnt++;
-    }
-    cnt = 0;
-    int x = gx[idx];
-    int y = gy[idx];
-    for (int i = 0; i < 31; i++) {
-        for (int j = 0; j < 28; j++) {
-            bmap[i][j] = 0;
-        }
-    }
-    bmap[x][y] = 1;
-    if (idx == 1 || idx == 2) {
-        bmap[wx][wy] = 1;
-    }
     
-    bit = 0;
-    if (game[x-1][y] != -1 && bmap[x-1][y] != 1) {  // up
-        if (x - 1 == tx && y == ty) {
-            gx[idx] = tx;
-            gy[idx] = ty;
-            game[x][y] = st[idx];
-            return;
-        }
-        bxt[bit] = x - 1;
-        byt[bit] = y;
-        bht[bit] = 0;
-        bmap[x-1][y] = 1;
-        bit++;
+    if (x > tx && game[x-1][y] != -1) {
+        d = 0;
+    } else if (x < tx && game[x+1][y] != -1) {
+        d = 1;
+    } else if (y > ty && game[x][y-1] != -1) {
+        d = 2;
+    } else if (y < ty && game[x][y+1] != -1) {
+        d = 3;
+    } else if (game[x][y+1] != -1) {
+        d = 3;
+    } else if (game[x][y-1] != -1) {
+        d = 2;
+    } else if (game[x+1][y] != -1) {
+        d = 1;
     }
-    if (game[x+1][y] != -1 && bmap[x+1][y] != 1) {  // down
-        if (x + 1 == tx && y == ty) {
-            gx[idx] = tx;
-            gy[idx] = ty;
-            game[x][y] = st[idx];
-            return;
-        }
-        bxt[bit] = x + 1;
-        byt[bit] = y;
-        bht[bit] = 1;
-        bmap[x+1][y] = 1;
-        bit++;
-    }
-    if (game[x][y-1] != -1 && bmap[x][y-1] != 1) {  // left
-        if (x == tx && y - 1 == ty) {
-            gx[idx] = tx;
-            gy[idx] = ty;
-            game[x][y] = st[idx];
-            return;
-        }
-        bxt[bit] = x;
-        byt[bit] = y - 1;
-        bht[bit] = 2;
-        bmap[x][y-1] = 1;
-        bit++;
-    }
-    if (game[x][y+1] != -1 && bmap[x][y+1] != 1) {  // right
-        if (x == tx && y + 1 == ty) {
-            gx[idx] = tx;
-            gy[idx] = ty;
-            game[x][y] = st[idx];
-            return;
-        }
-        bxt[bit] = x;
-        byt[bit] = y + 1;
-        bht[bit] = 3;
-        bmap[x][y+1] = 1;
-        bit++;
-    }
-    bit = 0;
-    int d = bfs(idx, tx, ty);
 
     game[x][y] = st[idx];
     if (d == 0) {   // move up
@@ -218,113 +157,35 @@ void ghost_move(int idx, int tx, int ty) {   // ghost index, target point x, tar
     if (st[idx] == 4) st[idx] = st[1];
     if (st[idx] == 5) st[idx] = st[2];
     if (st[idx] == 6) st[idx] = st[3];
-    // game[x][y] = idx + 3;
+    game[x][y] = idx + 3;
 }
 
-int bfs(int idx, int tx, int ty) {
-    while (true) {
-        cnt = 0;
-        while (cnt < 300) {
-            bx[cnt] = bxt[cnt];
-            by[cnt] = byt[cnt];
-            bh[cnt] = bht[cnt];
-            cnt++;
-        }
-        cnt = 0;
-        while (cnt < 300) {
-            bxt[cnt] = 0;
-            byt[cnt] = 0;
-            bht[cnt] = 0;
-            cnt++;
-        }
-        cnt = 0;
-        bi = 0;
-        bit = 0;
-
-        int x = bx[bi];
-        int y = by[bi];
-        int h = bh[bi];
-        while (x != 0 || y != 0) {
-            if (game[x-1][y] != -1 && bmap[x-1][y] == 0) {  // up
-                if (x - 1 == tx && y == ty) {
-                    if (idx == 0) {
-                        wx = x;
-                        wy = y;
-                    }
-                    return h;
-                }
-                bxt[bit] = x - 1;
-                byt[bit] = y;
-                bht[bit] = h;
-                bmap[x-1][y] = 1;
-                bit++;
-            }
-            if (game[x+1][y] != -1 && bmap[x+1][y] == 0) {  // down
-                if (x + 1 == tx && y == ty) {
-                    if (idx == 0) {
-                        wx = x;
-                        wy = y;
-                    }
-                    return h;
-                }
-                bxt[bit] = x + 1;
-                byt[bit] = y;
-                bht[bit] = h;
-                bmap[x+1][y] = 1;
-                bit++;
-            }
-            if (game[x][y-1] != -1 && bmap[x][y-1] == 0) {  // left
-                if (x == tx && y - 1 == ty) {
-                    if (idx == 0) {
-                        wx = x;
-                        wy = y;
-                    }
-                    return h;
-                }
-                bxt[bit] = x;
-                byt[bit] = y - 1;
-                bht[bit] = h;
-                bmap[x][y-1] = 1;
-                bit++;
-            }
-            if (game[x][y+1] != -1 && bmap[x][y+1] == 0) {  // right
-                if (x == tx && y + 1 == ty) {
-                    if (idx == 0) {
-                        wx = x;
-                        wy = y;
-                    }
-                    return h;
-                }
-                bxt[bit] = x;
-                byt[bit] = y + 1;
-                bht[bit] = h;
-                bmap[x][y+1] = 1;
-                bit++;
-            }
-            bi++;
-            x = bx[bi];
-            y = by[bi];
-            h = bh[bi];
-        }
-    }
-}
 
 void stepA() {
-    ghost_move(0, ox, oy);
+    idx = 0;
+    tx = ox;
+    ty = oy;
+    ghost_move();
 }
 
 void stepB() {
     int bx = gx[1];
     int by = gy[1];
-    if(((bx-ox >= 0) ? bx-ox : ox-bx) + ((by-oy >= 0) ? by-oy : oy-by) <= 2 && (bx != wx || by != wy)) {
-        ghost_move(1, ox, oy);
+    if(((bx-ox >= 0) ? bx-ox : ox-bx) + ((by-oy >= 0) ? by-oy : oy-by) <= 2) {
+        idx = 1;
+        tx = ox;
+        ty = oy;
+        ghost_move();
         return;
     }
     if (dir == 0) {
         cnt = 2;
         while (cnt >= 0) {
-            if (ox - cnt >= 0 && game[ox-cnt][oy] != -1 && bmap[ox-cnt][oy] != 1) {
-                ghost_move(1, ox-cnt, oy);
+            if (ox - cnt >= 0 && game[ox-cnt][oy] != -1) {
+                idx = 1;
+                tx = ox-cnt;
+                ty = oy;
+                ghost_move();
                 cnt = 0;
                 break;
             }
@@ -334,8 +195,11 @@ void stepB() {
     if (dir == 1) {
         cnt = 2;
         while (cnt >= 0) {
-            if (ox + cnt < 31 && game[ox+cnt][oy] != -1 && bmap[ox+cnt][oy] != 1) {
-                ghost_move(1, ox+cnt, oy);
+            if (ox + cnt < 31 && game[ox+cnt][oy] != -1) {
+                idx = 1;
+                tx = ox+cnt;
+                ty = oy;
+                ghost_move();
                 cnt = 0;
                 break;
             }
@@ -345,8 +209,11 @@ void stepB() {
     if (dir == 2) {
         cnt = 2;
         while (cnt >= 0) {
-            if (oy - cnt >= 0 && game[ox][oy-cnt] != -1 && bmap[ox][oy-cnt] != 1) {
-                ghost_move(1, ox, oy-cnt);
+            if (oy - cnt >= 0 && game[ox][oy-cnt] != -1) {
+                idx = 1;
+                tx = ox;
+                ty = oy-cnt;
+                ghost_move();
                 cnt = 0;
                 break;
             }
@@ -356,8 +223,11 @@ void stepB() {
     if (dir == 3) {
         cnt = 2;
         while (cnt >= 0) {
-            if (oy + cnt < 28 && game[ox][oy+cnt] != -1 && bmap[ox][oy+cnt] != 1) {
-                ghost_move(1, ox, oy+cnt);
+            if (oy + cnt < 28 && game[ox][oy+cnt] != -1) {
+                idx = 1;
+                tx = ox;
+                ty = oy+cnt;
+                ghost_move();
                 cnt = 0;
                 break;
             }
@@ -376,8 +246,11 @@ void stepC() {
     
     if (px > ox) {
         while (px >= ox) {
-            if (game[px][py] != -1 && bmap[px][py] != 1) {
-                ghost_move(2, px, py);
+            if (game[px][py] != -1) {
+                idx = 2;
+                tx = px;
+                ty = py;
+                ghost_move();
                 return;
             }
             px--;
@@ -385,8 +258,11 @@ void stepC() {
     }
     if (px < ox) {
         while (px <= ox) {
-            if (game[px][py] != -1 && bmap[px][py] != 1) {
-                ghost_move(2, px, py);
+            if (game[px][py] != -1) {
+                idx = 2;
+                tx = px;
+                ty = py;
+                ghost_move();
                 return;
             }
             px++;
@@ -394,8 +270,11 @@ void stepC() {
     }
     if (py > oy) {
         while (py >= oy) {
-            if (game[px][py] != -1 && bmap[px][py] != 1) {
-                ghost_move(2, px, py);
+            if (game[px][py] != -1) {
+                idx = 2;
+                tx = px;
+                ty = py;
+                ghost_move();
                 return;
             }
             py--;
@@ -403,8 +282,11 @@ void stepC() {
     }
     if (py < oy) {
         while (py <= oy) {
-            if (game[px][py] != -1 && bmap[px][py] != 1) {
-                ghost_move(2, px, py);
+            if (game[px][py] != -1) {
+                idx = 2;
+                tx = px;
+                ty = py;
+                ghost_move();
                 return;
             }
             py++;
@@ -416,9 +298,15 @@ void stepD() {
     int v = gx[3] - ox;
     int h = gy[3] - oy;
     if ((v >= 0 ? v : -v) + (h >= 0 ? h : -h) > 8) {
-        ghost_move(3, ox, oy);
+        idx = 3;
+        tx = ox;
+        ty = oy;
+        ghost_move();
     } else {
-        ghost_move(3, 29, 1);
+        idx = 3;
+        tx = 29;
+        ty = 1;
+        ghost_move();
     }
     game[ox][oy] = 2;
     game[gx[0]][gy[0]] = 3;
@@ -449,28 +337,28 @@ void time_delay() {
 }
 
 void print_map() {
-    // printf("   ");
-    // for (int j = 0; j < 28; j++) {
-    //     if (j < 10) printf("%d ", j);
-    //     else printf("%d", j);
-    // }
-    // printf("\n");
-    // for (int i = 0; i < 31; i++) {
-    //     if (i < 10) printf("%d  ", i);
-    //     else printf("%d ", i);
-    //     for (int j = 0; j < 28; j++) {
-    //         if (game[i][j] == -1) printf("X ");
-    //         else if (game[i][j] == 0) printf("  ");
-    //         else if (game[i][j] == 1) printf(". ");
-    //         else if (game[i][j] == 2) printf("O ");
-    //         else if (game[i][j] == 3) printf("A ");
-    //         else if (game[i][j] == 4) printf("B ");
-    //         else if (game[i][j] == 5) printf("C ");
-    //         else if (game[i][j] == 6) printf("D ");
-    //     }
-    //     printf("\n");
-    // }
-    // printf("**********************************************\n");
+    printf("   ");
+    for (int j = 0; j < 28; j++) {
+        if (j < 10) printf("%d ", j);
+        else printf("%d", j);
+    }
+    printf("\n");
+    for (int i = 0; i < 31; i++) {
+        if (i < 10) printf("%d  ", i);
+        else printf("%d ", i);
+        for (int j = 0; j < 28; j++) {
+            if (game[i][j] == -1) printf("X ");
+            else if (game[i][j] == 0) printf("  ");
+            else if (game[i][j] == 1) printf(". ");
+            else if (game[i][j] == 2) printf("O ");
+            else if (game[i][j] == 3) printf("A ");
+            else if (game[i][j] == 4) printf("B ");
+            else if (game[i][j] == 5) printf("C ");
+            else if (game[i][j] == 6) printf("D ");
+        }
+        printf("\n");
+    }
+    printf("**********************************************\n");
 }
 
 void init() {
@@ -495,8 +383,6 @@ void init() {
     step = 0;
     score = 0;
     cnt = 0;
-    bi = 0;
-    bit = 0;
 
     game[0][0] = -1;
     game[0][1] = -1;

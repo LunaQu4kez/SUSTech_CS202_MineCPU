@@ -3,12 +3,12 @@ module CPU_Clk (
     output clk0
 );
 
-    reg cnt = 0;
+    reg [15:0] cnt = 0;
     reg t = 0;
     assign clk0 = t;
 
     always @(posedge clk) begin
-        if (cnt == 1) begin
+        if (cnt == 50) begin
             cnt <= 0;
         end
         else begin
@@ -17,7 +17,7 @@ module CPU_Clk (
     end
 
     always @(posedge clk) begin
-        if (cnt == 1) begin
+        if (cnt == 50) begin
             t <= ~t;
         end 
     end

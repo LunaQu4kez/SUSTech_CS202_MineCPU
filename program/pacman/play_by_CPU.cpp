@@ -10,8 +10,7 @@ void stepB();
 void stepC();
 void stepD();
 bool checkover();
-void ghost_move(int, int, int);
-int bfs(int, int, int);
+void ghost_move();
 
 
 int game[31][28]; // -1 wall, 0 road, 1 point, 2 pacman, 3 red ghost, 4 pink ghost, 5 blue ghost, 6 orange ghost
@@ -21,10 +20,7 @@ int dir;  // direction: 0 up, 1 down, 2 left, 3 right
 int st[4];  // step now
 int step, score;  
 int cnt;  // for time delay
-int bx[300], by[300], bh[300], bxt[300], byt[300], bht[300];  // t: temp, x,y: x,y, h: head
-int bmap[31][28];
-int bi, bit;  // bfs index
-int wx, wy;
+int idx, tx, ty;
 
 
 int main() {
@@ -61,11 +57,7 @@ void stepO() {
     // same as play_by_keyboard.cpp
 }
 
-void ghost_move(int idx, int tx, int ty) {   // ghost index, target point x, target point y
-    // same as play_by_keyboard.cpp
-}
-
-int bfs(int idx, int tx, int ty) {
+void ghost_move() {   // ghost index, target point x, target point y
     // same as play_by_keyboard.cpp
 }
 
