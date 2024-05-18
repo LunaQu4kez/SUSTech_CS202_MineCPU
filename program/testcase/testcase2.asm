@@ -39,6 +39,8 @@ test_0:
 
 
 test_1:
+	sw zero,12(gp)
+	sw zero,16(gp)
 	lw a2,0(gp)
 	lw a3,4(gp)
 	addi t1,a3,0
@@ -50,26 +52,22 @@ test_1:
 	addi t1,t1,1024
 	li a5,128
 	and t3,a2,a5
-	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
 	li t6,25
 	sub t4,t6,t2
-	bge t4,zero,shift_right_1  #右移
+	bge t4,zero,shift_right_1
 	sub t4,t2,t6
 	sll t5,t1,t4
 	j out_1
-	nop
 	
 out_1:
 	beq t3,zero,positive_1_1
 	sub t5,zero,t5
 	sw t5,40(gp)
 	j loop
-	nop
 	
 positive_1_1:
 	sw t5,40(gp)
 	j loop
-	nop
 	
 shift_right_1:
 	srl t5,t1,t4
@@ -81,16 +79,15 @@ shift_right_1:
 	sub t5,zero,t5
 	sw t5,40(gp)
 	j loop
-	nop
 	
 positive_1_2:
 	addi t5,t5,1
 	sw t5,40(gp)
 	j loop
-	nop
-	
 
 test_2:
+	sw zero,12(gp)
+	sw zero,16(gp)
 	lw a2,0(gp)
 	lw a3,4(gp)
 	addi t1,a3,0
@@ -102,14 +99,12 @@ test_2:
 	addi t1,t1,1024
 	li a5,128
 	and t3,a2,a5
-	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
 	li t6,25
 	sub t4,t6,t2
-	bge t4,zero,shift_right_2  #右移
+	bge t4,zero,shift_right_2
 	sub t4,t2,t6
 	sll t5,t1,t4
 	j out_1
-	nop
 	
 shift_right_2:
 	srl t5,t1,t4
@@ -122,15 +117,15 @@ shift_right_2:
 	sub t5,zero,t5
 	sw t5,40(gp)
 	j loop
-	nop
 	
 positive_2_2:
 	sw t5,40(gp)
 	j loop
-	nop
 	
 	
 test_3:
+	sw zero,12(gp)
+	sw zero,16(gp)
 	lw a2,0(gp)
 	lw a3,4(gp)
 	addi t1,a3,0
@@ -142,10 +137,9 @@ test_3:
 	addi t1,t1,1024
 	li a5,128
 	and t3,a2,a5
-	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
 	li t6,25
 	sub t4,t6,t2
-	bge t4,zero,shift_right_3  #右移
+	bge t4,zero,shift_right_3
 	sub t4,t2,t6
 	sll t5,t1,t4
 	j out_1
@@ -196,6 +190,8 @@ inverse_num:
 	
 
 test_5:
+	sw zero,12(gp)
+	sw zero,16(gp)
 	lw a2,0(gp)
 	lw a3,4(gp)
 	li t1,15
@@ -208,6 +204,8 @@ test_5:
 
 
 test_6:
+	sw zero,12(gp)
+	sw zero,16(gp)
 	lw a2,0(gp)
 	li t5,0
 	li t6,0
@@ -237,18 +235,20 @@ L1:
 	sw a1, 8(sp)     # save result for fib(n-1)
 	addi t5,t5,1
 	lw a1, 0(sp)     # load n
+	addi t5,t5,1
 	addi a1, a1, -2  # n >= 2; argument gets(n-2)
 	jal fib          # call fib(n-2)
 	lw t1, 8(sp)     # restore fib(n-1)
-	add a1, a1, t1   # ao = fib(n-1) + fib(n-2)
+	add a1, a1, t1   # a1 = fib(n-1) + fib(n-2)
 	lw ra, 4(sp)     # restore the return address
-	lw t1, 8(sp)     # restore fib(n-1)
 	addi sp, sp, 12  # adjust stack pointer to pop 2 items
-	addi t5,t5,1
+	addi t5,t5,2
 	jr ra            # return to the caller
 
 	
 test_7:
+	sw zero,12(gp)
+	sw zero,16(gp)
 	lw a2,0(gp)
 	li t6,0
 	
@@ -265,13 +265,23 @@ fib_7:
 	sw a1, 0(sp)     # save the argument n
 	sw a1,40(gp)
 	
-	li t5,200000
+	li t5,500000
 	li t4,0
 stop_1:
 	nop
 	nop
 	addi t4,t4,1
 	ble t4,t5,stop_1
+	
+	li s11,-1
+	sw s11,40(gp)
+	li t5,100000
+	li t4,0
+stop_3:
+	nop
+	nop
+	addi t4,t4,1
+	ble t4,t5,stop_3
 	
 	slti t0, a1, 2   # test for n < 2
 	beq t0, zero, L1_7 # if n >= 2, go to L1
@@ -280,11 +290,11 @@ stop_1:
 	jr ra            # return to caller
 L1_7:
 	addi a1, a1, -1  # n >= 2; argument gets(n-1)
-	jal fib          # call fib(n-1)
+	jal fib_7        # call fib(n-1)
 	sw a1, 8(sp)     # save result for fib(n-1)
 	sw a1,40(gp)
 	
-	li t5,200000
+	li t5,500000
 	li t4,0
 stop_2:
 	nop
@@ -292,13 +302,22 @@ stop_2:
 	addi t4,t4,1
 	ble t4,t5,stop_2
 	
+	li s11,-1
+	sw s11,40(gp)
+	li t5,100000
+	li t4,0
+stop_4:
+	nop
+	nop
+	addi t4,t4,1
+	ble t4,t5,stop_4
+	
 	lw a1, 0(sp)     # load n
 	addi a1, a1, -2  # n >= 2; argument gets(n-2)
-	jal fib          # call fib(n-2)
+	jal fib_7        # call fib(n-2)
 	lw t1, 8(sp)     # restore fib(n-1)
 	add a1, a1, t1   # ao = fib(n-1) + fib(n-2)
 	lw ra, 4(sp)     # restore the return address
-	lw t1, 8(sp)     # restore fib(n-1)
 	addi sp, sp, 12  # adjust stack pointer to pop 2 items
 	jr ra            # return to the caller
 	
