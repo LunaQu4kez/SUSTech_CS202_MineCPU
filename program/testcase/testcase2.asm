@@ -50,7 +50,7 @@ test_1:
 	addi t1,t1,1024
 	li a5,128
 	and t3,a2,a5
-	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
+	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
 	li t6,25
 	sub t4,t6,t2
 	bge t4,zero,shift_right_1  #右移
@@ -102,7 +102,7 @@ test_2:
 	addi t1,t1,1024
 	li a5,128
 	and t3,a2,a5
-	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
+	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
 	li t6,25
 	sub t4,t6,t2
 	bge t4,zero,shift_right_2  #右移
@@ -142,7 +142,7 @@ test_3:
 	addi t1,t1,1024
 	li a5,128
 	and t3,a2,a5
-	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
+	#t1是已经加�?1的f，t2是位移之后的e,t3是没有位移的符号�?
 	li t6,25
 	sub t4,t6,t2
 	bge t4,zero,shift_right_3  #右移
@@ -167,14 +167,14 @@ shift_right_3:
 test_3_down:
 	beq t3,zero,positive_2_2
 	sub t5,zero,t5
-	lw t5,40(gp)
+	sw t5,40(gp)
 	j loop
 	
 test_3_up:
 	beq t3,zero,positive_1_2
 	addi t5,t5,1
 	sub t5,zero,t5
-	lw t5,40(gp)
+	sw t5,40(gp)
 	j loop
 	
 
@@ -229,7 +229,7 @@ fib:
 	beq t0, zero, L1 # if n >= 2, go to L1
 	addi a1, zero, 1 # else return 1
 	addi sp, sp, 12  # pop 2 items off stack
-	addi t5,t5,3
+	addi t5,t5,2
 	jr ra            # return to caller
 L1:
 	addi a1, a1, -1  # n >= 2; argument gets(n-1)
@@ -244,6 +244,7 @@ L1:
 	lw ra, 4(sp)     # restore the return address
 	lw t1, 8(sp)     # restore fib(n-1)
 	addi sp, sp, 12  # adjust stack pointer to pop 2 items
+	addi t5,t5,1
 	jr ra            # return to the caller
 
 	
