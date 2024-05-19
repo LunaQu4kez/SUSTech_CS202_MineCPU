@@ -13,7 +13,7 @@
 <div align="center">
     <img src="./docs/pic/pacman.png" alt="" width="600">
 </div>
-
+对 MineCPU 更详细的说明可参阅[项目报告文档](./docs/Report.md) 
 
 </div>
 
@@ -146,8 +146,6 @@ Powered by [draw.io](https://app.diagrams.net/)
 - **异常控制**:
   + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见 [Environment Call](#environment-call) 
 
-对 MineCPU 更详细的说明可参阅[项目报告文档](./docs/Report.md) 
-
 
 ### ISA
 
@@ -255,6 +253,10 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | 0xFFFFFF30 | R     | 4*4 小键盘按下位置       | 0x00 - 0x0F            |
 | 0xFFFFE___ (000-BFF) | W | VGA 字符 | 0x00 - 0xFF |
 | 0xFFFFD___ (000-BFF) | W | VGA 颜色 | 0x00 - 0xFF |
+
+### Pacman
+
+一个由汇编写成的小游戏 ([源代码](./program/pacman/pacman.asm))，能够适配 MineCPU 的 MMIO，汇编代码多达 1856 行，包含 `init`，`stepO`，`checkover` 等方法. **然而 MineCPU 能够成功跑通这个程序，足以证明 MineCPU 的鲁棒性极高.** 
 
 
 

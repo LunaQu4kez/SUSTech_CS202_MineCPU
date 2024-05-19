@@ -10,7 +10,7 @@
 
 | 学号     | 姓名    | 分工                 | 贡献比 |
 | -------- | ------ | ------------------- | ------ |
-| 12211655 | 于斯瑶  | IO 模块、汇编软件 | 33.33% |
+| 12211655 | 于斯瑶  | IO 实现、汇编软件 | 33.33% |
 | 12110120 | 赵钊   | 架构设计、上板调试 | 33.33% |
 | 12212231 | 陈贲   | 核心开发、仿真测试       | 33.33% |
 
@@ -517,8 +517,6 @@ module Seg7Tube(
 
 
 
-
-
 ## 测试说明
 
 
@@ -551,15 +549,34 @@ MineCPU Project 主要采用了两个方向上的性能优化，第一个是采�
 
 #### Forward
 
+```systemverilog
+module Forward (
+    input  logic [`REGS_WID] ID_EX_rs1, ID_EX_rs2, EX_MEM_rd, MEM_WB_rd,
+    input  logic             EX_MEM_RegWrite, MEM_WB_RegWrite,
+    output logic [`FW_WID  ] fwA, fwB // 00: no fwd, 01: from MEM/WB, 10: from EX/MEM
+);
+```
 
-
-
+前递模块，输入相关信号，输出是否前递的控制信号. 以 ALU 的 src1 输入数据为例，src1 数据的前递选择器逻辑为，若 `EX_MEM_RegWrite & (EX_MEM_rd != 0) & (EX_MEM_rd == ID_EX_rs1)` 成立，那么将从 MEM 阶段前递数据，若 `MEM_WB_RegWrite & (MEM_WB_rd != 0) & ~(EX_MEM_RegWrite & (EX_MEM_rd != 0) & (EX_MEM_rd == ID_EX_rs1)) & (MEM_WB_rd == ID_EX_rs1)` 成立，将从 WB 阶段前递数据，其余情况均不需要前递.
 
 #### Hazard
 
+```systemverilog
+module Hazard (
+    input  logic [`REGS_WID] IF_ID_rs1, IF_ID_rs2, ID_EX_rd,
+    input  logic             ID_EX_MemRead,
+    output logic             stall, IF_ID_Write, PC_Write  // 1 stall, 0 not stall
+);
+```
 
+Hazard 模块用于判断是否存在因与内存交互而需停顿一个时钟周期的数据冒险，例如下面代码
 
+```assembly
+lw t3, 0(t1)
+xori t3, t3, -1
+```
 
+该种数据冒险停顿的判断逻辑为如果 `ID_EX_MemRead & ((ID_EX_rd == IF_ID_rs1) | (ID_EX_rd == IF_ID_rs2))` 成立，则需要停顿，其余情况无需停顿.
 
 #### Branch_Predictor
 
@@ -590,19 +607,108 @@ module Branch_Predictor # (
 
 #### ICache
 
+```systemverilog
+module ICache #(
+    parameter CACHE_WID = 4
+)(
+    input  logic             clk, rst,
+    // cpu interface
+    input  logic [`DATA_WID] addr,
+    input  logic             predict_fail,
+    output logic [`DATA_WID] inst,
+    output logic             icache_stall,
+    // mem interface
+    input  logic [`DATA_WID] mem_inst,
+    output logic [`DATA_WID] mem_pc
+);
+```
 
+指令缓存模块用于管理指令的读取，缓存格式如下. 运行模式为如果 `tag` 不一样说明未命中，那么将流水线停顿并从内存中读取数据，输出并存入缓存. **值得注意的是，缓存的停顿需要做到和数据冒险停顿互不影响，否则流水线的执行将会出现错误.** 
 
+```systemverilog
+// format: valid[38] | tag[37:32] | data[31:0]
+reg  [46-CACHE_WID:0] cache [0: (1 << CACHE_WID) - 1];
+```
 
+指令缓存相比数据缓存会略微简单，因为只需从内存读取. **由于可以采用内存的时钟频率大于 CPU 时钟频率这一设计，因此还涉及到一个非常核心的问题，缓存的必要性. 加快内存时钟使得所需数据可以即时获取看似聪明，实际上是十分不切实际的，在真实的计算机中，内存由于容易巨大，可承受的时钟频率将会远小于 CPU，因此采取加快内存时钟频率的设计并不科学，缓存依旧有存在的必要性.**
 
 #### DCache
 
+```systemverilog
+module DCache #(
+    parameter CACHE_WID = 4
+)(
+    input  logic             clk, rst,
+    // cpu interface
+    input  logic [`DATA_WID] addr,
+    input  logic [`DATA_WID] write_data,
+    input  logic [`LDST_WID] MEMOp,
+    input  logic             MemRead,
+    input  logic             MemWrite,
+    output logic [`DATA_WID] data_out,
+    output logic             dcache_stall,
+    // mem interface
+    input  logic [`DATA_WID] mem_data,
+    output logic [`DATA_WID] mem_addr,
+    output logic [`DATA_WID] mem_write_data,
+    output logic             mem_web
+);
+```
 
+数据缓存需注意一下 3 点：
+
+- 数据缓存原理与指令缓存相似，但与内存的交互不仅限于读取，还包括写入
+- 若地址为 MMIO 相关，将无需经过缓存判断命中与停顿，直接与内存进行读取和写入
+- 同时，由于寻址单位为 32 bit，`lb`, `lh`, `sb`, `sh` 等指令需对数据进行切片，数据缓存中也需要相应的处理这些情况
 
 
 
 ### MineCPU 功能扩展
 
+MineCPU 实现了以中断的方式处理异常，指令 `ecall` 的实现就是通过异常中断，将控制权交给固件. 在中断时，会将中断前的 pc 赋值给 ID 阶段的寄存器 epc (详细可见报告中 CPU 内部结构的架构图)，并跳转至异常处理的统一地址 0x1c090000，将控制权交给固件 (这里是 IO 设备). 而固件通过 `sret` 指令将控制权交还给 CPU，CPU 加载 epc 中的值并赋值给 pc 从而继续程序的运行.
 
+除了采用异常中断的方式实现 `ecall` 外，MineCPU 还实现了 `lui` 和 `auipc`，只需在 EX 阶段稍微修改数据通路并添加选择器即可 (见报告中 Bonus 部分的问题及解决方案). 同时也需在控制单元中增加相应的控制情况，代码如下
+
+```systemverilog
+ always_comb begin : Ctrl_Signal_Gen
+    unique case (inst[`OP_WID])
+        // other cases leave out
+        `LUI_OP: begin
+            ALUOp    = `ALU_ADD;
+            BRUOp    = `BRU_NOP;
+            Jalr     = 0;
+            ALUSrc   = 1;
+            MemWrite = 0;
+            MemRead  = 0;
+            RegWrite = 1;
+            MemtoReg = 0;
+            MEMOp    = 0;
+        end
+        `AUIPC_OP: begin
+            ALUOp    = `ALU_ADD;
+            BRUOp    = `BRU_NOP;
+            Jalr     = 0;
+            ALUSrc   = 3;
+            MemWrite = 0;
+            MemRead  = 0;
+            RegWrite = 1;
+            MemtoReg = 0;
+            MEMOp    = 0;
+        end
+        `ECALL_OP: begin
+            ALUOp    = `ALU_ADD;
+            BRUOp    = `BRU_NOP;
+            Jalr     = 0;
+            ALUSrc   = 0;
+            MemWrite = 0;
+            MemRead  = 0;
+            RegWrite = 0;
+            MemtoReg = 0;
+            MEMOp    = 0;
+        end
+    endcase
+end
+```
 
 
 
@@ -622,23 +728,136 @@ module Queue (
 );
 ```
 
+队列能够将 4 个 8 bit 的数据拼接并计算需要存入内存的内存地址，核心代码如下
 
+```systemverilog
+always_ff @(posedge clk) begin : write
+    if (rst || (full && clk_cnt == 15)) begin
+        cnt <= 0;
+        data_queue <= 0;
+    end else if (ready_in) begin
+        cnt <= cnt + 1;
+        data_queue <= {data_in, data_queue[31:8]};
+    end else begin
+        cnt <= cnt;
+        data_queue <= data_queue;
+    end
+end
+```
 
+#### UART
 
+```systemverilog
+module UART (
+    input                    clk, rst, rx,
+    // ports to memory
+    output logic [`DATA_WID] data_out,
+    output logic [`DATA_WID] addr_out,
+    output logic             done
+);
+```
+
+UART 负责接收端口 `rx` 传入的信息，借助队列解析成需要的数据并存入内存，同时有一个代表是否传输完毕的信号.
+
+UART 接受数据的代码逻辑如下
+
+```systemverilog
+// receive data
+always_ff @(posedge clk) begin
+    if (rst) begin
+        rx_data <= 8'd0;
+        received <= 1'b0;
+    end else if (en_state) begin
+        received <= 1'b1;
+        case (bit_cnt)
+            4'd1: rx_data[0] <= rxd_t2;
+            4'd2: rx_data[1] <= rxd_t2;
+            4'd3: rx_data[2] <= rxd_t2;
+            4'd4: rx_data[3] <= rxd_t2;
+            4'd5: rx_data[4] <= rxd_t2;
+            4'd6: rx_data[5] <= rxd_t2;
+            4'd7: rx_data[6] <= rxd_t2;
+            4'd8: rx_data[7] <= rxd_t2;
+         default: rx_data <= rx_data;
+        endcase
+    end else begin
+        rx_data <= rx_data;
+        received <= received;
+    end
+end
+```
+
+控制 `done` 信号的逻辑如下
+
+```systemverilog
+// receive done logic
+always_ff @(posedge clk) begin
+    if (rst) begin
+        rx_done <= 1'b0;
+    end else if (en_state) begin
+        if(bit_cnt == 0) rx_done <= 1'b0;
+        else if(bit_cnt == 9 && baud_cnt == `BPS_CNT - 1) rx_done <= 1'b1;
+        else if(rx_done == 1'b1) rx_done <= 1'b0;
+        else rx_done <= rx_done;
+    end else if(rx_done == 1'b1) rx_done <= 1'b0;
+    else rx_done <= rx_done;
+end
+```
 
 
 
 ### VGA 的实现
 
+<div align="center">
+    <img src="./pic/vga.png" alt="" width="550">
+</div>
 
+VGA 采用字符映射的方式实现，即全屏共可以显示 96 × 32 个字符，每个字符的颜色和对应的编号 (基本为 ASCII 码). 在内存中，与其他 IO 一样，VGA 也采用 MMIO，字符编号对应的地址为 0xFFFFEXXX，颜色对应的地址为 0xFFFFDXXX，在 Memory 中被称为缓冲区. 可以通过汇编往缓冲区中写入，从而将字符显示在屏幕上.
+
+#### VGA
+
+```systemverilog
+module VGA (  // 800×600 60Hz
+    input  logic              clk,      // clk: 40MHz
+    // get char and color from memory
+    output logic [`VGA_ADDR]  vga_addr,
+    input  logic [`INFO_WID ] ch,
+    input  logic [`INFO_WID ] color,    // 0: black   1: yellow      2: red        3: pink
+                                        // 4: orange  5: light blue  6: dark blue  7: white
+    // output to VGA
+    output logic              hsync,    // line synchronization signal
+    output logic              vsync,    // vertical synchronization signal
+    output logic [`COLOR_WID] red,
+    output logic [`COLOR_WID] green,
+    output logic [`COLOR_WID] blue
+);
+```
+
+VGA 的硬件模块可以输出需要的字符的位置 `vga_addr` 而获得该字符的编号和颜色. 对于某一像素，需要先计算出该像素位于哪个字符中，获取到字符的编号和颜色，再计算出该像素在字符中的什么位置，从而进行渲染. 计算的核心代码如下
+
+```systemverilog
+assign char_addr = 128 - (hc0-16)%8 - ((vc0-44)%16)*8;
+assign x = (hc0-16)/8;
+assign y = (vc0-44)/16;
+assign vga_addr = 96*y+x;
+assign have_ch0 = have_ch[char_addr] && active;
+```
 
 
 
 ### Pacman (吃豆人) 小游戏的实现
 
+<div align="center">
+    <img src="./pic/pacman.png" alt="" width="550">
+</div>
+
+这是一个用汇编写的经典游戏 Pacman，实现方式并不复杂，用汇编写好代码逻辑并对应 VGA 的 MMIO 地址进行可视化即可. 但总体代码量将近 2000 行，工作量较大，**但也侧面印证了 MineCPU 的鲁棒性很好，可以成功跑通大型程序.**
 
 
 
+### Bonus 测试说明
+
+由于 MineCPU 的架构方式为五级流水线，因此所有测试都是围绕流水线结构展开，而在上面的测试说明中已详细描述所有测试，以及 Pacman 本身就是一个十分全面且强度极大的样例，因此这里不再重复赘述测试的相关说明.
 
 
 
@@ -669,8 +888,6 @@ module Queue (
     1. :negative_squared_cross_mark: 降低时钟频率，但是会导致 CPU 性能整体全面下降
     2. :negative_squared_cross_mark: 在 `lw` 和紧接的分支指令之间插入 `nop` 
     3. :white_check_mark: 调整预测表和缓存的大小，减少访问时间
-
-
 
 
 
