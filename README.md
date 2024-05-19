@@ -144,7 +144,9 @@ Powered by [draw.io](https://app.diagrams.net/)
   + ICache: 直接映射, 1472 bits, 32 entries
   + DCache: 直接映射/写回, 1504 bits, 32 entries
 - **异常控制**:
-  + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见 [Environment Call](#environment-call)
+  + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见 [Environment Call](#environment-call) 
+
+对 MineCPU 更详细的说明可参阅[项目报告文档](./docs/Report.md) 
 
 
 ### ISA
@@ -257,6 +259,15 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 
 
 ## 使用方法
+
+下图为 Minisys 的使用说明图例
+
+<div align="center">
+    <img src="./docs/pic/minisys.png" alt="" width="500">
+</div>
+
+#### 详细使用步骤如下：
+
  1. **创建 Vivado 项目**：通过 Vivado 创建一个 RTL Project，Project device 选择 **xc7a100tfgg484-1**，Target Language设置为 VHDL，设置完毕并创建项目后，将 [sources](./sources) 中的 Top.sv 及 [sources/core](./sources/core) 和 [sources/io](./sources/io) 目录下的所有 System Verilog 文件作为设计文件导入，再将 [sources/constrain](./sources/constrain) 中的 constr.xdc 作为约束文件导入
 
  2. **创建 IP 核** 
@@ -356,6 +367,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 3. 实现 CPU 的过程中有很多枚举性的工作，比如 ALU，控制模块等，**一定要很仔细并且写完之后仔细检查**，真出问题了不太好 debug :confused:
 4. 团队合作非常重要，一定要多和队友沟通，从一开始的设计和架构，到细节实现，到测试，再到上板，**整个 Project 非常需要充分交流和沟通！**
 5. Vivado 这个工具说实话不太好用。。。建议参考参考下方开发工具中的 Verilator 仿真器和用于 CPU 差分测试的 Unicorn。直接写汇编也是个比较痛苦的过程 :weary:，也许可以借助一点[工具](https://github.com/riscv-collab/riscv-gnu-toolchain)从高级语言交叉编译成汇编，但是要注意和自己设计的 CPU 的 IO 对应
+6. 尽可能在设计的时候考虑全面，尽管可能会花费更多的时间. MineCPU 在最初设计时采用的是在 ID 阶段进行分支预测，后面由于 ID 阶段的效率过低，改为在 IF 阶段预测，架构上进行了较大的修改，十分麻烦且易错
 
 
 
