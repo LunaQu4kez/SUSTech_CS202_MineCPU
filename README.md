@@ -266,13 +266,13 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
       - 将 clk_out1 的频率设置为 40MHz 并取消 reset 信号和 locked 信号
 
       <div align="center">
-          <img src="./docs/pic/ip1.png" alt="" width="350">
-          <img src="./docs/pic/ip2.png" alt="" width="350">
+          <img src="./docs/pic/ip1.png" alt="" width="400">
+          <img src="./docs/pic/ip2.png" alt="" width="400">
       </div>
 
       <div align="center">
-          <img src="./docs/pic/ip3.png" alt="" width="350">
-          <img src="./docs/pic/ip4.png" alt="" width="350">
+          <img src="./docs/pic/ip3.png" alt="" width="400">
+          <img src="./docs/pic/ip4.png" alt="" width="400">
       </div>
 
     - 创建 Block Memory Generator
@@ -282,17 +282,17 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
       - Port A 的 Write Width 修改为 32，Write Depth 修改为 16384 (Read Width, Read Depth 和 Port B 的相关参数会自动修改)
 
       <div align="center">
-          <img src="./docs/pic/ip5.png" alt="" width="350">
-          <img src="./docs/pic/ip6.png" alt="" width="350">
+          <img src="./docs/pic/ip5.png" alt="" width="400">
+          <img src="./docs/pic/ip6.png" alt="" width="400">
       </div>
 
- 3. **在 Vivado 中依次 Synthesis -> Implementation -> Generate Bitstream (注: 可以在等待过程中先进行下面的第 4 和 5 步)，将生成比特流文件 (.bit) 烧写进 FPGA** 
+ 3. **在 Vivado 中依次 Synthesis -> Implementation -> Generate Bitstream (注: 可以在等待过程中先进行下面的第 4 和 5 步)，将生成比特流文件 (.bit) 烧写进 FPGA (也可以直接将 [generated](./generated) 目录下的 .bit 文件烧写)** 
 
  4. **获取执行代码的机器码文件**：使用 RARS 打开需要执行的汇编代码，点击运行，再点击左上角 File，选择 Dump Memory，Dump Format 选择 Hexadecimal Text，点击 Dump To File... 并输入文件名后保存 (**注: 不需要带后缀**)
 
     <div align="center">
-        <img src="./docs/pic/rars1.png" alt="" height="180">
-        <img src="./docs/pic/rars2.png" alt="" height="180">
+        <img src="./docs/pic/rars1.png" alt="" height="220">
+        <img src="./docs/pic/rars2.png" alt="" height="220">
     </div>
 
  5. **获取 UART 串口传输的文件**：将上一步得到的文件放在指令转换脚本 [inst2txt.py](./tools/inst2txt.py) 同一目录下，打开 [inst2txt.py](./tools/inst2txt.py) 将第 4 行的 `filename` 改为上一步所得的文件的名称，运行脚本，得到一个 .txt 文件 (如 test.txt)，这是要通过 UART 串口传输给 CPU 运行的指令
@@ -300,7 +300,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
  6. **通过 UART 加载程序并运行**：打开串口工具 [UARTAssist.exe](./tools/UartAssist.exe)，串口号选择 COM6 (一般来说直接选能选的最后一个)，波特率设置为 115200，打开连接，发送选项选择 “按十六进制发送” 并 “启用文件数据源...”，选择上一步得到的 .txt 文件并确定，然后点击发送，发送完毕后 CPU 将会自动开始运行
 
     <div align="center">
-        <img src="./docs/pic/uart1.png" alt="" width="360">
+        <img src="./docs/pic/uart1.png" alt="" width="400">
     </div>
 
 ​		
