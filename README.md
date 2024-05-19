@@ -263,8 +263,9 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 下图为 Minisys 的使用说明图例
 
 <div align="center">
-    <img src="./docs/pic/minisys.png" alt="" width="500">
+    <img src="./docs/pic/minisys.png" alt="" width="600">
 </div>
+
 
 #### 详细使用步骤如下：
 
