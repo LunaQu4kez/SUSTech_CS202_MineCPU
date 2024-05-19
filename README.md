@@ -112,9 +112,9 @@ MineCPU
   - [x] Led & 7 段数码管
   - [x] UART *
   - [x] VGA *
-- [ ] 软件
+- [x] 软件
   - [x] 测试场景1
-  - [ ] 测试场景2
+  - [x] 测试场景2
   - [x] Pacman *
 
 
@@ -214,7 +214,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 - UART
   - 支持通过软件而非重新烧写 FPGA 的方式进行程序与数据的加载
   - 规格：115200Hz 波特率, 8 data bits, 1 stop bits
-  - 数据直接写入内存，在接收过数据后超过 * 秒空闲会触发超时中断，启动 CPU
+  - 数据直接写入内存，在接收过数据后超过约 0.5 秒空闲会触发超时中断，启动 CPU
 - 输入 (Input)
   - 24 个拨码开关
   - 5 个按钮
@@ -223,7 +223,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
   - 支持 24 个 LED 灯, 其中 8 个用于显示 CPU 状态
   - 7 段数码管, 可显示 4 Bytes
   - VGA
-    - 使用软硬件协同的方式实现 (MMIO)
+    - 使用软硬件协同的方式实现 (MMIO)，在内存中含有字符缓冲区和颜色缓冲区
     - 800×600 60Hz
     - 单个字符为 8×16 像素，全屏可显示 96×32 个字符，显示区域长宽比为 3 : 2
 
@@ -254,17 +254,56 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 
 
 ## 使用方法
- 1. 创建 vivado 项目，将 [sources](./sources) 中的 Top.sv 及 [sources/core](./sources/core) 和 [sources/io](./sources/io) 目录下的所有 System Verilog 文件作为设计文件导入，再将 [sources/constrain](./sources/constrain) 中的 constr.xdc 作为约束文件导入
- 2. 创建 ip 核，然后 Synthesis -> Implementation -> Generate Bitstream
- 3. 将比特流文件烧写进 FPGA，用 Uart 串口工具加载场景测试程序 / 小游戏 / 其他
+ 1. **创建 Vivado 项目**：通过 Vivado 创建一个 RTL Project，Project device 选择 **xc7a100tfgg484-1**，Target Language设置为 VHDL，设置完毕并创建项目后，将 [sources](./sources) 中的 Top.sv 及 [sources/core](./sources/core) 和 [sources/io](./sources/io) 目录下的所有 System Verilog 文件作为设计文件导入，再将 [sources/constrain](./sources/constrain) 中的 constr.xdc 作为约束文件导入
 
+ 2. **创建 IP 核** 
 
+    - 创建 Clocking Wizard
 
-## 总结与注意事项
+      - 将组件名称改为 VGAClkGen
+      - 选择 PLL 时钟
+      - 将 clk_in1 的 Source 修改为 Global buffer
+      - 将 clk_out1 的频率设置为 40MHz 并取消 reset 信号和 locked 信号
 
-最后再写
+      <div align="center">
+          <img src="./docs/pic/ip1.png" alt="" width="350">
+          <img src="./docs/pic/ip2.png" alt="" width="350">
+      </div>
 
+      <div align="center">
+          <img src="./docs/pic/ip3.png" alt="" width="350">
+          <img src="./docs/pic/ip4.png" alt="" width="350">
+      </div>
 
+    - 创建 Block Memory Generator
+
+      - 将组件名称改为 Mem
+      - Memory Type 选择 True Dual Port RAM
+      - Port A 的 Write Width 修改为 32，Write Depth 修改为 16384 (Read Width, Read Depth 和 Port B 的相关参数会自动修改)
+
+      <div align="center">
+          <img src="./docs/pic/ip5.png" alt="" width="350">
+          <img src="./docs/pic/ip6.png" alt="" width="350">
+      </div>
+
+ 3. **在 Vivado 中依次 Synthesis -> Implementation -> Generate Bitstream (注: 可以在等待过程中先进行下面的第 4 和 5 步)，将生成比特流文件 (.bit) 烧写进 FPGA** 
+
+ 4. **获取执行代码的机器码文件**：使用 RARS 打开需要执行的汇编代码，点击运行，再点击左上角 File，选择 Dump Memory，Dump Format 选择 Hexadecimal Text，点击 Dump To File... 并输入文件名后保存 (**注: 不需要带后缀**)
+
+    <div align="center">
+        <img src="./docs/pic/rars1.png" alt="" height="180">
+        <img src="./docs/pic/rars2.png" alt="" height="180">
+    </div>
+
+ 5. **获取 UART 串口传输的文件**：将上一步得到的文件放在指令转换脚本 [inst2txt.py](./tools/inst2txt.py) 同一目录下，打开 [inst2txt.py](./tools/inst2txt.py) 将第 4 行的 `filename` 改为上一步所得的文件的名称，运行脚本，得到一个 .txt 文件 (如 test.txt)，这是要通过 UART 串口传输给 CPU 运行的指令
+
+ 6. **通过 UART 加载程序并运行**：打开串口工具 [UARTAssist.exe](./tools/UartAssist.exe)，串口号选择 COM6 (一般来说直接选能选的最后一个)，波特率设置为 115200，打开连接，发送选项选择 “按十六进制发送” 并 “启用文件数据源...”，选择上一步得到的 .txt 文件并确定，然后点击发送，发送完毕后 CPU 将会自动开始运行
+
+    <div align="center">
+        <img src="./docs/pic/uart1.png" alt="" width="360">
+    </div>
+
+​		
 
 ## 问题及解决方案
 
@@ -298,6 +337,22 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
     1. :negative_squared_cross_mark: 降低时钟频率，但是会导致 CPU 性能整体全面下降
     2. :negative_squared_cross_mark: 在 `lw` 和紧接的分支指令之间插入 `nop` 
     3. :white_check_mark: 调整预测表和缓存的大小，减少访问时间
+
+
+
+## 总结
+
+1. 说在最前面，也是最重要的：**仿真对了上板也可能有各种奇奇怪怪的问题！！！** 可能硬件都是这样，写代码 5 分钟，上板调试 2 小时，所以尽可能安排好时间吧（比如本项目最后预取指并没有实现 ~~懒得改了ww~~）
+2. 如果上板发现寄了，可以考虑考虑以下问题
+   - 顶层模块接线接错了
+   - 模块中某个信号的 input，output 写反了，位宽写错了
+   - 时钟频率过快（毕竟仿真会理想化的假设没有延迟）
+   - 有隐性的 multi-driver 存在
+   - 时序逻辑应该在时钟的上升沿还是下降沿更新没有想清楚
+   - reset 信号是高电平还是低电平触发
+3. 实现 CPU 的过程中有很多枚举性的工作，比如 ALU，控制模块等，**一定要很仔细并且写完之后仔细检查**，真出问题了不太好 debug :confused:
+4. 团队合作非常重要，一定要多和队友沟通，从一开始的设计和架构，到细节实现，到测试，再到上板，**整个 Project 非常需要充分交流和沟通！**
+5. Vivado 这个工具说实话不太好用。。。建议参考参考下方开发工具中的 Verilator 仿真器和用于 CPU 差分测试的 Unicorn。直接写汇编也是个比较痛苦的过程 :weary:，也许可以借助一点[工具](https://github.com/riscv-collab/riscv-gnu-toolchain)从高级语言交叉编译成汇编，但是要注意和自己设计的 CPU 的 IO 对应
 
 
 
