@@ -266,13 +266,13 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
       - 将 clk_out1 的频率设置为 40MHz 并取消 reset 信号和 locked 信号
 
       <div align="center">
-          <img src="./docs/pic/ip1.png" alt="" width="400">
-          <img src="./docs/pic/ip2.png" alt="" width="400">
+          <img src="./docs/pic/ip1.png" alt="" width="370">
+          <img src="./docs/pic/ip2.png" alt="" width="370">
       </div>
 
       <div align="center">
-          <img src="./docs/pic/ip3.png" alt="" width="400">
-          <img src="./docs/pic/ip4.png" alt="" width="400">
+          <img src="./docs/pic/ip3.png" alt="" width="370">
+          <img src="./docs/pic/ip4.png" alt="" width="370">
       </div>
 
     - 创建 Block Memory Generator
@@ -282,8 +282,8 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
       - Port A 的 Write Width 修改为 32，Write Depth 修改为 16384 (Read Width, Read Depth 和 Port B 的相关参数会自动修改)
 
       <div align="center">
-          <img src="./docs/pic/ip5.png" alt="" width="400">
-          <img src="./docs/pic/ip6.png" alt="" width="400">
+          <img src="./docs/pic/ip5.png" alt="" width="370">
+          <img src="./docs/pic/ip6.png" alt="" width="370">
       </div>
 
  3. **在 Vivado 中依次 Synthesis -> Implementation -> Generate Bitstream (注: 可以在等待过程中先进行下面的第 4 和 5 步)，将生成比特流文件 (.bit) 烧写进 FPGA (也可以直接将 [generated](./generated) 目录下的 .bit 文件烧写)** 
