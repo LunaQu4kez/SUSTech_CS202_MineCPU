@@ -125,14 +125,17 @@ MineCPU
 Powered by [draw.io](https://app.diagrams.net/)
 
 
+
 ## 功能
 
 ### CPU
 
-- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU
-- 时钟频率:
-  + CPU: 50MHz
-  + MEM: 50MHz
+- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU，CPI 约为 4.7 (存在分支预测未命中和 Cache 未命中产生的停顿)
+- 含 32 个 32 bit 的寄存器 (不含 pc 寄存器)
+- 寻址单位为 32 bit (4 byte)
+- **时钟频率:** 
+  + CPU: 最高可支持 50MHz
+  + MEM: 与 CPU 同频
   + VGA: 40MHz
 - **分支预测**:
   + BHT: 32 entries, 2 bits
@@ -321,7 +324,7 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
   - **解决方案**:
     1. :negative_squared_cross_mark: 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
     2. :negative_squared_cross_mark: 进行停顿 / 改进转发单元。前者过于简单，后者工作量太大，且 `ld` 指令的冒险难以解决。~~考虑后续增加记分板~~
-    3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。~~那要 ld/sd ra, 4(sp) 有何用~~ 。记录指令跳转目标地址，在 EX 阶段计算实际跳转，并判断是否预测错误，如错误则更新正确 pc 并清空错误指令。由于 EX 阶段不存在 Data Hazard，故解决。
+    3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。~~那要 ld/sd ra, 4(sp) 有何用~~ 。记录指令跳转目标地址，在 EX 阶段计算实际跳转，并判断是否预测错误，如错误则更新正确 pc 并清空错误指令。由于 EX 阶段不存在 Data Hazard，故解决
 + **[CPU Clock Rate/Solved]** CPU 时钟频率上限较低而影响 CPU 的性能.
   - **原因**: 分支预测速度较慢，且在 ID 阶段需等待寄存器的 rs1_data 才可开始执行
   - **解决方案**:
