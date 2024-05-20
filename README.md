@@ -13,7 +13,7 @@
 <div align="center">
     <img src="./docs/pic/pacman.png" alt="" width="600">
 </div>
-对 MineCPU 更详细的说明可参阅[项目报告文档](./docs/Report.md) 
+对 MineCPU 更详细的说明可参阅 <a href="docs/Report.md">项目报告文档</a>
 
 </div>
 
@@ -130,7 +130,7 @@ Powered by [draw.io](https://app.diagrams.net/)
 
 ### CPU
 
-- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU，CPI 约为 4.7 (存在分支预测未命中和 Cache 未命中产生的停顿)
+- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU，CPI 约为 5.1 (存在分支预测未命中和 Cache 未命中产生的停顿)
 - 含 32 个 32 bit 的寄存器 (不含 pc 寄存器)
 - 寻址单位为 32 bit (4 byte)
 - **时钟频率:** 
