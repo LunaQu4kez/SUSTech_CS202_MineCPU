@@ -11,8 +11,10 @@
 **HAVE FUN ! ! ! :satisfied:**
 
 <div align="center">
-    <img src="./docs/pic/pacman.png" alt="" width="600">
+    <img src="./docs/pic/pacman1.png" alt="" height="270">
+    <img src="./docs/pic/pacman2.png" alt="" height="270">
 </div>
+
 对 MineCPU 更详细的说明可参阅 <a href="docs/Report.md">项目报告文档</a>
 
 </div>
@@ -255,6 +257,11 @@ RISC-V 基本指令集 (RV32I) 及乘除法拓展 (RV32M)
 | 0xFFFFD___ (000-BFF) | W | VGA 颜色 | 0x00 - 0xFF |
 
 ### Pacman
+
+<div align="center">
+    <img src="./docs/pic/pacman3.png" alt="" height="250">
+    <img src="./docs/pic/pacman4.png" alt="" height="250">
+</div>
 
 一个由汇编写成的小游戏 ([源代码](./program/pacman/pacman.asm))，能够适配 MineCPU 的 MMIO，汇编代码多达 1856 行，包含 `init`，`stepO`，`checkover` 等方法. **然而 MineCPU 能够成功跑通这个程序，足以证明 MineCPU 的鲁棒性极高.** 
 

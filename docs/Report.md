@@ -848,8 +848,10 @@ assign have_ch0 = have_ch[char_addr] && active;
 ### Pacman (吃豆人) 小游戏的实现
 
 <div align="center">
-    <img src="./pic/pacman.png" alt="" width="550">
+    <img src="./pic/pacman1.png" alt="" height="250">
+    <img src="./pic/pacman2.png" alt="" height="250">
 </div>
+
 
 这是一个用汇编写的经典游戏 Pacman，实现方式并不复杂，用汇编写好代码逻辑并对应 VGA 的 MMIO 地址进行可视化即可. 但总体代码量将近 2000 行，工作量较大，**但也侧面印证了 MineCPU 的鲁棒性很好，可以成功跑通大型程序.**
 
