@@ -1,5 +1,3 @@
-
-
 # CS202 课程项目 CPU 报告
 
 本报告为 2024 年春季南方科技大学计算机系课程 CS202 计算机组成原理的课程项目报告
@@ -7,6 +5,8 @@
 
 
 ## 团队分工
+
+> Lab: 周一56节 王晴老师
 
 | 学号     | 姓名    | 分工                 | 贡献比 |
 | -------- | ------ | ------------------- | ------ |
@@ -60,12 +60,12 @@
 
 ### CPU 特性
 
-- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU，CPI 约为 4.7 (存在分支预测未命中和 Cache 未命中产生的停顿)
-- 采用前递、分支预测的方式解决冒险
-- 含 32 个 32 bit 的寄存器 (不含 pc 寄存器)
-- 寻址单位为 32 bit (4 byte)
-- 冯诺依曼架构不对指令空间和数据空间进行区分
-- 栈空间基址为 0x7ffc
+- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU，CPI 约为 5.1[^1] (存在分支预测未命中和 Cache 未命中产生的停顿)
+  + 采用前递、分支预测的方式解决冒险
+  + 含 32 个 32 bit 的寄存器 (不含 pc 寄存器)
+  + 寻址单位为 32 bit (4 byte)
+  + 冯诺依曼架构不对指令空间和数据空间进行区分
+  + 栈空间基址为 0x7ffc
 - **时钟频率:** 
   + CPU: 最高可支持 50MHz
   + MEM: 与 CPU 同频
@@ -80,7 +80,7 @@
   + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见后续 Environment Call
   + 中断返回时使用 `sret` 指令
 
-
+[^1]: 基于BHT的分支预测器准确率约为90%, 假设分支指令有20%, CPI为 5 * 0.8 + 5 * 0.2 * 0.9 + 7 * 0.2 * 0.1 = 5.04。Cache 命中率约为90%, 假设sd和ld指令占10%， 则CPI = 5.04 * 0.8 + (7.04 * 0.1 + 9.04 * 0.1) * 0.1 + 5.04 * 0.2 * 0.9 = 5.1
 
 ### ISA
 
@@ -268,7 +268,7 @@ ALU 模块，起计算作用，输入 32 bit 数据 src1 和 src2 及控制信�
 
 #### Branch_Predictor *
 
-见 Bonus 部分
+见 [Bonus 部分](#branch_predictor)
 
 #### BRU (Branch Unit)
 
@@ -328,19 +328,19 @@ CPU 的顶层模块，仅包含 CPU，不包含 IO 处理如 7 段数码管和 V
 
 #### DCache *
 
-见 Bonus 部分
+见 [Bonus 部分](#Dcache)
 
 #### Forward *
 
-见 Bonus 部分
+见 [Bonus 部分](#Forward)
 
 #### Hazard *
 
-见 Bonus 部分
+见 [Bonus 部分](#Hazard)
 
 #### ICache *
 
-见 Bonus 部分
+见 [Bonus 部分](#ICache)
 
 #### ImmGen
 
@@ -431,7 +431,7 @@ module Keyboard (
 
 #### Queue *
 
-见 Bonus 部分
+见 [Bonus 部分](#queue)
 
 #### Seg7Tube
 
@@ -448,11 +448,11 @@ module Seg7Tube(
 
 #### UART *
 
-见 Bonus 部分
+见 [Bonus 部分](#uart)
 
 #### VGA *
 
-见 Bonus 部分
+见 [Bonus 部分](#vga)
 
 
 
@@ -519,11 +519,24 @@ module Seg7Tube(
 
 ## 测试说明
 
+批量测试汇编代码比较繁琐，因为需要在rars中打开（rars用的是Java文件浏览器及其难用），然后汇编并导出text和data段，最后再生成coe文件导入到IP核设置中。并且确认CPU运行结果需要检查32个寄存器的值，非常容易出错。于是我们决定寻找其他测试方案，最后确定使用Verilator仿真+Unicorn虚拟机做差分测试。这个方案使用[riscv-gnu-toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) 并编写Makefile自动化编译成二进制，然后可以快速加载编译好的程序，每一个周期都可以对比CPU和参考结果，如果不一致，暂停并输出波形图。这个方案非常高效，使得我们的开发流程非常方便迅速。仿真激励文件见[sim](../sources/sim)文件夹下的`*.cpp`文件。以下表格按测试时间顺序排列。
 
+|    测试方法   | 测试类型 | 测试用例描述 | 测试结果 |
+| :----------: | :------: | :----------: | :------: |
+| Verilator 仿真 | 单元测试/ALU | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/ALU_Sim.cpp)，使用STL随机数生成器生成ALU的两个操作数，再随机生成ALUOp测试指令类型。同时将操作数和ALUOp输入到ALU单元和C++代码，生成两个结果并对比，C++的输出作为参考值。若不相同，输出输入数据和答案对比。 | 通过 |
+| Verilator 仿真 | 单元测试/Forward | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/Forward_Sim.cpp)，对样例进行编码。由于指令难以随机生成，且随机生成的样例也大概率不存在Hazard，因此采用课本的样例和其他CPU测试文件的样例。将答案编码进仿真文件并对比，不相同则输出该样例数据。 | 通过 |
+| Verilator 仿真 | 单元测试/ImmGen | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/ImmGen_Sim.cpp)，使用STL随机数生成器随机选取Opcode并生成高25位。用C++编写ImmGen模块（参考现有的CPU仿真文件），其输出作为参考值。将数据同时输入到C++和模块中，得到并对比输出。若不相同，输出输入数据和答案。 | 通过 |
+| Verilator 仿真 | 单元测试/Memory | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/Memory_Sim.cpp)。该测试对象是Cache之前的Memory，包括IP RAM和sb/sh/sw/lb/lbu/lh/lhu/lw的逻辑正确性。该逻辑已移动到DCache中。由于Verilator不支持Vivado的IP核仿真，于是编写一个模拟IP RAM的模块MemoryAnalog，该模块在Vivado上仿真波形与IP核一致。 | 通过 |
+| Verilator 仿真 | 单元测试/UART | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/UART_Sim.cpp)。完成CPU接线后加入UART模块测试正确性。编写C++仿真激励文件，导入CPU测试文件的二进制并模拟UART发送过程，使用Verilator支持的VPI功能访问CPU内存确认数据正确写入。 | 通过 |
+| Verilator 仿真 | 集成测试/CPU | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/CPU_Sim.cpp)测试汇编代码文件见[assembly](../sources/assembly/test_sim/)。导入二进制文件并模拟UART行为写入内存。然后同时运行CPU和Unicorn模拟器，使用VPI读取寄存器并对比二者寄存器的值，相同则通过测试。同时检查PC，避免PC进入死循环。 | 通过 |
+| 上板测试 | 单元测试/UART | 测试UART写入IP RAM的功能，并把数据输出到数码管上显示。 | 通过 |
+| 上板测试 | 集成测试/Testcase 1 | 测试CPU功能与Testcase测试场景1汇编代码的正确性。 | 通过 |
+| 上板测试 | 集成测试/Testcase 2 | 测试Testcase测试场景2汇编代码的正确性。 | 通过 |
+| 上板测试 | 集成测试/Bonus Testcase | 测试Pacman吃豆人游戏的正确性和VGA的功能。 | 通过 |
 
+### 测试结论
 
-
-
+测试全部通过。整个测试流程的顺利进行印证了这套方案的合理性。先仿真确保行为逻辑正确，再进行上板调试时序问题，尽量减少上板测试的次数。测试在开发中占大部分比例，因此减少测试开销是十分必要的。
 
 
 
@@ -714,7 +727,7 @@ end
 
 ### UART 的实现
 
-本项目的 UART 波特率为 115200，参数为 8 bit 数据配合 1 bit 停止位. 由于寻址单位为 32 bit，因此需要一个队列来实现接受并计数 4 byte 数据后统一存进内存.
+出于兼容性的考虑，本项目并未使用课程提供的IP核而是选择自己编写。本项目的 UART 波特率为 115200，参数为 8 bit 数据配合 1 bit 停止位。 由于寻址单位为 32 bit，因此需要一个队列来实现接受并计数 4 byte 数据后统一存进内存。
 
 #### Queue
 
@@ -757,9 +770,7 @@ module UART (
 );
 ```
 
-UART 负责接收端口 `rx` 传入的信息，借助队列解析成需要的数据并存入内存，同时有一个代表是否传输完毕的信号.
-
-UART 接受数据的代码逻辑如下
+UART 负责接收端口 `rx` 传入的信息，借助队列解析成需要的数据并存入内存，同时有一个代表是否传输完毕的信号。UART 接受数据的代码逻辑如下
 
 ```systemverilog
 // receive data
@@ -812,7 +823,7 @@ end
     <img src="./pic/vga.png" alt="" width="550">
 </div>
 
-VGA 采用字符映射的方式实现，即全屏共可以显示 96 × 32 个字符，每个字符的颜色和对应的编号 (基本为 ASCII 码). 在内存中，与其他 IO 一样，VGA 也采用 MMIO，字符编号对应的地址为 0xFFFFEXXX，颜色对应的地址为 0xFFFFDXXX，在 Memory 中被称为缓冲区. 可以通过汇编往缓冲区中写入，从而将字符显示在屏幕上.
+VGA 采用字符映射的方式实现，即全屏共可以显示 96 × 32 个字符，每个字符的颜色和对应的编号 (基本为 ASCII 码)。 在内存中，与其他 IO 一样，VGA 也采用 MMIO，字符编号对应的地址为 0xFFFFEXXX，颜色对应的地址为 0xFFFFDXXX，在 Memory 中被称为缓冲区。 可以通过汇编往缓冲区中写入，从而将字符显示在屏幕上.
 
 #### VGA
 
