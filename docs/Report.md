@@ -60,7 +60,7 @@
 
 ### CPU 特性
 
-- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU，CPI 约为 5.1[^1] (存在分支预测未命中和 Cache 未命中产生的停顿)
+- **冯诺依曼架构**支持 **RISC-V** 指令集的**五级流水线** CPU，CPI 约为 5.1[^1]
   + 采用前递、分支预测的方式解决冒险
   + 含 32 个 32 bit 的寄存器 (不含 pc 寄存器)
   + 寻址单位为 32 bit (4 byte)
@@ -80,7 +80,7 @@
   + ecall: 外部设备驱动, 通过 MMIO 进行输入输出, API doc 见后续 Environment Call
   + 中断返回时使用 `sret` 指令
 
-[^1]: 基于BHT的分支预测器准确率约为90%, 假设分支指令有20%, CPI为 5 * 0.8 + 5 * 0.2 * 0.9 + 7 * 0.2 * 0.1 = 5.04。Cache 命中率约为90%, 假设sd和ld指令占10%， 则CPI = 5.04 * 0.8 + (7.04 * 0.1 + 9.04 * 0.1) * 0.1 + 5.04 * 0.2 * 0.9 = 5.1
+[^1]: 包括分支预测未命中和 Cache 未命中产生的停顿。基于BHT的分支预测器准确率约为90%, 假设分支指令有20%, CPI为 5 * 0.8 + 5 * 0.2 * 0.9 + 7 * 0.2 * 0.1 = 5.04。Cache 命中率约为90%, 假设sd和ld指令占10%， 则CPI = 5.04 * 0.8 + (7.04 * 0.1 + 9.04 * 0.1) * 0.1 + 5.04 * 0.2 * 0.9 = 5.1
 
 ### ISA
 
@@ -115,16 +115,16 @@
 | `sb rd, imm(rs1)`       | S        | 存入 1 byte                               |
 | `sh rd, imm(rs1)`       | S        | 存入 1 half-word (2 bytes)                |
 | `sw rd, imm(rs1)`       | S        | 存入 1 word (4 bytes)                     |
-| `beq rs1, rs2, label`   | B        | if (rs1 == rs2)  PC += (imm << 1)         |
-| `bne rs1, rs2, label`   | B        | if (rs1 != rs2)  PC += (imm << 1)         |
-| `blt rs1, rs2, label`   | B        | if (rs1 < rs2)  PC += (imm << 1)          |
-| `bge rs1, rs2, label`   | B        | if (rs1 >= rs2)  PC += (imm << 1)         |
-| `bltu rs1, rs2, label`  | B        | if ( (u)rs1 < (u)rs2 )  PC += (imm << 1)  |
-| `bgeu rs1, rs2, label`  | B        | if ( (u)rs1 >= (u)rs2 )  PC += (imm << 1) |
-| `jal rd, label`         | J        | rd = PC + 4; PC += (imm << 1)             |
-| `jalr rd, rs1, imm`     | I        | rd = PC + 4; PC = rs1 + imm               |
+| `beq rs1, rs2, label`   | B        | if (rs1 == rs2)  pc += (imm << 1)         |
+| `bne rs1, rs2, label`   | B        | if (rs1 != rs2)  pc += (imm << 1)         |
+| `blt rs1, rs2, label`   | B        | if (rs1 < rs2)  pc += (imm << 1)          |
+| `bge rs1, rs2, label`   | B        | if (rs1 >= rs2)  pc += (imm << 1)         |
+| `bltu rs1, rs2, label`  | B        | if ( (u)rs1 < (u)rs2 )  pc += (imm << 1)  |
+| `bgeu rs1, rs2, label`  | B        | if ( (u)rs1 >= (u)rs2 )  pc += (imm << 1) |
+| `jal rd, label`         | J        | rd = pc + 4; pc += (imm << 1)             |
+| `jalr rd, rs1, imm`     | I        | rd = pc + 4; pc = rs1 + imm               |
 | `lui rd, imm`           | U        | rd = imm << 12                            |
-| `auipc rd, imm`         | U        | rd = PC + (imm << 12)                     |
+| `auipc rd, imm`         | U        | rd = pc + (imm << 12)                     |
 | `ecall`                 | I        | 控制权交给固件 (采用输入设备模拟)         |
 | `sret` *                | I        | 控制权交还给程序                          |
 | `mul rd, rs1, rs2` *    | R        | rd = (rs1 * rs2)[31:0]                    |
@@ -246,13 +246,13 @@ MineCPU 的输入信号包含：
     <img src="./pic/schematic8.png" alt="" height="135">
 </div>
 
-以上是 Vivado 生成的 Schematic 图，但并不能清晰的展现总体结构，下图清晰的展现了 MineCPU 的设计架构与模块间的关联
+以上是 Vivado 生成的 Schematic 图，但并不能清晰的展现总体结构，下图清晰的展现了 MineCPU 的设计架构与模块间的关联。
 
 <div align="center">
     <img src="./pic/architecture.png" alt="" width="600">
 </div>
 
-下面将对主要模块端口及功能进行说明 **(不包含 5 个 Stage 模块和 Stage 间的 Regs，它们只起到封装和传输信号作用)** 
+下面将对主要模块端口及功能进行说明 **(不包含 5 个 Stage 模块和 Stage 间的 Regs，它们只起到封装和传输信号作用)**。
 
 #### ALU
 
@@ -264,7 +264,7 @@ module ALU (
 );
 ```
 
-ALU 模块，起计算作用，输入 32 bit 数据 src1 和 src2 及控制信号 ALU_op，输出 32 bit 的结果 result.
+ALU 模块，起计算作用，输入 32 bit 数据 src1 和 src2 及控制信号 ALU_op，输出 32 bit 的结果 result。
 
 #### Branch_Predictor *
 
@@ -282,11 +282,11 @@ module BRU (
 );
 ```
 
-用于处理分支指令的结果，可理解为分支指令的专属 ALU，同时处理下一条指令的真实 pc，并判断分支预测是否正确即是否需要停顿.
+用于处理分支指令的结果，可理解为分支指令的专属 ALU，同时处理下一条指令的真实 pc，并判断分支预测是否正确即是否需要停顿。
 
 #### Const
 
-用于储存所有常数的头文件 (.svh)
+用于储存所有常数的头文件 `Const.svh`。
 
 #### Control
 
@@ -297,7 +297,7 @@ module Control (
 );
 ```
 
-控制单元，输入 32 bit 的指令，输出位宽为 17 bit 的控制总线，包含 EX 阶段、MEM 阶段和 WB 阶段的控制信号
+控制信号生成单元。输入 32 bit 的指令，输出位宽为 17 bit 的控制总线，包含 EX 阶段、MEM 阶段和 WB 阶段的控制信号。
 
 #### CPU
 
@@ -324,7 +324,7 @@ module CPU (
 );
 ```
 
-CPU 的顶层模块，仅包含 CPU，不包含 IO 处理如 7 段数码管和 VGA，也不包含 UART.
+CPU 的顶层模块，仅包含 CPU，不包含 IO 处理如 7 段数码管和 VGA，也不包含 UART。
 
 #### DCache *
 
@@ -351,7 +351,7 @@ module ImmGen (
 );
 ```
 
-立即数生成模块，输入 32 bit 指令，根据指令类型生成符号扩展的 32 bit 立即数
+立即数生成模块，输入 32 bit 指令，根据指令类型生成符号扩展的 32 bit 立即数。
 
 #### Memory
 
@@ -376,7 +376,7 @@ module Memory (
 );
 ```
 
-内存模块，输入输出包含内存相关信号，IO 相关信号. IO 采用轮询的 MMIO 模式.
+内存模块，输入输出包含内存相关信号，IO 相关信号。 IO 采用轮询的 MMIO 模式。
 
 #### PC
 
@@ -391,7 +391,7 @@ module PC (
 );
 ```
 
-管理指令 pc 的模块，输入包含因与内存交互导致数据冒险的停顿信号，指令缓存和数据缓存未命中的停顿信号，输出包含新 pc.
+管理指令 pc 的模块，输入包含因与内存交互导致数据冒险的停顿信号，指令缓存和数据缓存未命中的停顿信号，输出包含新 pc。
 
 #### RegisterFile
 
@@ -405,7 +405,7 @@ module RegisterFile (
 );
 ```
 
-寄存器模块，输入包含时钟和复位信号，寄存器写入信号，和5 bit 位宽的读取寄存器的 rd1，rd2，写入寄存器的 write_reg. 输出包含 32 bit 的从寄存器读取到的数据.
+寄存器模块，输入包含时钟和复位信号，寄存器写入信号，和5 bit 位宽的读取寄存器的 rd1，rd2，写入寄存器的 write_reg。输出包含 32 bit 的从寄存器读取到的数据。
 
 #### CPU_Clk
 
@@ -416,7 +416,7 @@ module CPU_Clk (
 );
 ```
 
-注意到 ip Clocking Wizard 能够生成的时钟范围仅为 6MHz 到 80MHz，因此如果需要生成更低频比如 1MHz 的时钟，需要分频器，而 CPU_Clk 模块的作用就是分频.
+注意到 IP Clocking Wizard 能够生成的时钟范围仅为 6MHz 到 80MHz，因此如果需要生成更低频比如 1MHz 的时钟，需要分频器，而 CPU_Clk 模块的作用就是分频。
 
 #### Keyboard
 
@@ -427,7 +427,7 @@ module Keyboard (
 );
 ```
 
-小键盘的控制模块.
+小键盘的控制模块。输入为小键盘的地址线，输出为每个按键的编码。
 
 #### Queue *
 
@@ -444,7 +444,7 @@ module Seg7Tube(
 );
 ```
 
-七段数码管的控制模块，数据要显示的数据，输出七段数码管的扫描信号和使能信号.
+七段数码管的控制模块，数据要显示的数据，输出七段数码管的扫描信号和使能信号。
 
 #### UART *
 
@@ -528,7 +528,7 @@ module Seg7Tube(
 | Verilator 仿真 | 单元测试/ImmGen | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/ImmGen_Sim.cpp)，使用STL随机数生成器随机选取Opcode并生成高25位。用C++编写ImmGen模块（参考现有的CPU仿真文件），其输出作为参考值。将数据同时输入到C++和模块中，得到并对比输出。若不相同，输出输入数据和答案。 | 通过 |
 | Verilator 仿真 | 单元测试/Memory | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/Memory_Sim.cpp)。该测试对象是Cache之前的Memory，包括IP RAM和sb/sh/sw/lb/lbu/lh/lhu/lw的逻辑正确性。该逻辑已移动到DCache中。由于Verilator不支持Vivado的IP核仿真，于是编写一个模拟IP RAM的模块MemoryAnalog，该模块在Vivado上仿真波形与IP核一致。 | 通过 |
 | Verilator 仿真 | 单元测试/UART | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/UART_Sim.cpp)。完成CPU接线后加入UART模块测试正确性。编写C++仿真激励文件，导入CPU测试文件的二进制并模拟UART发送过程，使用Verilator支持的VPI功能访问CPU内存确认数据正确写入。 | 通过 |
-| Verilator 仿真 | 集成测试/CPU | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/CPU_Sim.cpp)测试汇编代码文件见[assembly](../sources/assembly/test_sim/)。导入二进制文件并模拟UART行为写入内存。然后同时运行CPU和Unicorn模拟器，使用VPI读取寄存器并对比二者寄存器的值，相同则通过测试。同时检查PC，避免PC进入死循环。 | 通过 |
+| Verilator 仿真 | 集成测试/CPU | 使用Verilartor仿真器并编写[C++仿真激励文件](../sources/sim/CPU_Sim.cpp)测试汇编代码文件见[assembly](../sources/assembly/test_sim/)。导入二进制文件并模拟UART行为写入内存。然后同时运行CPU和Unicorn模拟器，使用VPI读取寄存器并对比二者寄存器的值，相同则通过测试。同时检查pc，避免pc进入死循环。 | 通过 |
 | 上板测试 | 单元测试/UART | 测试UART写入IP RAM的功能，并把数据输出到数码管上显示。 | 通过 |
 | 上板测试 | 集成测试/Testcase 1 | 测试CPU功能与Testcase测试场景1汇编代码的正确性。 | 通过 |
 | 上板测试 | 集成测试/Testcase 2 | 测试Testcase测试场景2汇编代码的正确性。 | 通过 |
@@ -570,7 +570,7 @@ module Forward (
 );
 ```
 
-前递模块，输入相关信号，输出是否前递的控制信号. 以 ALU 的 src1 输入数据为例，src1 数据的前递选择器逻辑为，若 `EX_MEM_RegWrite & (EX_MEM_rd != 0) & (EX_MEM_rd == ID_EX_rs1)` 成立，那么将从 MEM 阶段前递数据，若 `MEM_WB_RegWrite & (MEM_WB_rd != 0) & ~(EX_MEM_RegWrite & (EX_MEM_rd != 0) & (EX_MEM_rd == ID_EX_rs1)) & (MEM_WB_rd == ID_EX_rs1)` 成立，将从 WB 阶段前递数据，其余情况均不需要前递.
+前递模块，输入相关信号，输出是否前递的控制信号. 以 ALU 的 src1 输入数据为例，src1 数据的前递选择器逻辑为，若 `EX_MEM_RegWrite & (EX_MEM_rd != 0) & (EX_MEM_rd == ID_EX_rs1)` 成立，那么将从 MEM 阶段前递数据，若 `MEM_WB_RegWrite & (MEM_WB_rd != 0) & ~(EX_MEM_RegWrite & (EX_MEM_rd != 0) & (EX_MEM_rd == ID_EX_rs1)) & (MEM_WB_rd == ID_EX_rs1)` 成立，将从 WB 阶段前递数据，其余情况均不需要前递。
 
 #### Hazard
 
@@ -589,7 +589,7 @@ lw t3, 0(t1)
 xori t3, t3, -1
 ```
 
-该种数据冒险停顿的判断逻辑为如果 `ID_EX_MemRead & ((ID_EX_rd == IF_ID_rs1) | (ID_EX_rd == IF_ID_rs2))` 成立，则需要停顿，其余情况无需停顿.
+该种数据冒险停顿的判断逻辑为如果 `ID_EX_MemRead & ((ID_EX_rd == IF_ID_rs1) | (ID_EX_rd == IF_ID_rs2))` 成立，则需要停顿，其余情况无需停顿。
 
 #### Branch_Predictor
 
@@ -614,9 +614,11 @@ module Branch_Predictor # (
 );
 ```
 
-分支预测模块在 IF 阶段进行，由于在 IF 阶段并未将指令解码，而预测某指令是否为分支指令过于复杂，因此采取预解码的方式判断该指令是否为分支指令。分支预测的实现方式为状态机，有强不跳转、弱不跳转、弱跳转、强跳转这 4 种状态，`history_table` 中假设所有分支初始都是弱不跳转，预测时按照状态处于跳转或不跳转进行预测，若预测失败，流水线清空错误指令并执行正确指令，并在每次预测后更新 `history_table`.
+分支预测模块在 IF 阶段进行，由于在 IF 阶段并未将指令解码，而预测某指令是否为分支指令过于复杂，因此采取预解码的方式判断该指令是否为分支指令。分支预测的实现方式为局部分支历史表(BHT)，每个项(Entry)使用2位饱和计数器有强不跳转、弱不跳转、弱跳转、强跳转这 4 种状态，`history_table` 中假设所有分支初始都是弱不跳转，预测时按照状态处于跳转或不跳转进行预测。每个周期首先检查是否预测失败，检测方法为对比EX阶段的预测pc和实际pc，预测pc是当前pc的预测下一条指令的pc。若预测失败，流水线清空错误指令并执行正确指令，并在每次分支指令执行后更新 `history_table`。
 
-此外，分支预测中还加入了返回地址栈 [Return Address Stack (RAS)]，用于解决方法调用结束后返回时 ra 寄存器可能存在的数据冒险. RAS 在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容，记录指令跳转目标地址，在 EX 阶段计算实际跳转，并判断是否预测错误，如错误则更新正确 pc 并清空错误指令.
+此外，分支预测中还加入了返回地址栈 (Return Address Stack, RAS)，用于加速`call`和`ret`这两个常用的jump指令。RAS 在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。同时记录预测的指令跳转目标地址，在 EX 阶段计算实际跳转，并判断是否预测错误，如错误则更新正确pc并清空错误指令。
+
+由于EX阶段计算实际pc时的数据冒险已解决，故不存在分支计算的数据冒险。
 
 #### ICache
 
@@ -636,14 +638,14 @@ module ICache #(
 );
 ```
 
-指令缓存模块用于管理指令的读取，缓存格式如下. 运行模式为如果 `tag` 不一样说明未命中，那么将流水线停顿并从内存中读取数据，输出并存入缓存. **值得注意的是，缓存的停顿需要做到和数据冒险停顿互不影响，否则流水线的执行将会出现错误.** 
+指令缓存模块用于管理指令的读取，缓存格式如下。 考虑到访问时延大，采用直接映射缓存，每个Block存储4 Words。如果 `tag` 不一样则缓存未命中(Cache Miss)，那么将流水线停顿并从内存中读取数据，输出并存入缓存。ICache停顿不会阻塞后续阶段的执行。**值得注意的是，缓存的停顿需要做到和数据冒险停顿互不影响，否则流水线的执行将会出现错误。**
 
 ```systemverilog
 // format: valid[38] | tag[37:32] | data[31:0]
 reg  [46-CACHE_WID:0] cache [0: (1 << CACHE_WID) - 1];
 ```
 
-指令缓存相比数据缓存会略微简单，因为只需从内存读取. **由于可以采用内存的时钟频率大于 CPU 时钟频率这一设计，因此还涉及到一个非常核心的问题，缓存的必要性. 加快内存时钟使得所需数据可以即时获取看似聪明，实际上是十分不切实际的，在真实的计算机中，内存由于容易巨大，可承受的时钟频率将会远小于 CPU，因此采取加快内存时钟频率的设计并不科学，缓存依旧有存在的必要性.**
+指令缓存相比数据缓存会略微简单，因为只需从内存读取。 **由于可以采用内存的时钟频率大于 CPU 时钟频率这一设计，因此还涉及到一个非常核心的问题，缓存的必要性。 加快内存时钟使得所需数据可以即时获取看似聪明，实际上是十分不切实际的，在真实的计算机中，内存由于容易巨大，可承受的时钟频率将会远小于 CPU，因此采取加快内存时钟频率的设计并不科学，缓存依旧有存在的必要性。**
 
 #### DCache
 
@@ -671,6 +673,7 @@ module DCache #(
 数据缓存需注意一下 3 点：
 
 - 数据缓存原理与指令缓存相似，但与内存的交互不仅限于读取，还包括写入
+- 如果缓存未命中，则停顿整个流水线
 - 若地址为 MMIO 相关，将无需经过缓存判断命中与停顿，直接与内存进行读取和写入
 - 同时，由于寻址单位为 32 bit，`lb`, `lh`, `sb`, `sh` 等指令需对数据进行切片，数据缓存中也需要相应的处理这些情况
 
@@ -678,9 +681,9 @@ module DCache #(
 
 ### MineCPU 功能扩展
 
-MineCPU 实现了以中断的方式处理异常，指令 `ecall` 的实现就是通过异常中断，将控制权交给固件. 在中断时，会将中断前的 pc 赋值给 ID 阶段的寄存器 epc (详细可见报告中 CPU 内部结构的架构图)，并跳转至异常处理的统一地址 0x1c090000，将控制权交给固件 (这里是 IO 设备). 而固件通过 `sret` 指令将控制权交还给 CPU，CPU 加载 epc 中的值并赋值给 pc 从而继续程序的运行.
+MineCPU 实现了以中断的方式处理异常，指令 `ecall` 的实现就是通过异常中断，将控制权交给固件。 在中断时，会将中断前的 pc 赋值给 ID 阶段的寄存器 epc (详细可见报告中 CPU 内部结构的架构图)，并跳转至异常处理的统一地址 0x1c090000，将控制权交给固件 (这里是 IO 设备)。 而固件通过 `sret` 指令将控制权交还给 CPU，CPU 加载 epc 中的值并赋值给 pc 从而继续程序的运行。
 
-除了采用异常中断的方式实现 `ecall` 外，MineCPU 还实现了 `lui` 和 `auipc`，只需在 EX 阶段稍微修改数据通路并添加选择器即可 (见报告中 Bonus 部分的问题及解决方案). 同时也需在控制单元中增加相应的控制情况，代码如下
+除了采用异常中断的方式实现 `ecall` 外，MineCPU 还实现了 `lui` 和 `auipc`，只需在 EX 阶段稍微修改数据通路并添加选择器即可 (见报告中 Bonus 部分的问题及解决方案)。 同时也需在控制单元中增加相应的控制情况，代码如下
 
 ```systemverilog
  always_comb begin : Ctrl_Signal_Gen
@@ -823,7 +826,7 @@ end
     <img src="./pic/vga.png" alt="" width="550">
 </div>
 
-VGA 采用字符映射的方式实现，即全屏共可以显示 96 × 32 个字符，每个字符的颜色和对应的编号 (基本为 ASCII 码)。 在内存中，与其他 IO 一样，VGA 也采用 MMIO，字符编号对应的地址为 0xFFFFEXXX，颜色对应的地址为 0xFFFFDXXX，在 Memory 中被称为缓冲区。 可以通过汇编往缓冲区中写入，从而将字符显示在屏幕上.
+VGA 采用字符映射的方式实现，即全屏共可以显示 96 × 32 个字符，每个字符的颜色和对应的编号 (基本为 ASCII 码)。 在内存中，与其他 IO 一样，VGA 也采用 MMIO，字符编号对应的地址为 0xFFFFEXXX，颜色对应的地址为 0xFFFFDXXX，在 Memory 中被称为缓冲区。 可以通过汇编往缓冲区中写入，从而将字符显示在屏幕上。
 
 #### VGA
 
@@ -844,7 +847,7 @@ module VGA (  // 800×600 60Hz
 );
 ```
 
-VGA 的硬件模块可以输出需要的字符的位置 `vga_addr` 而获得该字符的编号和颜色. 对于某一像素，需要先计算出该像素位于哪个字符中，获取到字符的编号和颜色，再计算出该像素在字符中的什么位置，从而进行渲染. 计算的核心代码如下
+VGA 的硬件模块可以输出需要的字符的位置 `vga_addr` 而获得该字符的编号和颜色。 对于某一像素，需要先计算出该像素位于哪个字符中，获取到字符的编号和颜色，再计算出该像素在字符中的什么位置，从而进行渲染。 计算的核心代码如下
 
 ```systemverilog
 assign char_addr = 128 - (hc0-16)%8 - ((vc0-44)%16)*8;
@@ -864,19 +867,19 @@ assign have_ch0 = have_ch[char_addr] && active;
 </div>
 
 
-这是一个用汇编写的经典游戏 Pacman，实现方式并不复杂，用汇编写好代码逻辑并对应 VGA 的 MMIO 地址进行可视化即可. 但总体代码量将近 2000 行，工作量较大，**但也侧面印证了 MineCPU 的鲁棒性很好，可以成功跑通大型程序.**
+这是一个用汇编写的经典游戏 Pacman，实现方式并不复杂，用汇编写好代码逻辑并对应 VGA 的 MMIO 地址进行可视化即可。 但总体代码量将近 2000 行，工作量较大，**但也侧面印证了 MineCPU 的鲁棒性很好，可以成功跑通大型程序。**
 
 
 
 ### Bonus 测试说明
 
-由于 MineCPU 的架构方式为五级流水线，因此所有测试都是围绕流水线结构展开，而在上面的测试说明中已详细描述所有测试，以及 Pacman 本身就是一个十分全面且强度极大的样例，因此这里不再重复赘述测试的相关说明.
+由于 MineCPU 的架构方式为五级流水线，因此所有测试都是围绕流水线结构展开，而在上面的测试说明中已详细描述所有测试，以及 Pacman 本身就是一个十分全面且强度极大的样例，因此这里不再重复赘述测试的相关说明。
 
 
 
 ### Bonus 部分的问题及解决方案
 
-+ **[Instruction `auipc`/Solved]** 指令 `auipc` 的实现.
++ **[Instruction `auipc`/Solved]** 指令 `auipc` 的实现。
   - **原因**: 指令 `auipc` 需要进行 pc 相关的计算，而 ALU 没有相关数据的输入
   - **解决方案**:
     1. :white_check_mark: 在 ALU 输入 rs1 的端口前添加选择器，对 pc 和 rs1_data 进行选择，同时拓宽控制信号 ALUSrc
@@ -885,17 +888,17 @@ assign have_ch0 = have_ch[char_addr] && active;
   - **解决方案**:
     1. :negative_squared_cross_mark: 保证 `ret` 指令在 `ld ra, 0(sp)` 4 条指令后执行 (如在 `ret` 指令之前插入 nop 指令)
     2. :negative_squared_cross_mark: 进行停顿 / 改进转发单元。前者过于简单，后者工作量太大，且 `ld` 指令的冒险难以解决。~~考虑后续增加记分板~~
-    3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。记录指令跳转目标地址，在 EX 阶段计算实际跳转，并判断是否预测错误，如错误则更新正确 pc 并清空错误指令。由于 EX 阶段不存在 Data Hazard，故解决.
-+ **[CPU Clock Rate/Solved]** CPU 时钟频率上限较低而影响 CPU 的性能.
+    3. :white_check_mark: 在分支预测中加入 RAS (Return Address Stack) 结构，在遇到 `call` 或 `ret` 指令时将压入 / 弹出 ra 寄存器的内容。记录指令跳转目标地址，在 EX 阶段计算实际跳转，并判断是否预测错误，如错误则更新正确 pc 并清空错误指令。由于 EX 阶段不存在 Data Hazard，故解决。
++ **[CPU Clock Rate/Solved]** CPU 时钟频率上限较低而影响 CPU 的性能。
   - **原因**: 分支预测速度较慢，且在 ID 阶段需等待寄存器的 rs1_data 才可开始执行
   - **解决方案**:
     1. :white_check_mark: 将分支预测移到 IF 阶段进行，但由于 IF 阶段获取指令后未进行解码，因此需要对指令进行预解码 (否则不仅需要预测是否跳转，同时也需要预测该指令是否为分支指令，较为复杂)
-+ **[UART/Pending]** 第一个 Byte 接收会有概率出错 / 丢失.
++ **[UART/Pending]** 第一个 Byte 接收会有概率出错 / 丢失。
   - **原因**: 未知 (但大概率是 UART 串口工具发送时的小问题)
   - **解决方案**:
     1. :white_check_mark: 在第 1 条指令预先插入 `nop` 或 0x00000000
     2. :negative_squared_cross_mark: 使用课程提供的 UART IP 核
-+ **[Branch Instruction Data Hazard/Pending]** `lw` 后的分支指令若存在数据冒险，在 CPU 的时钟频率较高 (50MHz) 时可能执行错误，但频率较低 (1Hz) 时不会执行错误.
++ **[Branch Instruction Data Hazard/Pending]** `lw` 后的分支指令若存在数据冒险，在 CPU 的时钟频率较高 (50MHz) 时可能执行错误，但频率较低 (1Hz) 时不会执行错误。
   - **可能原因**: 分支预测 (Branch Predictor) 和指令缓存 (ICache) 耗时较长
   - **解决方案**:
     1. :negative_squared_cross_mark: 降低时钟频率，但是会导致 CPU 性能整体全面下降
@@ -913,9 +916,9 @@ assign have_ch0 = have_ch[char_addr] && active;
    - 时钟频率过快（毕竟仿真会理想化的假设没有延迟）
    - 有隐性的 multi-driver 存在
    - 时序逻辑应该在时钟的上升沿还是下降沿更新没有想清楚
-   - reset 信号是高电平还是低电平触发
+   - reset 信号是高电平还是低电平触发 (确认板子的用户手册)
 3. 实现 CPU 的过程中有很多枚举性的工作，比如 ALU，控制模块等，**一定要很仔细并且写完之后仔细检查**，真出问题了不太好 debug
 4. 团队合作非常重要，一定要多和队友沟通，从一开始的设计和架构，到细节实现，到测试，再到上板，**整个 Project 非常需要充分交流和沟通！**
 5. Vivado 这个工具说实话不太好用，可以使用 Verilator 仿真器和用于 CPU 差分测试的 Unicorn
-6. 尽可能在设计的时候考虑全面，尽管可能会花费更多的时间. MineCPU 在最初设计时采用的是在 ID 阶段进行分支预测，后面由于 ID 阶段的效率过低，改为在 IF 阶段预测，架构上进行了较大的修改，十分麻烦且易错
+6. 尽可能在设计的时候考虑全面，尽管可能会花费更多的时间。 MineCPU 在最初设计时采用的是在 ID 阶段进行分支预测，后面由于 ID 阶段的效率过低，改为在 IF 阶段预测，架构上进行了较大的修改，十分麻烦且易错
 
