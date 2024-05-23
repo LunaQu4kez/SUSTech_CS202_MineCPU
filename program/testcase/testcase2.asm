@@ -33,10 +33,14 @@ test_0:
 	j count
 	exit_0:
 	addi t1,zero,8
+	beq t0,zero,l0
 	sub t0,t1,t0
 	sw t0,12(gp)
 	j loop
-
+	l0:
+	li t0,7
+	sw t0,12(gp)
+	j loop
 
 test_1:
 	sw zero,12(gp)
@@ -173,19 +177,22 @@ test_3_up:
 	
 
 test_4:
+	sw zero,12(gp)
+	sw zero,16(gp)
 	lw a2,0(gp)
 	lw a3,4(gp)
 	add t1,a2,a3
-	sw t1,16(gp)
 	srli t2,t1,8
+	li t3,0x000000ff
+	and t1,t1,t3
 	beq t2,zero,inverse_num
 	add t1,t1,t2
 	j inverse_num
 	
 inverse_num:
-	li t3,-1
 	xor t1,t1,t3
 	sw t1,12(gp)
+	sw t1,40(gp)
 	j loop
 	
 
@@ -196,9 +203,10 @@ test_5:
 	lw a3,4(gp)
 	li t1,15
 	and t2,t1,a2
-	slli a3,a3,24
-	slli t2,t2,16
+	slli a3,a3,8
 	add t2,a3,t2
+	li t1,0x00000fff
+	and t2,t1,t2
 	sw t2,40(gp)
 	j loop
 
