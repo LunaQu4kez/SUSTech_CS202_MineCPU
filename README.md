@@ -1,8 +1,6 @@
 <div align=center>
 
-# SUSTech CS202 Course Project: MineCPU
-
-南方科技大学 2024 年春季 `CS202 计算机组成原理` 的课程 Project 
+# MineCPU 
 
 **支持 RISC-V ISA 的冯诺依曼架构含 Cache 和异常控制并附带手搓 UART 的标准五级 pipeline CPU**
 
@@ -15,7 +13,7 @@
 </div>
 
 
-对 MineCPU 更详细的说明可参阅 <a href="docs/Report.md">项目报告文档</a>
+对 MineCPU 更详细的说明可参阅 <a href="docs/Report.md">报告文档</a>
 
 </div>
 
